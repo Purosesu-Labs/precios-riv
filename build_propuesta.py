@@ -1,18 +1,89 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agente de AsoBares · Propuesta de precios</title>
-<meta name="description" content="Precios del agente de WhatsApp con IA para los afiliados de AsoBares: tres modalidades desde $80.000 + IVA, costo real de IA medido con DeepSeek V4.1 Flash, capacidad por slices de InterServer y simulador de consumo.">
-<meta property="og:title" content="Agente de AsoBares · Propuesta de precios">
-<meta property="og:description" content="Comparación de tres modalidades de servicio, con el costo real de operar el agente medido sobre el código y una conversación real.">
-<meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 28 9v14L16 30 4 23V9z' fill='%230f766e'/%3E%3Cpath d='M11 16.5l3.5 3.5L21 13' stroke='%23fff' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
+# -*- coding: utf-8 -*-
+"""Genera propuesta/index.html — página de precios del agente de AsoBares.
+
+Sistema de diseño: Propuestas comerciales (skill diseno-propuestas-comerciales)
+  · Superficie Compare: 3 columnas alineadas, una destacada como RECOMENDADA
+  · IBM Plex Sans + IBM Plex Mono; mono solo para labels, números y kickers
+  · Teal #0f766e como único acento; fondos #fff / #f6f8f8 / #eef7f6
+  · Radios 14px cards, 9px botones
+
+Fondo del título: Dither Canvas de ObsidianUI, adaptado a señal procedural.
+"""
+import html as H
+import os
+from data_precios import PRECIO_BASE, PRECIO_IVA, PRECIO_FINAL, MENSAJES_INCLUIDOS
+from simulacion_tokens import filas_perfiles, filas_plan, sensibilidad
+from simulador_js import SIM_JS
+from dither_js import DITHER_JS
+
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "propuesta")
+os.makedirs(OUT, exist_ok=True)
+
+
+def esc(s):
+    return H.escape(str(s), quote=False)
+
+
+# ---------- Filas de tablas ----------
+perfil_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(e)}</td><td class='num'>{n}</td>"
+    f"<td class='num'>{esc(o)}</td><td class='num'>{esc(tk)}</td>"
+    f"<td class='num'><span class='strong'>${esc(cc)}</span></td>"
+    f"<td class='num muted-sm'>${esc(sc)}</td></tr>"
+    for e, n, o, tk, cc, sc, _ in filas_perfiles())
+
+plan_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(e)}</td><td class='num'>{esc(cv)}</td>"
+    f"<td class='num'><span class='strong'>${esc(cc)}</span></td>"
+    f"<td class='num muted-sm'>${esc(sc)}</td>"
+    f"<td class='num'>{esc(pc)}%</td></tr>"
+    for e, cv, cc, sc, pc in filas_plan())
+
+sens_cols = "\n".join(
+    f"<tr><td class='rowhead'>{esc(e)}</td><td class='num'>${esc(v)}</td>"
+    f"<td class='num'>{esc(r)}</td><td class='muted-sm'>{esc(no)}</td></tr>"
+    for e, v, r, no in sensibilidad())
+
+# Componentes medidos del prompt (de simulacion_tokens.py)
+from simulacion_tokens import COMPONENTES_PROMPT, FIJO, CACHEABLE
+comp_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(c)}</td><td class='muted-sm'>{esc(d)}</td>"
+    f"<td class='num'><span class='strong'>{esc(t)}</span></td>"
+    f"<td class='muted-sm'>{esc(n)}</td></tr>"
+    for c, d, t, n in COMPONENTES_PROMPT)
+
+# Medición de la conversación real (contar_tokens_conversacion.py)
+CONV_MEDIDA = [
+    ("Mensajes en el chat", "16", "8 del cliente, 8 del agente"),
+    ("Tokens de texto en pantalla", "693", "Lo que se ve en el chat"),
+    ("Llamadas al LLM", "8", "Una por mensaje del cliente"),
+    ("Entrada facturada", "25.394", "36,6× el texto: el historial se reenvía"),
+    ("Salida", "506", "82 tokens por respuesta"),
+    ("Costo de la conversación", "$3,26", "Con caché de prompt, off-peak"),
+]
+medida_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(c)}</td><td class='num'><span class='strong'>{esc(v)}</span></td>"
+    f"<td class='muted-sm'>{esc(n)}</td></tr>"
+    for c, v, n in CONV_MEDIDA)
+
+# Slices de InterServer
+SLICES = [
+    ("1 slice", "1", "2", "40", "3,00", "12.000", "50", "Piloto y primeros afiliados", ""),
+    ("2 slices", "2", "4", "80", "6,00", "24.000", "100", "Crecimiento cómodo", ""),
+    ("4 slices", "2", "8", "160", "12,00", "48.000", "100", "Talla del análisis original", ""),
+    ("8 slices", "4", "16", "320", "24,00", "96.000", "200", "Soporte gestionado incluido", "rec"),
+    ("16 slices", "8", "32", "640", "48,00", "192.000", "400", "Varios capítulos regionales", ""),
+]
+slices_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(n)}</td><td class='num'>{esc(co)}</td>"
+    f"<td class='num'>{esc(ra)} GB</td><td class='num'>{esc(di)} GB</td>"
+    f"<td class='num'>US$ {esc(u)}</td>"
+    f"<td class='num{' col-rec' if rc else ''}'>${esc(cp)}</td>"
+    f"<td class='num{' col-rec' if rc else ''}'><span class='strong'>{esc(neg)}</span></td>"
+    f"<td class='muted-sm'>{esc(no)}</td></tr>"
+    for n, co, ra, di, u, cp, neg, no, rc in SLICES)
+
+CSS = r"""
 :root{
   --bg:#ffffff;--bg-soft:#f6f8f8;--bg-accent:#eef7f6;
   --ink:#10201e;--ink-2:#33423f;--muted:#64716e;
@@ -282,7 +353,23 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
   footer{display:none}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
-</style>
+"""
+
+html_doc = f'''<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agente de AsoBares · Propuesta de precios</title>
+<meta name="description" content="Precios del agente de WhatsApp con IA para los afiliados de AsoBares: tres modalidades desde $80.000 + IVA, costo real de IA medido con DeepSeek V4.1 Flash, capacidad por slices de InterServer y simulador de consumo.">
+<meta property="og:title" content="Agente de AsoBares · Propuesta de precios">
+<meta property="og:description" content="Comparación de tres modalidades de servicio, con el costo real de operar el agente medido sobre el código y una conversación real.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 28 9v14L16 30 4 23V9z' fill='%230f766e'/%3E%3Cpath d='M11 16.5l3.5 3.5L21 13' stroke='%23fff' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>{CSS}</style>
 </head>
 <body>
 
@@ -537,11 +624,7 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
             </tr>
           </thead>
           <tbody>
-<tr><td class='rowhead'>1 slice</td><td class='num'>1</td><td class='num'>2 GB</td><td class='num'>40 GB</td><td class='num'>US$ 3,00</td><td class='num'>$12.000</td><td class='num'><span class='strong'>50</span></td><td class='muted-sm'>Piloto y primeros afiliados</td></tr>
-<tr><td class='rowhead'>2 slices</td><td class='num'>2</td><td class='num'>4 GB</td><td class='num'>80 GB</td><td class='num'>US$ 6,00</td><td class='num'>$24.000</td><td class='num'><span class='strong'>100</span></td><td class='muted-sm'>Crecimiento cómodo</td></tr>
-<tr><td class='rowhead'>4 slices</td><td class='num'>2</td><td class='num'>8 GB</td><td class='num'>160 GB</td><td class='num'>US$ 12,00</td><td class='num'>$48.000</td><td class='num'><span class='strong'>100</span></td><td class='muted-sm'>Talla del análisis original</td></tr>
-<tr><td class='rowhead'>8 slices</td><td class='num'>4</td><td class='num'>16 GB</td><td class='num'>320 GB</td><td class='num'>US$ 24,00</td><td class='num col-rec'>$96.000</td><td class='num col-rec'><span class='strong'>200</span></td><td class='muted-sm'>Soporte gestionado incluido</td></tr>
-<tr><td class='rowhead'>16 slices</td><td class='num'>8</td><td class='num'>32 GB</td><td class='num'>640 GB</td><td class='num'>US$ 48,00</td><td class='num'>$192.000</td><td class='num'><span class='strong'>400</span></td><td class='muted-sm'>Varios capítulos regionales</td></tr>
+{slices_rows}
           </tbody>
         </table>
       </div>
@@ -570,11 +653,7 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
         <table class="cmp">
           <thead><tr><th>Componente del prompt</th><th>Origen</th><th>Tokens</th><th>Nota</th></tr></thead>
           <tbody>
-<tr><td class='rowhead'>System prompt base</td><td class='muted-sm'>prompts/base.txt · 3.982 caracteres</td><td class='num'><span class='strong'>1.140</span></td><td class='muted-sm'>Medido. El documento asumía 900.</td></tr>
-<tr><td class='rowhead'>Datos del negocio</td><td class='muted-sm'>nombre, horario, instrucciones</td><td class='num'><span class='strong'>120</span></td><td class='muted-sm'>Se inyectan en cada turno desde la base de datos.</td></tr>
-<tr><td class='rowhead'>Esquemas de herramientas</td><td class='muted-sm'>7 herramientas @tool con su JSON Schema</td><td class='num'><span class='strong'>1.664</span></td><td class='muted-sm'>Medido. Pesa más que el prompt base y no estaba contado.</td></tr>
-<tr><td class='rowhead'>Historial de conversación</td><td class='muted-sm'>hasta 10 mensajes previos · ~30 tok cada uno</td><td class='num'><span class='strong'>300</span></td><td class='muted-sm'>`historial_max_mensajes = 10` por defecto. Crece dentro de la conversación.</td></tr>
-<tr><td class='rowhead'>Mensaje del cliente</td><td class='muted-sm'>un mensaje típico de WhatsApp</td><td class='num'><span class='strong'>20</span></td><td class='muted-sm'>Texto libre del usuario.</td></tr>
+{comp_rows}
           </tbody>
         </table>
       </div>
@@ -594,12 +673,7 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
         <table class="cmp" style="min-width:640px">
           <thead><tr><th>Métrica</th><th>Medido</th><th>Qué significa</th></tr></thead>
           <tbody>
-<tr><td class='rowhead'>Mensajes en el chat</td><td class='num'><span class='strong'>16</span></td><td class='muted-sm'>8 del cliente, 8 del agente</td></tr>
-<tr><td class='rowhead'>Tokens de texto en pantalla</td><td class='num'><span class='strong'>693</span></td><td class='muted-sm'>Lo que se ve en el chat</td></tr>
-<tr><td class='rowhead'>Llamadas al LLM</td><td class='num'><span class='strong'>8</span></td><td class='muted-sm'>Una por mensaje del cliente</td></tr>
-<tr><td class='rowhead'>Entrada facturada</td><td class='num'><span class='strong'>25.394</span></td><td class='muted-sm'>36,6× el texto: el historial se reenvía</td></tr>
-<tr><td class='rowhead'>Salida</td><td class='num'><span class='strong'>506</span></td><td class='muted-sm'>82 tokens por respuesta</td></tr>
-<tr><td class='rowhead'>Costo de la conversación</td><td class='num'><span class='strong'>$3,26</span></td><td class='muted-sm'>Con caché de prompt, off-peak</td></tr>
+{medida_rows}
           </tbody>
         </table>
       </div>
@@ -624,10 +698,7 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
         <table class="cmp">
           <thead><tr><th>Perfil</th><th>Mensajes</th><th>Salida/msg</th><th>Tokens entrada</th><th>Con caché</th><th>Sin caché</th></tr></thead>
           <tbody>
-<tr><td class='rowhead'>Consulta simple</td><td class='num'>2</td><td class='num'>50</td><td class='num'>5.918</td><td class='num'><span class='strong'>$0,49</span></td><td class='num muted-sm'>$3,79</td></tr>
-<tr><td class='rowhead'>Conversación normal</td><td class='num'>6</td><td class='num'>82</td><td class='num'>18.114</td><td class='num'><span class='strong'>$2,16</span></td><td class='num muted-sm'>$12,05</td></tr>
-<tr><td class='rowhead'>Conversación larga</td><td class='num'>12</td><td class='num'>90</td><td class='num'>37.278</td><td class='num'><span class='strong'>$5,17</span></td><td class='num muted-sm'>$24,96</td></tr>
-<tr><td class='rowhead'>Con herramientas</td><td class='num'>20</td><td class='num'>110</td><td class='num'>63.230</td><td class='num'><span class='strong'>$10,24</span></td><td class='num muted-sm'>$43,22</td></tr>
+{perfil_rows}
           </tbody>
         </table>
       </div>
@@ -642,10 +713,7 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
         <table class="cmp" style="min-width:720px">
           <thead><tr><th>Perfil dominante</th><th>Conversaciones</th><th>Con caché</th><th>Sin caché</th><th>% de $80.000</th></tr></thead>
           <tbody>
-<tr><td class='rowhead'>Consulta simple</td><td class='num'>500</td><td class='num'><span class='strong'>$247</span></td><td class='num muted-sm'>$1.895</td><td class='num'>0,3%</td></tr>
-<tr><td class='rowhead'>Conversación normal</td><td class='num'>167</td><td class='num'><span class='strong'>$359</span></td><td class='num muted-sm'>$2.008</td><td class='num'>0,4%</td></tr>
-<tr><td class='rowhead'>Conversación larga</td><td class='num'>83</td><td class='num'><span class='strong'>$431</span></td><td class='num muted-sm'>$2.080</td><td class='num'>0,5%</td></tr>
-<tr><td class='rowhead'>Con herramientas</td><td class='num'>50</td><td class='num'><span class='strong'>$512</span></td><td class='num muted-sm'>$2.161</td><td class='num'>0,6%</td></tr>
+{plan_rows}
           </tbody>
         </table>
       </div>
@@ -660,11 +728,7 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
         <table class="cmp" style="min-width:720px">
           <thead><tr><th>Escenario</th><th>Costo mensual</th><th>vs. base</th><th>Condición</th></tr></thead>
           <tbody>
-<tr><td class='rowhead'>Con caché de prompt, off-peak</td><td class='num'>$247</td><td class='num'>100%</td><td class='muted-sm'>El escenario publicado</td></tr>
-<tr><td class='rowhead'>Sin caché de prompt</td><td class='num'>$1.895</td><td class='num'>768%</td><td class='muted-sm'>Si el prefijo no se reutiliza</td></tr>
-<tr><td class='rowhead'>Prompt base 1.000 tokens más largo</td><td class='num'>$259</td><td class='num'>105%</td><td class='muted-sm'>Carta extensa o muchas instrucciones</td></tr>
-<tr><td class='rowhead'>Clasificador reactivado</td><td class='num'>$400</td><td class='num'>162%</td><td class='muted-sm'>2 llamadas por mensaje en vez de 1</td></tr>
-<tr><td class='rowhead'>Tarifa peak en todo el tráfico</td><td class='num'>$493</td><td class='num'>200%</td><td class='muted-sm'>Cota superior; el tráfico real es off-peak</td></tr>
+{sens_cols}
           </tbody>
         </table>
       </div>
@@ -869,607 +933,36 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
   </div>
 </footer>
 
+<script>{DITHER_JS}</script>
+<script>{SIM_JS}</script>
 <script>
-/* Dither Canvas — adaptado de ObsidianUI (obsidianui.dev/docs/dither-canvas).
-   Sin el video original: la señal se genera proceduralmente y se le aplica el
-   mismo pipeline (simulación de fluido, matriz de Bayer 4x4, atlas de caracteres,
-   distorsión por puntero). Se degrada en silencio si no hay WebGL2. */
-(function(){
-"use strict";
-var canvas = document.getElementById('dither');
-if (!canvas) return;
-var motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-var FC = 80, FR = 60, FN = FC * FR;
-var CC = 60, EDGE_LO = 36, EDGE_HI = 130;
-var EDGES = ['.', ',', '=', '+', '-'];
-var BRIGHTS = ['A','S','O','B','A','R','E','S'];
-var ALL_CHARS = EDGES.concat(BRIGHTS);
-var BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
-var TL = 320, TS = 10, TM = 72;
-var TRAIL_CFG = { fb: 0.08, fss: 18, ffm: 0.15, fir: 0.8, firl: 1.0 };
-
-var VS = '#version 300 es\nin vec2 a_pos;\nvoid main(){ gl_Position = vec4(a_pos, 0, 1); }';
-
-var FS = '#version 300 es\n' +
-'precision highp float;\n' +
-'uniform sampler2D uFluid, uAtlas;\n' +
-'uniform vec2 uRes;\n' +
-'uniform float uTime;\n' +
-'uniform int uPhase, uTrailN;\n' +
-'uniform vec4 uTP[' + TM + '];\n' +
-'uniform float uTL[' + TM + '];\n' +
-'out vec4 O;\n' +
-'const float CC = ' + CC + '.0, EL = ' + EDGE_LO + '.0, EH = ' + EDGE_HI + '.0;\n' +
-'const float FC = ' + FC + '.0, FR = ' + FR + '.0;\n' +
-'const int BAYER[16] = int[16](' + BAYER.map(function(v){return Math.round((v/16)*255);}).join(',') + ');\n' +
-'const int CHAR_N = ' + ALL_CHARS.length + ';\n' +
-'float signal(vec2 uv){\n' +
-'  float horizon = smoothstep(0.0, 0.45, uv.y) * (1.0 - smoothstep(0.55, 1.0, uv.y));\n' +
-'  float band = 1.0 - abs(uv.y - 0.5) * 2.0;\n' +
-'  float swell = sin(uv.x * 5.2 + uTime * 0.55) * 0.5 + 0.5;\n' +
-'  float ripple = sin(uv.y * 7.5 - uTime * 0.42 + uv.x * 3.1) * 0.5 + 0.5;\n' +
-'  float pulse = sin((uv.x + uv.y) * 3.4 - uTime * 0.33) * 0.5 + 0.5;\n' +
-'  float s = 0.16 + band * 0.26 + horizon * (swell * 0.34 + ripple * 0.22 + pulse * 0.18);\n' +
-'  return clamp(s, 0.0, 1.0);\n' +
-'}\n' +
-'void main(){\n' +
-'  float cw = uRes.x / CC;\n' +
-'  float rows = ceil(uRes.y / cw) + 1.0;\n' +
-'  float gx = floor(gl_FragCoord.x / cw);\n' +
-'  float gy = floor((uRes.y - gl_FragCoord.y) / cw);\n' +
-'  if(gx >= CC || gy >= rows) discard;\n' +
-'  vec2 cp = vec2(fract(gl_FragCoord.x / cw), fract((uRes.y - gl_FragCoord.y) / cw));\n' +
-'  vec2 bp = vec2((gx + 0.5) * cw, (gy + 0.5) * cw);\n' +
-'  ivec2 fc = ivec2(gx / CC * FC, gy / rows * FR);\n' +
-'  fc = clamp(fc, ivec2(0), ivec2(int(FC)-1, int(FR)-1));\n' +
-'  vec2 flow = texelFetch(uFluid, fc, 0).rg;\n' +
-'  vec2 disp = vec2(0.0);\n' +
-'  for(int i = 0; i < uTrailN; i++){\n' +
-'    float life = uTL[i];\n' +
-'    if(life <= 0.0) continue;\n' +
-'    vec2 d = bp - uTP[i].xy;\n' +
-'    float dist = length(d);\n' +
-'    float r = 5.0 + life * 3.0;\n' +
-'    if(dist == 0.0 || dist > r) continue;\n' +
-'    float f = pow(1.0 - dist / r, 2.0);\n' +
-'    disp += (d / dist) * f * life * 3.0 + uTP[i].zw * f * 0.04;\n' +
-'  }\n' +
-'  vec2 sp = bp + disp + flow * 6.0;\n' +
-'  vec2 uv = clamp(sp / uRes, 0.0, 1.0);\n' +
-'  float s = signal(uv);\n' +
-'  float bg = smoothstep(0.06, 0.62, s) * 255.0;\n' +
-'  float hm = min(1.0, length(flow) * 1.1);\n' +
-'  float gray = bg * (1.0 - hm) + (255.0 - bg) * hm;\n' +
-'  float thr = float(BAYER[(int(gy) & 3) * 4 + (int(gx) & 3)]);\n' +
-'  bool invDark = hm > 0.05 && bg > thr && gray <= thr;\n' +
-'  bool lit = gray > thr;\n' +
-'  if(!lit && !invDark) discard;\n' +
-'  float pg = invDark ? bg : gray;\n' +
-'  int ci;\n' +
-'  if(pg >= EL && pg <= EH) ci = uPhase % 5;\n' +
-'  else if(pg > EH) ci = 5 + uPhase % ' + BRIGHTS.length + ';\n' +
-'  else discard;\n' +
-'  float au = (float(ci) + cp.x) / float(CHAR_N);\n' +
-'  float ca = texture(uAtlas, vec2(au, cp.y)).a;\n' +
-'  if(ca < 0.05) discard;\n' +
-'  vec3 teal   = vec3(0.059, 0.463, 0.431);\n' +
-'  vec3 cyan   = vec3(0.051, 0.580, 0.529);\n' +
-'  vec3 deep   = vec3(0.043, 0.369, 0.345);\n' +
-'  vec3 green  = vec3(0.102, 0.498, 0.306);\n' +
-'  float tint = smoothstep(0.15, 0.9, uv.x * 0.6 + uv.y * 0.4);\n' +
-'  vec3 col = mix(teal, cyan, tint);\n' +
-'  col = mix(col, deep, hm * 0.65);\n' +
-'  col = mix(col, green, smoothstep(0.72, 1.0, uv.x) * 0.45);\n' +
-'  float a = (invDark ? 0.85 : 1.0) * ca;\n' +
-'  O = vec4(col * a, a);\n' +
-'}\n';
-
-function createFluid(){
-  var vx = new Float32Array(FN), vy = new Float32Array(FN);
-  var vx0 = new Float32Array(FN), vy0 = new Float32Array(FN);
-  var p = new Float32Array(FN), div = new Float32Array(FN);
-  function fi(x, y){
-    return Math.max(0, Math.min(FR - 1, y)) * FC + Math.max(0, Math.min(FC - 1, x));
-  }
-  function bnd(b, a){
-    var x, y;
-    for (x = 1; x < FC - 1; x++){
-      a[fi(x, 0)] = b === 2 ? -a[fi(x, 1)] : a[fi(x, 1)];
-      a[fi(x, FR - 1)] = b === 2 ? -a[fi(x, FR - 2)] : a[fi(x, FR - 2)];
-    }
-    for (y = 1; y < FR - 1; y++){
-      a[fi(0, y)] = b === 1 ? -a[fi(1, y)] : a[fi(1, y)];
-      a[fi(FC - 1, y)] = b === 1 ? -a[fi(FC - 2, y)] : a[fi(FC - 2, y)];
-    }
-  }
-  function diffuse(b, d, s, diff, dt){
-    var a = dt * diff * FN, k, x, y;
-    for (k = 0; k < 4; k++){
-      for (y = 1; y < FR - 1; y++) for (x = 1; x < FC - 1; x++){
-        d[fi(x, y)] = (s[fi(x, y)] + a * (d[fi(x-1,y)] + d[fi(x+1,y)] + d[fi(x,y-1)] + d[fi(x,y+1)])) / (1 + 4 * a);
-      }
-      bnd(b, d);
-    }
-  }
-  function advect(b, d, d0, ux, uy, dt){
-    var dtx = dt * FC * 1.4, dty = dt * FR * 1.4, x, y;
-    for (y = 1; y < FR - 1; y++) for (x = 1; x < FC - 1; x++){
-      var px = Math.max(0.5, Math.min(FC - 1.5, x - dtx * ux[fi(x, y)]));
-      var py = Math.max(0.5, Math.min(FR - 1.5, y - dty * uy[fi(x, y)]));
-      var x0 = Math.floor(px), y0 = Math.floor(py);
-      var s1 = px - x0, s0 = 1 - s1, t1 = py - y0, t0 = 1 - t1;
-      d[fi(x, y)] = s0 * (t0 * d0[fi(x0,y0)] + t1 * d0[fi(x0,y0+1)]) + s1 * (t0 * d0[fi(x0+1,y0)] + t1 * d0[fi(x0+1,y0+1)]);
-    }
-    bnd(b, d);
-  }
-  function project(ux, uy){
-    var hx = 1 / FC, hy = 1 / FR, k, x, y;
-    for (y = 1; y < FR - 1; y++) for (x = 1; x < FC - 1; x++){
-      div[fi(x,y)] = -0.5 * (hx * (ux[fi(x+1,y)] - ux[fi(x-1,y)]) + hy * (uy[fi(x,y+1)] - uy[fi(x,y-1)]));
-      p[fi(x,y)] = 0;
-    }
-    bnd(0, div); bnd(0, p);
-    for (k = 0; k < 4; k++){
-      for (y = 1; y < FR - 1; y++) for (x = 1; x < FC - 1; x++){
-        p[fi(x,y)] = (div[fi(x,y)] + p[fi(x-1,y)] + p[fi(x+1,y)] + p[fi(x,y-1)] + p[fi(x,y+1)]) / 4;
-      }
-      bnd(0, p);
-    }
-    for (y = 1; y < FR - 1; y++) for (x = 1; x < FC - 1; x++){
-      ux[fi(x,y)] -= 0.5 * (p[fi(x+1,y)] - p[fi(x-1,y)]) / hx;
-      uy[fi(x,y)] -= 0.5 * (p[fi(x,y+1)] - p[fi(x,y-1)]) / hy;
-    }
-    bnd(1, ux); bnd(2, uy);
-  }
-  return {
-    vx: vx, vy: vy, fi: fi,
-    step: function(){
-      diffuse(1, vx0, vx, 0.00002, 0.016);
-      diffuse(2, vy0, vy, 0.00002, 0.016);
-      project(vx0, vy0);
-      advect(1, vx, vx0, vx0, vy0, 0.016);
-      advect(2, vy, vy0, vx0, vy0, 0.016);
-      project(vx, vy);
-      for (var i = 0; i < FN; i++){ vx[i] *= 0.94; vy[i] *= 0.94; }
-    }
-  };
-}
-
-/* Autodisparo: sin puntero, la simulación recibe impulsos periódicos para que
-   la textura nunca quede muerta. */
-function autoPulse(fluid, W, H){
-  var cx = ((0.28 + Math.random() * 0.44) * W) | 0;
-  var cy = ((0.25 + Math.random() * 0.5) * H) | 0;
-  var ang = Math.random() * Math.PI * 2;
-  var mag = 1.6 + Math.random() * 2.4;
-  var vx = Math.cos(ang) * mag, vy = Math.sin(ang) * mag;
-  var r = 9;
-  var gx = ((cx / W) * FC) | 0, gy = ((cy / H) * FR) | 0;
-  for (var dy = -r; dy <= r; dy++) for (var dx = -r; dx <= r; dx++){
-    var dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist > r) continue;
-    var f = Math.pow(1 - dist / r, 2);
-    fluid.vx[fluid.fi(gx + dx, gy + dy)] += vx * f * 2.2;
-    fluid.vy[fluid.fi(gx + dx, gy + dy)] += vy * f * 2.2;
-  }
-}
-
-var gl = null;
-try { gl = canvas.getContext('webgl2', { alpha: true, antialias: false, premultipliedAlpha: true, preserveDrawingBuffer: true }); } catch (e) { gl = null; }
-if (!gl) return;   /* el fallback CSS con mask-image queda visible */
-
-var disposed = false, rafId = 0, textures = [], shaders = [], buffers = [], prog = null;
-var listeners = [];
-
-function cleanup(){
-  if (disposed) return;
-  disposed = true;
-  cancelAnimationFrame(rafId);
-  listeners.forEach(function (off) { off(); });
-  textures.forEach(function (t) { gl.deleteTexture(t); });
-  buffers.forEach(function (b) { gl.deleteBuffer(b); });
-  shaders.forEach(function (s) { gl.deleteShader(s); });
-  if (prog) gl.deleteProgram(prog);
-}
-function listen(target, event, handler){
-  target.addEventListener(event, handler);
-  listeners.push(function () { target.removeEventListener(event, handler); });
-}
-function fallback(){
-  if (disposed) return;
-  canvas.style.opacity = '0';
-  canvas.style.pointerEvents = 'none';
-  cleanup();
-}
-/* Reporta el motivo una sola vez: un fallo mudo de shader es imposible de depurar. */
-function reportar(motivo){
-  if (window.__ditherDiag) return;
-  window.__ditherDiag = String(motivo);
-  if (window.console && console.warn) console.warn('[dither-canvas] desactivado:', motivo);
-}
-
-try {
-  function mkShader(type, source){
-    var sh = gl.createShader(type);
-    if (!sh) throw new Error('shader alloc');
-    shaders.push(sh);
-    gl.shaderSource(sh, source);
-    gl.compileShader(sh);
-    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
-      throw new Error('shader compile: ' + (gl.getShaderInfoLog(sh) || 'sin log'));
-    }
-    return sh;
-  }
-  function mkTex(unit){
-    var tex = gl.createTexture();
-    if (!tex) throw new Error('tex alloc');
-    textures.push(tex);
-    gl.activeTexture(gl.TEXTURE0 + unit);
-    gl.bindTexture(gl.TEXTURE_2D, tex);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    return tex;
-  }
-
-  prog = gl.createProgram();
-  if (!prog) throw new Error('prog alloc');
-  gl.attachShader(prog, mkShader(gl.VERTEX_SHADER, VS));
-  gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, FS));
-  gl.linkProgram(prog);
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error('link');
-  gl.useProgram(prog);
-
-  function loc(name){ return gl.getUniformLocation(prog, name); }
-
-  var buf = gl.createBuffer();
-  if (!buf) throw new Error('buf alloc');
-  buffers.push(buf);
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-  var aPos = gl.getAttribLocation(prog, 'a_pos');
-  gl.enableVertexAttribArray(aPos);
-  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-
-  var fluidTex = mkTex(0);
-
-  var atlasCanvas = document.createElement('canvas');
-  var CELL = 64;
-  atlasCanvas.width = CELL * ALL_CHARS.length;
-  atlasCanvas.height = CELL;
-  var actx = atlasCanvas.getContext('2d');
-  if (!actx) throw new Error('atlas');
-  actx.font = (CELL * 0.92) + 'px monospace';
-  actx.textAlign = 'center';
-  actx.textBaseline = 'middle';
-  actx.fillStyle = '#fff';
-  ALL_CHARS.forEach(function (ch, i) { actx.fillText(ch, CELL * (i + 0.5), CELL * 0.5); });
-  mkTex(1);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, atlasCanvas);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.uniform1i(loc('uFluid'), 0);
-  gl.uniform1i(loc('uAtlas'), 1);
-
-  var fluid = createFluid();
-  var fluidData = new Float32Array(FN * 2);
-  var mouse = { x: -9999, y: -9999, vx: 0, vy: 0 };
-  var trail = [];
-  function now(){ return performance.now(); }
-
-  function onMove(ev){
-    var rect = canvas.getBoundingClientRect();
-    var px = mouse.x, py = mouse.y;
-    mouse.x = ev.clientX - rect.left;
-    mouse.y = ev.clientY - rect.top;
-    mouse.vx = mouse.x - px;
-    mouse.vy = mouse.y - py;
-    if (px < 0 || py < 0){
-      trail.unshift({ x: mouse.x, y: mouse.y, vx: 0, vy: 0, b: now() });
-      if (trail.length > TM) trail.length = TM;
-      return;
-    }
-    var d = Math.sqrt(mouse.vx * mouse.vx + mouse.vy * mouse.vy);
-    if (d < 0.5) return;
-    var steps = Math.max(1, Math.ceil(d / TS));
-    var birth = now();
-    for (var s = 1; s <= steps; s++){
-      var t = s / steps;
-      trail.unshift({ x: px + mouse.vx * t, y: py + mouse.vy * t, vx: mouse.vx / steps, vy: mouse.vy / steps, b: birth });
-      if (trail.length > TM) trail.length = TM;
-    }
-  }
-  listen(canvas, 'pointermove', onMove);
-  listen(canvas, 'pointerleave', function () { mouse.x = mouse.y = -9999; });
-  listen(canvas, 'webglcontextlost', function (ev) { ev.preventDefault(); fallback(); });
-
-  var W = 1, H = 1;
-  function resize(){
-    var rect = canvas.getBoundingClientRect();
-    W = canvas.width = Math.max(1, Math.round(rect.width));
-    H = canvas.height = Math.max(1, Math.round(rect.height));
-    gl.viewport(0, 0, W, H);
-  }
-  resize();
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-
-  var uTP = loc('uTP'), uTLoc = loc('uTL'), uRes = loc('uRes');
-  var uPhase = loc('uPhase'), uTrailN = loc('uTrailN'), uTime = loc('uTime');
-  var tpBuf = new Float32Array(TM * 4);
-  var tlBuf = new Float32Array(TM);
-  var phase = 0, frame = 0, pulseAt = 0, running = false;
-  var t0 = now();
-
-  function draw(){
-    var ts = now();
-    var elapsed = (ts - t0) / 1000;
-    var cfg = TRAIL_CFG;
-
-    /* impulsos automáticos para que el campo nunca quede estático */
-    if (ts - pulseAt > 900){
-      pulseAt = ts;
-      autoPulse(fluid, W, H);
-    }
-
-    for (var i = trail.length - 1; i >= 0; i--){
-      var pt = trail[i];
-      var age = ts - pt.b;
-      if (age >= TL){ trail.splice(i, 1); continue; }
-      var life = 1 - age / TL;
-      var radius = cfg.fir + life * cfg.firl;
-      var gr = Math.ceil(radius);
-      var speed = Math.sqrt(pt.vx * pt.vx + pt.vy * pt.vy);
-      var force = (cfg.fb + Math.min(speed, cfg.fss) / cfg.fss) * life;
-      var cx = ((pt.x / W) * FC) | 0;
-      var cy = ((pt.y / H) * FR) | 0;
-      for (var dy = -gr; dy <= gr; dy++) for (var dx = -gr; dx <= gr; dx++){
-        var dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist > radius) continue;
-        var f = Math.pow(1 - dist / radius, 2);
-        fluid.vx[fluid.fi(cx + dx, cy + dy)] += pt.vx * f * force * cfg.ffm;
-        fluid.vy[fluid.fi(cx + dx, cy + dy)] += pt.vy * f * force * cfg.ffm;
-      }
-    }
-
-    fluid.step();
-    if (frame++ % 8 === 0) phase = (phase + 1) % 255;
-
-    for (var j = 0; j < FN; j++){
-      fluidData[j * 2] = fluid.vx[j];
-      fluidData[j * 2 + 1] = fluid.vy[j];
-    }
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, fluidTex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG32F, FC, FR, 0, gl.RG, gl.FLOAT, fluidData);
-
-    tpBuf.fill(0); tlBuf.fill(0);
-    for (var k = 0; k < trail.length; k++){
-      var q = trail[k];
-      tpBuf[k*4] = q.x; tpBuf[k*4+1] = q.y; tpBuf[k*4+2] = q.vx; tpBuf[k*4+3] = q.vy;
-      tlBuf[k] = 1 - (ts - q.b) / TL;
-    }
-    gl.uniform4fv(uTP, tpBuf);
-    gl.uniform1fv(uTLoc, tlBuf);
-    gl.uniform1i(uTrailN, trail.length);
-    gl.uniform2f(uRes, W, H);
-    gl.uniform1i(uPhase, phase);
-    gl.uniform1f(uTime, elapsed);
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    if (canvas.style.opacity !== '1') canvas.style.opacity = '1';
-  }
-
-  function render(){
-    if (disposed || !running) return;
-    try { draw(); } catch (e) { fallback(); return; }
-    rafId = requestAnimationFrame(render);
-  }
-
-  /* Solo anima mientras la banda es visible: sin costo fuera de pantalla. */
-  function start(){
-    if (disposed || running) return;
-    /* Con movimiento reducido se pinta un fotograma estático y se detiene.
-       preserveDrawingBuffer mantiene ese fotograma visible. */
-    if (motion.matches) { try { draw(); } catch (e) { reportar(e && e.message ? e.message : e); fallback(); } return; }
-    running = true;
-    rafId = requestAnimationFrame(render);
-  }
-  function stop(){
-    running = false;
-    cancelAnimationFrame(rafId);
-  }
-
-  listen(motion, 'change', function () { stop(); start(); });
-
-  if ('IntersectionObserver' in window){
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) { if (en.isIntersecting) start(); else stop(); });
-    }, { threshold: 0.01 });
-    io.observe(canvas);
-    listeners.push(function () { io.disconnect(); });
-  } else {
-    start();
-  }
-
-  var ro = new ResizeObserver(function () { resize(); if (!running) { try { draw(); } catch (e) {} } });
-  ro.observe(canvas.parentElement);
-  listeners.push(function () { ro.disconnect(); });
-
-} catch (e) {
-  reportar(e && e.message ? e.message : e);
-  fallback();
-}
-})();
-</script>
-<script>
-/* Simulador de precios. Las constantes llegan desde data_precios.py para que
-   el resultado no pueda divergir de las tablas del documento. */
-(function(){
-"use strict";
-var C = {"trm": 4000, "iva": 0.19, "precio_base": 80000, "mensajes_incluidos": 1000, "in_miss": 1.5e-07, "in_hit": 3e-09, "out": 6e-07, "precio_excedente": 60, "fijo": 2924, "cacheable": 2804, "hist_tok": 30, "hist_max": 10, "user_tok": 20, "out_msg": 82, "msgs_conv": 6};
-
-var elMsgs  = document.getElementById('sim-msgs');
-var elNeg   = document.getElementById('sim-negocios');
-var elInfra = document.getElementById('sim-infra');
-if(!elMsgs || !elNeg || !elInfra) return;
-
-var msgs = +elMsgs.value;
-var negocios = +elNeg.value;
-var infraCosto = +elInfra.options[elInfra.selectedIndex].dataset.costo;
-var infraCap = +elInfra.value;
-var usaCache = true;
-
-function cop(n){ return '$' + Math.round(n).toLocaleString('es-CO'); }
-function num(n){ return n.toLocaleString('es-CO'); }
-function pct(n){ return n.toFixed(1).replace('.', ',') + '%'; }
-
-/* Costo de IA con el modelo medido: prompt fijo (2.924 tok, del que 2.804 es
-   prefijo cacheable) + historial que crece + mensaje del cliente.
-   El historial se reconstruye segun la posicion del mensaje dentro de la
-   conversacion, porque no cuesta lo mismo el 1o que el 6o. */
-function costoIA(m, cache){
-  if(cache === undefined) cache = true;
-  var conv = Math.max(1, C.msgs_conv);
-  var completas = Math.floor(m / conv);
-  var sobrantes = m % conv;
-  var usd = 0;
-
-  function msg(pos){
-    var hist = Math.min(pos, C.hist_max) * C.hist_tok;
-    var entrada = C.fijo + hist + C.user_tok;
-    var cacheado = cache ? Math.min(C.cacheable, entrada) : 0;
-    return (entrada - cacheado) * C.in_miss + cacheado * C.in_hit + C.out_msg * C.out;
-  }
-  var i;
-  for(i = 0; i < conv; i++) usd += msg(i) * completas;
-  for(i = 0; i < sobrantes; i++) usd += msg(i);
-  return usd * C.trm;
-}
-
-function calcular(){
-  var ia = costoIA(msgs, usaCache);
-  var infra = infraCosto / Math.max(1, negocios);
-  var costo = ia + infra;
-
-  var excedente = Math.max(0, msgs - C.mensajes_incluidos);
-  var cargo = excedente * C.precio_excedente;
-
-  var base = C.precio_base + cargo;
-  var iva = base * C.iva;
-  var factura = base + iva;
-
-  var margen = base - costo;
-  var mPct = base > 0 ? margen / base * 100 : 0;
-
-  document.getElementById('sim-msgs-out').textContent = num(msgs);
-  document.getElementById('sim-negocios-out').textContent = num(negocios);
-  document.getElementById('sim-incluidos').textContent = num(C.mensajes_incluidos);
-  document.getElementById('sim-excedente').textContent = num(excedente);
-  document.getElementById('sim-cargo').textContent = cop(cargo);
-  document.getElementById('sim-ia').textContent = cop(ia);
-  document.getElementById('sim-sup').textContent = usaCache ? 'con caché' : 'sin caché';
-  document.getElementById('sim-infra-costo').textContent = cop(infra);
-  document.getElementById('sim-costo').textContent = cop(costo);
-  document.getElementById('sim-margen').textContent = cop(margen);
-  document.getElementById('sim-margen-pct').textContent = pct(mPct);
-  document.getElementById('sim-factura').textContent = cop(factura);
-  document.getElementById('sim-factura-sub').textContent =
-    'Base ' + cop(base) + ' + IVA ' + cop(iva) + (cargo > 0 ? ' (incluye excedente)' : '');
-
-  /* Barra: porcion del precio base consumida por costos. */
-  var usado = base > 0 ? Math.min(100, costo / base * 100) : 0;
-  document.getElementById('sim-bar-fill').style.width = usado.toFixed(2) + '%';
-  document.getElementById('sim-leg-margen').textContent = pct(mPct);
-  document.getElementById('sim-leg-ia').textContent = pct(base > 0 ? ia / base * 100 : 0);
-  document.getElementById('sim-leg-infra').textContent = pct(base > 0 ? infra / base * 100 : 0);
-
-  /* Aviso de capacidad del servidor. */
-  var hint = document.getElementById('sim-capacidad');
-  var aviso = document.getElementById('sim-aviso');
-  if(negocios > infraCap){
-    hint.classList.add('over');
-    hint.textContent = 'Capacidad de este servidor: ' + num(infraCap) +
-      ' negocios — te pasaste por ' + num(negocios - infraCap);
-    aviso.hidden = false;
-    document.getElementById('sim-aviso-txt').textContent =
-      'Con ' + num(negocios) + ' negocios en un servidor de ' + num(infraCap) +
-      ' de capacidad, la talla se queda corta. Sube de slices o reparte los negocios en dos servidores.';
-  } else {
-    hint.classList.remove('over');
-    hint.textContent = 'Capacidad de este servidor: ' + num(infraCap) + ' negocios';
-    aviso.hidden = true;
-  }
-
-  var botones = document.querySelectorAll('.sim-preset');
-  for(var i = 0; i < botones.length; i++){
-    botones[i].classList.toggle('on', +botones[i].dataset.msgs === msgs);
-  }
-}
-
-elMsgs.addEventListener('input', function(){ msgs = +elMsgs.value; calcular(); });
-elNeg.addEventListener('input', function(){ negocios = +elNeg.value; calcular(); });
-elInfra.addEventListener('change', function(){
-  infraCosto = +elInfra.options[elInfra.selectedIndex].dataset.costo;
-  infraCap = +elInfra.value;
-  elNeg.max = Math.max(infraCap, 1);
-  /* Al cambiar de talla, el numero de negocios debe seguir teniendo sentido:
-     un servidor de 200 cupos no se compra para 25 negocios. Se ajusta al
-     rango razonable de esa talla, respetando lo que el usuario ya eligio
-     si cabe. */
-  var minRazonable = Math.max(1, Math.round(infraCap * 0.5));
-  if(negocios > infraCap || negocios < minRazonable) negocios = minRazonable;
-  elNeg.value = negocios;
-  calcular();
-});
-
-var btnOn = document.getElementById('sim-cache-on');
-var btnOff = document.getElementById('sim-cache-off');
-var cacheHint = document.getElementById('sim-cache-hint');
-function setCache(v){
-  usaCache = v;
-  btnOn.classList.toggle('on', v);
-  btnOff.classList.toggle('on', !v);
-  cacheHint.textContent = v
-    ? 'El prefijo de 2.804 tokens se reutiliza: es el mejor caso.'
-    : 'Si el prefijo no se reutiliza, cada turno paga la entrada completa.';
-  cacheHint.classList.toggle('over', !v);
-  calcular();
-}
-btnOn.addEventListener('click', function(){ setCache(true); });
-btnOff.addEventListener('click', function(){ setCache(false); });
-
-var presets = document.querySelectorAll('.sim-preset');
-for(var j = 0; j < presets.length; j++){
-  presets[j].addEventListener('click', function(){
-    msgs = +this.dataset.msgs;
-    elMsgs.value = msgs;
-    calcular();
-  });
-}
-
-calcular();
-})();
-</script>
-<script>
-(function(){
+(function(){{
   "use strict";
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var reveals = document.querySelectorAll(".reveal");
-  if (reduce || !("IntersectionObserver" in window)) {
-    reveals.forEach(function(el){ el.classList.add("in"); });
-  } else {
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(e){
-        if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
-      });
-    }, {threshold: 0.12, rootMargin: "0px 0px -40px 0px"});
-    reveals.forEach(function(el){ io.observe(el); });
-  }
-})();
+  if (reduce || !("IntersectionObserver" in window)) {{
+    reveals.forEach(function(el){{ el.classList.add("in"); }});
+  }} else {{
+    var io = new IntersectionObserver(function(entries){{
+      entries.forEach(function(e){{
+        if (e.isIntersecting){{ e.target.classList.add("in"); io.unobserve(e.target); }}
+      }});
+    }}, {{threshold: 0.12, rootMargin: "0px 0px -40px 0px"}});
+    reveals.forEach(function(el){{ io.observe(el); }});
+  }}
+}})();
 </script>
 </body>
 </html>
+'''
+
+assert MENSAJES_INCLUIDOS == 1000
+assert PRECIO_FINAL == 95200
+
+out_path = os.path.join(OUT, "index.html")
+with open(out_path, "w", encoding="utf-8") as f:
+    f.write(html_doc)
+
+print(f"OK · {out_path}")
+print(f"   {len(html_doc):,} bytes · Compare con 3 modalidades")
+print(f"   Precio base ${PRECIO_BASE:,} + IVA ${PRECIO_IVA:,} = ${PRECIO_FINAL:,}")

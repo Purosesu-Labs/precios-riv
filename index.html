@@ -3,686 +3,699 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Precios · Agente de AsoBares · Documentación</title>
-<meta name="description" content="Documentación de precios del agente de WhatsApp con IA para AsoBares: plan de $80.000 + IVA con 1.000 mensajes, costo real de IA con DeepSeek V4.1 Flash, precios verificados de InterServer y margen por negocio.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 30 10v12L16 30 2 22V10z' fill='%23533afd'/%3E%3Cpath d='M11 16.5l3.5 3.5L21 13' stroke='%23fff' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<title>Agente de AsoBares · Propuesta de precios</title>
+<meta name="description" content="Precios del agente de WhatsApp con IA para los afiliados de AsoBares: tres modalidades desde $80.000 + IVA, costo real de IA medido con DeepSeek V4.1 Flash, capacidad por slices de InterServer y simulador de consumo.">
+<meta property="og:title" content="Agente de AsoBares · Propuesta de precios">
+<meta property="og:description" content="Comparación de tres modalidades de servicio, con el costo real de operar el agente medido sobre el código y una conversación real.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 28 9v14L16 30 4 23V9z' fill='%230f766e'/%3E%3Cpath d='M11 16.5l3.5 3.5L21 13' stroke='%23fff' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --primary:#533afd;--primary-deep:#4434d4;--primary-press:#2e2b8c;--primary-soft:#665efd;
-  --primary-subdued:#b9b9f9;--brand-dark:#1c1e54;
-  --ink:#0d253d;--ink-2:#273951;--mute:#64748d;
-  --canvas:#ffffff;--canvas-soft:#f6f9fc;--cream:#f5e9d4;
-  --hairline:#e3e8ee;--hairline-input:#a8c3de;
-  --ruby:#ea2261;--lemon:#9b6829;
-  --shadow-1:rgba(0,55,112,.08) 0 1px 3px;
-  --shadow-2:rgba(0,55,112,.08) 0 8px 24px, rgba(0,55,112,.04) 0 2px 6px;
-  --sans:'Inter','SF Pro Display',system-ui,-apple-system,sans-serif;
-  --sidebar-w:292px;
+  --bg:#ffffff;--bg-soft:#f6f8f8;--bg-accent:#eef7f6;
+  --ink:#10201e;--ink-2:#33423f;--muted:#64716e;
+  --line:#e3e8e7;--line-strong:#cdd6d4;
+  --accent:#0f766e;--accent-strong:#0b5e58;--accent-soft:#e6f4f2;--accent-ring:rgba(15,118,110,.25);
+  --ok:#1a7f4e;--warn:#b45309;--danger:#b42318;
+  --radius:14px;--radius-sm:9px;
+  --shadow-card:0 1px 2px rgba(16,32,30,.05);
+  --shadow-rec:0 18px 44px -18px rgba(15,118,110,.35), 0 2px 6px rgba(16,32,30,.06);
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:24px}
-body{font-family:var(--sans);color:var(--ink);background:var(--canvas);font-weight:300;
-  font-size:15px;line-height:1.5;font-feature-settings:"ss01";-webkit-font-smoothing:antialiased}
-::selection{background:var(--primary-subdued)}
-a{color:var(--primary);text-decoration:none}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.55;font-size:16px;-webkit-font-smoothing:antialiased}
+::selection{background:var(--accent-soft)}
+a{color:var(--accent-strong);text-decoration:none}
 a:hover{text-decoration:underline}
-code{font-family:var(--sans);font-weight:400;font-size:.85em;background:var(--canvas-soft);
-  border:1px solid var(--hairline);border-radius:4px;padding:1px 6px;color:var(--ink-2);font-feature-settings:"tnum"}
-strong{font-weight:500}
-.tnum{font-feature-settings:"tnum";letter-spacing:-.2px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 
-/* ---------- Mesh + Dither Canvas ---------- */
-.mesh{position:relative;height:230px;overflow:hidden;background:var(--canvas)}
-.mesh::before{content:"";position:absolute;inset:-40px;
+/* ---------- Topbar ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px;letter-spacing:.2px}
+.brand svg{flex:none}
+.brand .sub{color:var(--muted);font-weight:500}
+.topbar nav{display:flex;gap:22px;font-size:13.5px;font-weight:500}
+.topbar nav a{color:var(--ink-2)}
+.topbar nav .pill{font-family:var(--mono);font-size:11.5px;background:var(--accent-soft);color:var(--accent-strong);padding:6px 10px;border-radius:99px;margin-left:8px}
+.btn-print{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;font-weight:600;color:#fff;background:var(--accent);border:1px solid var(--accent);padding:9px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s}
+.btn-print:hover{background:var(--accent-strong)}
+.btn-print svg{flex:none}
+
+/* ---------- Hero con Dither Canvas de fondo ---------- */
+.hero{position:relative;padding:76px 0 54px;background:linear-gradient(180deg,var(--bg-soft) 0%,var(--bg) 100%);border-bottom:1px solid var(--line);overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hero-bg::before{content:"";position:absolute;inset:-40px;
   background:
-    radial-gradient(45% 95% at 5% 55%, rgba(245,233,212,.95), transparent 62%),
-    radial-gradient(40% 85% at 26% 30%, rgba(249,150,80,.38), transparent 62%),
-    radial-gradient(46% 95% at 52% 45%, rgba(178,132,255,.42), transparent 66%),
-    radial-gradient(52% 110% at 78% 35%, rgba(83,58,253,.68), transparent 66%),
-    radial-gradient(38% 85% at 100% 55%, rgba(234,34,97,.5), transparent 62%);
-  filter:blur(6px)}
-.mesh::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,transparent 40%,var(--canvas) 100%);z-index:3}
+    radial-gradient(42% 90% at 6% 58%, rgba(230,244,242,.95), transparent 64%),
+    radial-gradient(40% 85% at 30% 26%, rgba(15,118,110,.20), transparent 64%),
+    radial-gradient(46% 92% at 56% 48%, rgba(13,148,136,.22), transparent 68%),
+    radial-gradient(50% 100% at 82% 34%, rgba(15,118,110,.30), transparent 66%),
+    radial-gradient(36% 82% at 100% 60%, rgba(26,127,78,.18), transparent 62%);
+  filter:blur(8px)}
 .dither-fallback{position:absolute;inset:0;z-index:1;pointer-events:none;
-  background-image:linear-gradient(135deg,transparent 12%,#2563eb 35%,#0aa3e0 55%,#5c4af2 72%,transparent 90%);
+  background-image:linear-gradient(135deg,transparent 12%,#0f766e 35%,#0d9488 55%,#0b5e58 72%,transparent 90%);
   -webkit-mask-image:radial-gradient(circle,#000 1px,transparent 1.3px);
   mask-image:radial-gradient(circle,#000 1px,transparent 1.3px);
-  -webkit-mask-size:7px 7px;mask-size:7px 7px;opacity:.5}
-#dither{position:absolute;inset:0;z-index:2;width:100%;height:100%;
-  display:block;opacity:0;transition:opacity .6s ease;pointer-events:auto;cursor:crosshair}
-.mesh-hint{position:absolute;right:18px;bottom:14px;z-index:4;font-size:10px;letter-spacing:.1px;
-  text-transform:uppercase;color:var(--mute);background:rgba(255,255,255,.72);backdrop-filter:blur(6px);
-  border:1px solid var(--hairline);border-radius:9999px;padding:4px 10px;pointer-events:none;
-  font-feature-settings:"tnum"}
+  -webkit-mask-size:7px 7px;mask-size:7px 7px;opacity:.4}
+#dither{position:absolute;inset:0;z-index:2;width:100%;height:100%;display:block;
+  opacity:0;transition:opacity .6s ease;pointer-events:auto;cursor:crosshair}
+/* Velo: cubre el H1 y se abre hacia los bordes. */
+.hero::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:
+    linear-gradient(180deg, rgba(246,248,248,.72) 0%, rgba(255,255,255,.62) 40%,
+                    rgba(255,255,255,.40) 72%, var(--bg) 100%)}
+/* Bajo el bloque de texto el velo se refuerza solo lo necesario para leer. */
+.hero .wrap{position:relative;z-index:4}
+.hero .wrap::before{content:"";position:absolute;inset:-18px -26px -14px -26px;z-index:-1;
+  border-radius:18px;
+  background:radial-gradient(72% 88% at 34% 46%, rgba(255,255,255,.74), rgba(255,255,255,.30) 62%, transparent 100%)}
+.hero .wrap{position:relative;z-index:4}
+.mesh-hint{position:absolute;right:24px;top:74px;z-index:5;font-family:var(--mono);font-size:10px;
+  letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,.8);
+  backdrop-filter:blur(6px);border:1px solid var(--line-strong);border-radius:99px;padding:5px 11px;
+  pointer-events:none}
 
-/* ---------- Sidebar ---------- */
-.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--canvas);
-  border-right:1px solid var(--hairline);display:flex;flex-direction:column;z-index:40;transition:transform .22s ease}
-.side-brand{display:flex;align-items:center;gap:10px;padding:18px 20px 14px;border-bottom:1px solid var(--hairline)}
-.side-brand svg{flex:none}
-.side-brand .t{font-weight:400;font-size:14.5px;line-height:1.25;letter-spacing:-.2px}
-.side-brand .v{font-size:11px;color:var(--mute);display:block;margin-top:2px;font-feature-settings:"tnum"}
-.side-search{padding:14px 16px;border-bottom:1px solid var(--hairline)}
-.side-search input{width:100%;font-family:var(--sans);font-weight:300;font-size:14px;padding:9px 12px;
-  border:1px solid var(--hairline-input);border-radius:6px;background:var(--canvas);color:var(--ink);outline:none;
-  transition:border-color .15s,box-shadow .15s}
-.side-search input:focus{border-color:var(--primary)}
-.side-search .nores{display:none;font-size:12px;color:var(--mute);padding:8px 4px 0}
-.side-nav{flex:1;overflow-y:auto;padding:12px 8px 24px}
-.side-nav>ul{list-style:none}
-.nav-item>a{display:block;padding:7px 12px;border-radius:8px;font-size:13.5px;font-weight:400;color:var(--ink-2);line-height:1.35;letter-spacing:-.1px}
-.nav-item>a:hover{background:var(--canvas-soft);text-decoration:none;color:var(--primary-deep)}
-.nav-item>a.active{background:var(--primary-subdued);color:var(--primary-deep);font-weight:400}
-.side-foot{padding:12px 20px;border-top:1px solid var(--hairline);font-size:10.5px;color:var(--mute)}
+.eyebrow{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:26px;height:1.5px;background:var(--accent)}
+.hero h1{font-size:clamp(30px,4.4vw,50px);line-height:1.08;letter-spacing:-1.2px;font-weight:700;margin:18px 0 18px;max-width:860px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p.lead{font-size:17.5px;color:var(--ink-2);max-width:780px}
+.drivers{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.drivers span{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;color:var(--ink-2);border:1px solid var(--line-strong);background:rgba(255,255,255,.86);backdrop-filter:blur(4px);padding:8px 13px;border-radius:99px}
+.drivers svg{flex:none}
+.hero-cta{margin-top:30px;display:flex;gap:12px;flex-wrap:wrap}
+.cta{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14.5px;padding:12px 20px;border-radius:var(--radius-sm);transition:background .15s}
+.cta.primary{background:var(--accent);color:#fff}
+.cta.primary:hover{background:var(--accent-strong);text-decoration:none}
+.cta.ghost{border:1px solid var(--line-strong);color:var(--ink-2);background:rgba(255,255,255,.86)}
+.cta.ghost:hover{background:var(--bg-soft);text-decoration:none}
 
-/* ---------- Content ---------- */
-.content{margin-left:var(--sidebar-w)}
-.doc{max-width:820px;margin:0 auto;padding:0 40px 96px}
-h1{font-size:44px;font-weight:300;line-height:1.05;letter-spacing:-1.1px}
-h2{font-size:28px;font-weight:300;line-height:1.1;letter-spacing:-.5px;margin:0 0 4px}
-h3{font-size:19px;font-weight:300;letter-spacing:-.2px;margin:36px 0 10px;scroll-margin-top:24px}
-h4{font-size:15px;font-weight:400;margin:0 0 8px}
-h5{font-size:10px;font-weight:400;letter-spacing:.1px;text-transform:uppercase;color:var(--mute);margin:12px 0 6px}
-.doc-header{padding:38px 0 26px;border-bottom:1px solid var(--hairline);margin-bottom:6px}
-.doc-header .kicker{font-size:10px;font-weight:400;letter-spacing:.1px;text-transform:uppercase;
-  color:var(--primary-deep);background:var(--primary-subdued);display:inline-flex;padding:4px 8px;border-radius:9999px;margin-bottom:16px}
-.doc-header .meta{font-size:13px;color:var(--mute);margin-top:12px;letter-spacing:-.2px}
-.doc-header .lead{color:var(--ink-2);margin-top:12px;font-size:16px;line-height:1.45}
-.stat-row{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
-.stat-pill{background:var(--canvas-soft);border:1px solid var(--hairline);border-radius:9999px;
-  padding:6px 14px;font-size:13px;color:var(--ink-2);font-feature-settings:"tnum"}
-.stat-pill b{color:var(--primary-deep);font-weight:500}
-.doc>section{margin:40px 0}
-.doc>section>h2{scroll-margin-top:24px}
-.sec-kicker{font-size:10px;font-weight:400;letter-spacing:.1px;text-transform:uppercase;color:var(--primary-deep);
-  background:var(--primary-subdued);display:inline-flex;padding:3px 8px;border-radius:9999px;margin-bottom:12px}
-.section-sub{color:var(--mute);font-size:14px;margin-bottom:16px}
+/* ---------- Section scaffolding ---------- */
+section{padding:64px 0}
+.sec-head{margin-bottom:34px}
+.sec-kicker{font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent)}
+.sec-title{font-size:clamp(24px,3vw,34px);letter-spacing:-.6px;font-weight:700;margin-top:8px}
+.sec-sub{color:var(--muted);margin-top:10px;max-width:760px;font-size:15.5px}
 
-/* ---------- Tarjeta de precio ---------- */
-.price-hero{background:var(--brand-dark);color:#fff;border-radius:12px;padding:32px;margin:18px 0;box-shadow:var(--shadow-2)}
-.price-hero .ph-label{font-size:10px;font-weight:400;letter-spacing:.1px;text-transform:uppercase;opacity:.7}
-.price-hero .ph-amount{font-size:52px;font-weight:300;letter-spacing:-1.4px;line-height:1.05;margin:10px 0 2px;font-feature-settings:"tnum"}
-.price-hero .ph-amount span{font-size:22px;opacity:.7;letter-spacing:-.4px}
-.price-hero .ph-sub{font-size:14px;opacity:.82;line-height:1.5}
-.price-hero .ph-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.16);
-  border-radius:8px;overflow:hidden;margin-top:22px}
-.price-hero .ph-cell{background:var(--brand-dark);padding:14px 16px}
-.price-hero .ph-cell .k{font-size:10px;letter-spacing:.1px;text-transform:uppercase;opacity:.62}
-.price-hero .ph-cell .v{font-size:19px;font-weight:300;letter-spacing:-.3px;margin-top:4px;font-feature-settings:"tnum"}
+/* ---------- Compare cards ---------- */
+.compare{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch}
+.card{position:relative;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px 24px 24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow-card)}
+.card.muted{background:var(--bg-soft)}
+.card.rec{border:1.5px solid var(--accent);box-shadow:var(--shadow-rec);background:var(--bg-accent)}
+.badge-rec{position:absolute;top:-13px;left:24px;display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#fff;background:var(--accent);padding:5px 12px;border-radius:99px;box-shadow:0 4px 12px rgba(15,118,110,.35)}
+.opt-no{font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:1.4px;color:var(--muted)}
+.card.rec .opt-no{color:var(--accent-strong)}
+.card h3{font-size:20px;letter-spacing:-.3px;font-weight:700;margin-top:5px;line-height:1.2}
+.card .concept{font-size:14px;color:var(--ink-2)}
+.spec{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:16px}
+.spec .k{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted)}
+.spec .v{font-size:13.5px;color:var(--ink);line-height:1.5}
+.spec .v strong{font-weight:600}
+.risk{font-size:13.5px;color:var(--ink-2);border-top:1px solid var(--line);padding-top:14px;display:flex;gap:9px;align-items:flex-start}
+.risk svg{flex:none;margin-top:3px}
+.risk.warn svg circle.r{stroke:var(--warn)}
+.risk.ok svg circle.r{stroke:var(--ok)}
+.price{border-top:1px solid var(--line);padding-top:16px;margin-top:auto}
+.price .label{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted)}
+.price .amount{font-size:21px;font-weight:600;letter-spacing:-.3px;margin-top:4px}
+.price .range{font-size:13px;color:var(--muted);margin-top:2px}
+.card-link{margin-top:6px;font-size:13.5px;font-weight:600}
+.tag{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.6px;padding:3px 8px;border-radius:6px;background:var(--bg-soft);color:var(--ink-2);border:1px solid var(--line-strong)}
+.card.rec .tag{background:var(--accent-soft);border-color:transparent;color:var(--accent-strong)}
 
-/* ---------- Admonitions ---------- */
-.adm{display:flex;gap:12px;padding:16px 18px;border-radius:12px;margin:16px 0;font-size:14px;line-height:1.5;border:1px solid var(--hairline)}
-.adm svg{width:18px;height:18px;flex:none;margin-top:2px}
-.adm .adm-title{font-weight:500;margin-bottom:2px;letter-spacing:-.1px}
-.adm-note{background:var(--canvas-soft);color:var(--ink-2)}
-.adm-note svg{stroke:var(--primary)}
-.adm-warning{background:var(--cream);color:var(--lemon);border-color:transparent}
-.adm-warning svg{stroke:var(--lemon)}
-.adm-warning .adm-title,.adm-warning li{color:var(--ink)}
+/* ---------- Topology strip ---------- */
+.topology{display:grid;grid-template-columns:1fr 44px 1fr 44px 1fr;align-items:stretch;gap:0;margin-top:36px;border:1px solid var(--line);border-radius:var(--radius);background:#fff;overflow:hidden}
+.topo-node{padding:22px 18px;display:flex;flex-direction:column;gap:7px}
+.topo-node .role{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase}
+.topo-node .hw{font-size:14px;font-weight:600;line-height:1.3}
+.topo-node .job{font-size:12.5px;color:var(--muted)}
+.topo-node.a{background:var(--ink);color:#fff}
+.topo-node.a .role{color:#7dd3c8}
+.topo-node.a .job{color:#b9c6c3}
+.topo-node.b{background:var(--bg-soft)}
+.topo-node.c{background:var(--bg-accent)}
+.topo-arrow{display:flex;align-items:center;justify-content:center;color:var(--accent)}
 
-/* ---------- Tables ---------- */
-.tbl-wrap{overflow-x:auto;border:1px solid var(--hairline);border-radius:12px;background:var(--canvas);margin:16px 0;box-shadow:var(--shadow-1)}
-table.doc-t{width:100%;border-collapse:collapse;font-size:14px;font-weight:300}
-table.doc-t th,table.doc-t td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--hairline)}
-table.doc-t thead th{font-size:10px;font-weight:400;letter-spacing:.1px;text-transform:uppercase;color:var(--mute);background:var(--canvas-soft)}
-table.doc-t tbody tr:last-child td{border-bottom:none}
-table.doc-t td.rowhead{font-weight:400;color:var(--ink-2);background:var(--canvas-soft);white-space:nowrap;letter-spacing:-.1px}
-table.doc-t td.tnum{font-feature-settings:"tnum";letter-spacing:-.2px}
+/* ---------- Detail blocks ---------- */
+.detail{display:grid;grid-template-columns:52px 1fr;gap:22px;padding:30px 0;border-top:1px solid var(--line)}
+.detail .dnum{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--muted);line-height:1.6;padding-top:2px}
+.detail.rec .dnum{color:var(--accent-strong)}
+.detail h3{font-size:20px;letter-spacing:-.3px;font-weight:700}
+.detail .dsub{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:3px}
+.detail p{margin-top:12px;font-size:15px;color:var(--ink-2);max-width:860px}
+.detail ul{margin:12px 0 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;max-width:860px}
+.detail li{font-size:14.5px;color:var(--ink-2);padding-left:22px;position:relative}
+.detail li::before{content:"";position:absolute;left:4px;top:9px;width:6px;height:6px;border-radius:2px;background:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;max-width:860px}
 
-/* ---------- Flow ---------- */
-ol.flow{list-style:none;counter-reset:paso;margin:14px 0}
-ol.flow li{counter-increment:paso;position:relative;padding:8px 0 8px 46px;border-left:1px solid var(--hairline);margin-left:15px;font-size:14px;color:var(--ink-2)}
-ol.flow li::before{content:counter(paso,decimal-leading-zero);position:absolute;left:-15px;top:6px;width:30px;height:30px;border-radius:9999px;
-  background:var(--brand-dark);color:#fff;font-size:10px;font-weight:400;font-feature-settings:"tnum";letter-spacing:-.2px;display:flex;align-items:center;justify-content:center}
-ol.flow li:last-child{border-left-color:transparent}
-ol.flow strong{color:var(--ink)}
-mark{background:var(--cream);border-radius:3px;padding:0 2px}
+/* ---------- Table ---------- */
+.table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:#fff}
+table.cmp{width:100%;border-collapse:collapse;min-width:880px}
+table.cmp th,table.cmp td{padding:13px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);font-size:13.5px}
+table.cmp thead th{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);background:var(--bg-soft);position:sticky;top:60px;z-index:2}
+table.cmp thead th.col-rec{background:var(--accent-soft);color:var(--accent-strong)}
+table.cmp td.rowhead{font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.5px;color:var(--muted);background:var(--bg-soft);width:170px}
+table.cmp tbody td.col-rec{background:var(--bg-accent)}
+table.cmp tbody tr:last-child td{border-bottom:none}
+table.cmp td .strong{font-weight:600}
+table.cmp td .muted-sm{color:var(--muted);font-size:12.5px}
+.rec-note{display:flex;gap:12px;align-items:flex-start;margin-top:22px;padding:16px 18px;background:var(--accent-soft);border:1px solid var(--accent-ring);border-radius:var(--radius-sm);font-size:14px;color:var(--ink-2)}
+.rec-note svg{flex:none;margin-top:2px}
+.note-warn{background:#fdf6ec;border-color:rgba(180,83,9,.28)}
+.note-warn svg{stroke:var(--warn)}
 
-/* ---------- Menú móvil ---------- */
-.menu-btn{display:none;position:fixed;bottom:18px;right:18px;z-index:60;width:44px;height:44px;border-radius:9999px;
-  border:none;background:var(--primary);color:#fff;cursor:pointer;box-shadow:var(--shadow-2);align-items:center;justify-content:center}
-.menu-btn:active{background:var(--primary-press)}
-.overlay{display:none;position:fixed;inset:0;background:rgba(13,37,61,.4);z-index:35}
-
-@media (max-width:960px){
-  .sidebar{transform:translateX(-100%)}
-  .sidebar.open{transform:none;box-shadow:var(--shadow-2)}
-  .content{margin-left:0}
-  .doc{padding:0 20px 96px}
-  .menu-btn{display:flex}
-  .overlay.show{display:block}
-  h1{font-size:34px;letter-spacing:-.8px}
-  .price-hero{padding:24px}
-  .price-hero .ph-amount{font-size:40px}
-  .price-hero .ph-grid{grid-template-columns:1fr}
-  .mesh{height:170px}
-}
-@media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
-  html{scroll-behavior:auto}
-}
-/* ---------- Simulador de precios ---------- */
-.sim{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
-.sim-panel{background:var(--canvas);border:1px solid var(--hairline);border-radius:12px;
-  padding:24px;box-shadow:var(--shadow-1)}
-.sim-result{background:var(--brand-dark);color:#fff;border-color:transparent;box-shadow:var(--shadow-2)}
-.sim-label{display:block;font-size:10px;font-weight:400;letter-spacing:.1px;text-transform:uppercase;
-  color:var(--mute);margin:0 0 8px}
-.sim-result .sim-label{color:rgba(255,255,255,.7)}
-.sim-readout{font-size:30px;font-weight:300;letter-spacing:-.7px;line-height:1.1;
-  font-feature-settings:"tnum";margin-bottom:10px}
-.sim-readout-sm{font-size:22px;letter-spacing:-.4px}
-.sim-unit{font-size:13px;color:var(--mute);letter-spacing:0}
-.sim-scale{display:flex;justify-content:space-between;font-size:10px;color:var(--mute);margin-top:4px}
-
-/* range */
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;
-  cursor:pointer;margin:0}
-input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--hairline);border-radius:9999px}
-input[type=range]::-moz-range-track{height:3px;background:var(--hairline);border-radius:9999px}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;
-  border-radius:9999px;background:var(--primary);border:3px solid var(--canvas);margin-top:-8px;
-  box-shadow:var(--shadow-1);transition:transform .15s}
-input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.12)}
-input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--primary-deep);outline-offset:2px}
-input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:9999px;background:var(--primary);
-  border:3px solid var(--canvas);box-shadow:var(--shadow-1)}
-
-/* presets */
+/* ---------- Simulador ---------- */
+.sim{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.sim-panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-card)}
+.sim-result{background:var(--ink);color:#fff;border-color:transparent;box-shadow:var(--shadow-rec)}
+.sim-label{display:block;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.sim-result .sim-label{color:rgba(255,255,255,.72)}
+.sim-readout{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:30px;font-weight:600;letter-spacing:-.8px;line-height:1.1;margin-bottom:10px}
+.sim-readout-sm{font-size:22px}
+.sim-unit{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--muted);letter-spacing:0}
+.sim-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--line-strong);border-radius:99px}
+input[type=range]::-moz-range-track{height:3px;background:var(--line-strong);border-radius:99px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:99px;background:var(--accent);border:3px solid #fff;margin-top:-8px;box-shadow:var(--shadow-card)}
+input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--accent-strong);outline-offset:2px}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:99px;background:var(--accent);border:3px solid #fff}
 .sim-presets{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:18px 0 20px}
-.sim-preset{font-family:var(--sans);font-weight:300;font-size:12.5px;text-align:left;line-height:1.3;
-  padding:10px 12px;border:1px solid var(--hairline);border-radius:8px;background:var(--canvas-soft);
-  color:var(--ink-2);cursor:pointer;transition:border-color .15s,background .15s,color .15s}
-.sim-preset span{display:block;font-size:10px;color:var(--mute);font-feature-settings:"tnum";margin-top:2px}
-.sim-preset:hover{border-color:var(--primary);color:var(--primary-deep)}
-.sim-preset.on{background:var(--primary-subdued);border-color:var(--primary);color:var(--primary-deep);font-weight:400}
-.sim-preset.on span{color:var(--primary-deep)}
-
-.sim-toggle{display:flex;gap:0;margin-bottom:8px;border:1px solid var(--hairline);
-  border-radius:9999px;overflow:hidden;width:fit-content}
-.sim-toggle button{font-family:var(--sans);font-weight:300;font-size:12.5px;padding:7px 16px;
-  border:none;background:var(--canvas);color:var(--ink-2);cursor:pointer;transition:background .15s,color .15s}
-.sim-toggle button:hover{background:var(--canvas-soft);color:var(--primary-deep)}
-.sim-toggle button.on{background:var(--primary);color:#fff;font-weight:400}
-.sim-sup{font-size:9.5px;letter-spacing:.1px;text-transform:uppercase;opacity:.6;margin-left:4px}
-select{width:100%;font-family:var(--sans);font-weight:300;font-size:13.5px;padding:9px 12px;
-  border:1px solid var(--hairline-input);border-radius:6px;background:var(--canvas);color:var(--ink);
-  margin-bottom:20px;cursor:pointer}
-select:focus{border-color:var(--primary);outline:none}
-.sim-hint{font-size:11.5px;color:var(--mute);margin-top:6px;font-feature-settings:"tnum"}
-.sim-hint.over{color:var(--lemon);font-weight:400}
-
-/* resultado */
+.sim-preset{font-family:var(--sans);font-weight:500;font-size:12.5px;text-align:left;line-height:1.3;padding:10px 12px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--bg-soft);color:var(--ink-2);cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+.sim-preset span{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+.sim-preset:hover{border-color:var(--accent);color:var(--accent-strong)}
+.sim-preset.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-strong);font-weight:600}
+.sim-toggle{display:flex;margin-bottom:8px;border:1px solid var(--line-strong);border-radius:99px;overflow:hidden;width:fit-content}
+.sim-toggle button{font-family:var(--mono);font-size:12px;font-weight:600;padding:7px 16px;border:none;background:#fff;color:var(--ink-2);cursor:pointer;transition:background .15s,color .15s}
+.sim-toggle button:hover{background:var(--bg-soft);color:var(--accent-strong)}
+.sim-toggle button.on{background:var(--accent);color:#fff}
+select{width:100%;font-family:var(--sans);font-weight:500;font-size:13.5px;padding:9px 12px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:#fff;color:var(--ink);margin-bottom:20px;cursor:pointer}
+select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-ring)}
+.sim-hint{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums}
+.sim-hint.over{color:var(--warn);font-weight:600}
 .sim-res-head{border-bottom:1px solid rgba(255,255,255,.16);padding-bottom:18px;margin-bottom:6px}
-.sim-res-tag{font-size:10px;letter-spacing:.1px;text-transform:uppercase;opacity:.7}
-.sim-big{font-size:40px;font-weight:300;letter-spacing:-1.1px;line-height:1.05;margin:8px 0 4px;
-  font-feature-settings:"tnum"}
-.sim-per{font-size:13px;opacity:.7;letter-spacing:0;margin-left:6px}
-.sim-big-sub{font-size:12px;opacity:.72;font-feature-settings:"tnum"}
+.sim-res-tag{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase;opacity:.72}
+.sim-big{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:40px;font-weight:600;letter-spacing:-1.2px;line-height:1.05;margin:8px 0 4px}
+.sim-per{font-family:var(--sans);font-size:13px;font-weight:500;opacity:.72;letter-spacing:0;margin-left:6px}
+.sim-big-sub{font-family:var(--mono);font-size:12px;opacity:.74}
 .sim-rows{margin:14px 0 0}
-.sim-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
-  padding:9px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:13.5px}
+.sim-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:13.5px}
 .sim-row:last-child{border-bottom:none}
-.sim-row dt{opacity:.85}
-.sim-row dd{font-feature-settings:"tnum";letter-spacing:-.2px;font-weight:400}
-.sim-int{font-size:9px;letter-spacing:.1px;text-transform:uppercase;opacity:.55;
-  border:1px solid rgba(255,255,255,.3);border-radius:9999px;padding:1px 6px;margin-left:4px}
-.sim-row-hi dt,.sim-row-hi dd{color:var(--primary-subdued)}
+.sim-row dt{opacity:.86}
+.sim-row dd{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600}
+.sim-int{font-family:var(--mono);font-size:9px;letter-spacing:.8px;text-transform:uppercase;opacity:.55;border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:1px 6px;margin-left:4px}
+.sim-sup{font-family:var(--mono);font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;opacity:.6;margin-left:4px}
+.sim-row-hi dt,.sim-row-hi dd{color:#7dd3c8}
 .sim-sep{border-top:1px solid rgba(255,255,255,.22);margin-top:6px;padding-top:13px}
-.sim-row-total dt,.sim-row-total dd{font-weight:400}
-.sim-row-margen dt,.sim-row-margen dd{color:#fff;font-weight:400;padding-top:12px;
-  border-top:1px solid rgba(255,255,255,.22);margin-top:4px}
+.sim-row-margen dt,.sim-row-margen dd{padding-top:12px;border-top:1px solid rgba(255,255,255,.22);margin-top:4px}
 .sim-pct{font-size:11.5px;opacity:.75;margin-left:6px}
-
-/* barra */
 .sim-bar{margin-top:20px}
-.sim-bar-lbl{font-size:10px;letter-spacing:.1px;text-transform:uppercase;opacity:.7;display:block;margin-bottom:8px}
-.sim-bar-track{height:7px;border-radius:9999px;overflow:hidden;background:rgba(255,255,255,.16);display:flex}
-.sim-bar-fill{display:block;height:100%;background:linear-gradient(90deg,var(--primary-soft),var(--primary));
-  border-radius:9999px;transition:width .35s cubic-bezier(.16,1,.3,1)}
-.sim-bar-legend{display:flex;gap:16px;margin-top:10px;font-size:11px;opacity:.82;flex-wrap:wrap}
+.sim-bar-lbl{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase;opacity:.72;display:block;margin-bottom:8px}
+.sim-bar-track{height:7px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.18)}
+.sim-bar-fill{display:block;height:100%;background:linear-gradient(90deg,#7dd3c8,var(--accent));border-radius:99px;transition:width .35s ease}
+.sim-bar-legend{display:flex;gap:16px;margin-top:10px;font-family:var(--mono);font-size:11px;opacity:.84;flex-wrap:wrap}
 .sim-bar-legend span{display:flex;align-items:center;gap:5px}
-.sim-bar-legend b{font-weight:400;font-feature-settings:"tnum"}
+.sim-bar-legend b{font-weight:600}
 .sw{width:8px;height:8px;border-radius:2px;display:inline-block;flex:none}
-.sw-margen{background:var(--primary-soft)}
-.sw-ia{background:var(--ruby)}
-.sw-infra{background:var(--primary-subdued)}
+.sw-margen{background:#7dd3c8}
+.sw-ia{background:#f0a05a}
+.sw-infra{background:#9fb3b0}
 
-@media (max-width:820px){
+/* ---------- Footer ---------- */
+footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0;font-size:13px;color:var(--muted)}
+.foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.foot .mono{font-size:12px}
+
+/* ---------- Reveal ---------- */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none;transition:none}
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width:980px){
+  .compare{grid-template-columns:1fr}
+  .card.rec{order:-1}
+  .topology{grid-template-columns:1fr;grid-auto-rows:auto}
+  .topo-arrow{transform:rotate(90deg);padding:6px 0}
+  .topbar nav{display:none}
   .sim{grid-template-columns:1fr}
   .sim-big{font-size:34px}
-  .sim-presets{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  .hero{padding:52px 0 34px}
+  section{padding:46px 0}
+  .detail{grid-template-columns:1fr;gap:10px}
+  .brand .sub{display:none}
+  .mesh-hint{display:none}
+  .sim-presets{grid-template-columns:1fr}
 }
 
+/* ---------- Print ---------- */
 @media print{
-  .sidebar,.menu-btn,.overlay,.side-search,.mesh{display:none!important}
-  .content{margin:0}
-  .doc{max-width:none;padding:0}
-  .adm,.tbl-wrap,.price-hero{break-inside:avoid;box-shadow:none}
+  @page{margin:14mm 12mm}
+  body{font-size:11.5px;background:#fff}
+  .topbar{position:static;backdrop-filter:none;border-bottom:1px solid var(--line)}
+  .btn-print,.hero-cta,.topbar nav,.hero-bg,.mesh-hint{display:none !important}
+  .hero{padding:26px 0 14px;background:none;border-bottom:1px solid var(--line)}
+  .hero::after{display:none}
+  .reveal{opacity:1;transform:none}
+  .compare{grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .card{padding:14px;break-inside:avoid;box-shadow:none}
+  .card.rec{order:0}
+  section{padding:18px 0}
+  .detail{padding:14px 0;break-inside:avoid}
+  .topology,.sim{break-inside:avoid}
+  .table-scroll{overflow:visible}
+  table.cmp{min-width:0}
+  table.cmp thead th{position:static;background:var(--bg-soft)}
+  .topbar-inner{height:44px}
+  footer{display:none}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
 </head>
 <body>
 
-<aside class="sidebar">
-  <div class="side-brand">
-    <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 30 10v12L16 30 2 22V10z" fill="#533afd"/><path d="M11 16.5l3.5 3.5L21 13" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <div>
-      <span class="t">AsoBares · Precios</span>
-      <span class="v">Versión 1.0 · TRM $4,000</span>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand">
+      <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 28 9v14L16 30 4 23V9z" fill="#0f766e"/><path d="M11 16.5l3.5 3.5L21 13" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Agente de WhatsApp <span class="sub">· AsoBares</span></span>
     </div>
+    <nav aria-label="Secciones">
+      <a href="#opciones">Modalidades</a>
+      <a href="#capacidad">Capacidad</a>
+      <a href="#simulador">Simulador</a>
+      <a href="#comparativa">Comparativa <span class="pill">3 opciones</span></a>
+    </nav>
+    <button class="btn-print" onclick="window.print()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Exportar PDF
+    </button>
   </div>
-  <div class="side-search">
-    <input id="doc-search" type="search" placeholder="Buscar sección…" aria-label="Buscar en el documento">
-    <p class="nores" id="search-nores">Sin resultados. Prueba con otro término (p. ej. IA, margen, VPS).</p>
-  </div>
-  <nav class="side-nav" aria-label="Contenido">
-    <ul>
-<li class='nav-item'><a href='#resumen' data-nav>Resumen del plan</a></li>
-<li class='nav-item'><a href='#plan' data-nav>01 · El plan</a></li>
-<li class='nav-item'><a href='#incluye' data-nav>02 · Qué incluye</a></li>
-<li class='nav-item'><a href='#ia' data-nav>03 · Costo de IA</a></li>
-<li class='nav-item'><a href='#infra' data-nav>04 · Costo del servidor</a></li>
-<li class='nav-item'><a href='#arquitectura' data-nav>05 · Arquitectura centralizada</a></li>
-<li class='nav-item'><a href='#slices' data-nav>06 · Slices y capacidad</a></li>
-<li class='nav-item'><a href='#simulador' data-nav>07 · Simulador de precios</a></li>
-<li class='nav-item'><a href='#margen' data-nav>08 · Margen por negocio</a></li>
-<li class='nav-item'><a href='#escenarios' data-nav>09 · Escenarios de uso</a></li>
-<li class='nav-item'><a href='#metodo' data-nav>10 · Método de cálculo</a></li>
-<li class='nav-item'><a href='#fuentes' data-nav>11 · Fuentes verificadas</a></li>
-    </ul>
-  </nav>
-  <div class="side-foot">
-    Operado por Purosesu Labs · Documento interno y comercial
-  </div>
-</aside>
+</header>
 
-<button class="menu-btn" aria-label="Abrir menú">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-</button>
-<div class="overlay"></div>
-
-<div class="content">
-  <div class="mesh" aria-hidden="true">
-    <div class="dither-fallback"></div>
-    <canvas id="dither"></canvas>
-    <span class="mesh-hint">Mueve el cursor</span>
-  </div>
-
-  <div class="doc">
-
-    <header class="doc-header" id="resumen">
-      <span class="kicker">Documentación de precios</span>
-      <h1>Agente de WhatsApp con IA para bares</h1>
-      <p class="lead">Un solo plan para los afiliados de AsoBares, con el costo real de operarlo
-      medido y verificado: consumo de <strong>DeepSeek V4.1 Flash</strong>, precios de
-      <strong>InterServer</strong> y el margen que queda por negocio.</p>
-      <p class="meta">Precio de venta $80.000 + IVA · 1.000 mensajes mensuales · TRM $4.000 COP/USD · Cifras verificadas en septiembre de 2026</p>
-      <div class="stat-row">
-        <span class="stat-pill"><b>$95.200</b> valor final con IVA</span>
-        <span class="stat-pill"><b>1.000</b> mensajes incluidos</span>
-        <span class="stat-pill"><b>$359</b> costo de IA / mes</span>
-        <span class="stat-pill"><b>84,3%</b> margen en VPS 1 slice</span>
+<main>
+  <section class="hero">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="dither-fallback"></div>
+      <canvas id="dither"></canvas>
+    </div>
+    <span class="mesh-hint" aria-hidden="true">Mueve el cursor</span>
+    <div class="wrap">
+      <div class="eyebrow">Propuesta comercial · Afiliados AsoBares</div>
+      <h1>Un agente de WhatsApp que atiende tu bar <em>24/7</em></h1>
+      <p class="lead">Tres modalidades de servicio para el mismo agente con inteligencia artificial: responde el menú, los horarios, toma reservas y registra pedidos. El costo real de operarlo está medido sobre el código del agente y sobre una conversación de WhatsApp real, no estimado. A continuación, las tres opciones con su capacidad, sus límites y su precio.</p>
+      <div class="drivers" aria-label="Principios del servicio">
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Servidor compartido</span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Costo medido, no estimado</span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Ley 1581 de 2012</span>
       </div>
-    </header>
+      <div class="hero-cta">
+        <a class="cta primary" href="#opciones">Ver las 3 modalidades
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a class="cta ghost" href="#simulador">Calcular mi consumo</a>
+      </div>
+    </div>
+  </section>
 
-    <section id="plan">
-      <span class="sec-kicker">01 · El plan</span>
-      <h2>Un precio, sin escalones ni sorpresas</h2>
-      <p class="section-sub">El afiliado paga un valor fijo mensual que cubre infraestructura, IA, soporte y mantenimiento.</p>
+  <section id="opciones">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-kicker">Modalidades</div>
+        <h2 class="sec-title">Tres formas de contratar el mismo agente</h2>
+        <p class="sec-sub">Las tres incluyen el agente completo y la instalación gratis. Cambian el volumen de mensajes incluidos, el soporte y el grado de dedicación de la infraestructura.</p>
+      </div>
 
-      <div class="price-hero">
-        <div class="ph-label">Plan AsoBares · Agencia única</div>
-        <div class="ph-amount">$80.000 <span>+ IVA / mes</span></div>
-        <div class="ph-sub">Valor final con IVA del 19%: <strong>$95.200</strong> mensuales. La instalación no tiene costo.</div>
-        <div class="ph-grid">
-          <div class="ph-cell"><div class="k">Mensajes incluidos</div><div class="v">1,000</div></div>
-          <div class="ph-cell"><div class="k">Costo de IA real</div><div class="v">$359</div></div>
-          <div class="ph-cell"><div class="k">Permanencia</div><div class="v">Ninguna</div></div>
+      <div class="compare">
+        <article class="card muted reveal">
+          <div class="opt-no">OPCIÓN 01</div>
+          <h3>Esencial</h3>
+          <p class="concept">El plan de entrada. Cubre la operación de un bar con consultas de menú, horarios y reservas ocasionales.</p>
+          <div class="spec">
+            <span class="k">Mensajes incluidos</span>
+            <span class="v"><strong>1.000</strong> mensajes al mes</span>
+          </div>
+          <div class="spec">
+            <span class="k">Infraestructura</span>
+            <span class="v">Servidor compartido con otros afiliados · 1 slice · respaldos diarios y monitoreo</span>
+          </div>
+          <div class="spec">
+            <span class="k">Costo de IA medido</span>
+            <span class="v"><strong>$359</strong> al mes con caché de prompt · <span class="tag">0,4% del precio</span></span>
+          </div>
+          <div class="risk warn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle class="r" cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5" stroke="#b45309"/></svg>
+            <span><strong>Límite:</strong> el servidor se comparte, así que el dimensionamiento depende del conjunto de afiliados. Si el bar supera los 1.000 mensajes, se avisa antes de facturar.</span>
+          </div>
+          <div class="price">
+            <div class="label">Precio mensual</div>
+            <div class="amount num">$80.000 <span style="font-size:13px;color:var(--muted)">+ IVA COP</span></div>
+            <div class="range">Valor final con IVA 19%: $95.200. Instalación gratis. Sin permanencia.</div>
+          </div>
+          <a class="card-link" href="#detalle-op1">Ver detalle →</a>
+        </article>
+
+        <article class="card rec reveal">
+          <span class="badge-rec">★ Recomendada</span>
+          <div class="opt-no">OPCIÓN 02</div>
+          <h3>Profesional</h3>
+          <p class="concept">El plan para el bar que ya vive del agente: más volumen, respuesta prioritaria y un servidor con holgura real.</p>
+          <div class="spec">
+            <span class="k">Mensajes incluidos</span>
+            <span class="v"><strong>3.000</strong> mensajes al mes</span>
+          </div>
+          <div class="spec">
+            <span class="k">Infraestructura</span>
+            <span class="v">Servidor compartido de <strong>8 slices</strong> · 4 núcleos · 16 GB · <strong>soporte gestionado de InterServer incluido</strong></span>
+          </div>
+          <div class="spec">
+            <span class="k">Costo de IA medido</span>
+            <span class="v"><strong>$1.078</strong> al mes con caché de prompt · <span class="tag">0,3% del precio</span><br><span class="muted-sm">Escala lineal: el costo por mensaje no cambia, el volumen sí.</span></span>
+          </div>
+          <div class="risk ok">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle class="r" cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5.5" stroke="#1a7f4e"/></svg>
+            <span><strong>Ventaja clave:</strong> la talla de 8 slices ya tiene soporte gestionado y capacidad para 200 negocios, así que el afiliado no compite por recursos durante los picos de fin de semana.</span>
+          </div>
+          <div class="price">
+            <div class="label">Precio mensual</div>
+            <div class="amount num">$190.000 <span style="font-size:13px;color:var(--muted)">+ IVA COP</span></div>
+            <div class="range">Valor final con IVA 19%: $226.100. Instalación gratis. Sin permanencia.</div>
+          </div>
+          <a class="card-link" href="#detalle-op2">Ver detalle →</a>
+        </article>
+
+        <article class="card muted reveal">
+          <div class="opt-no">OPCIÓN 03</div>
+          <h3>A la medida</h3>
+          <p class="concept">Para cadenas, gastrobares de eventos o capítulos regionales que quieren su propia instancia y control total del consumo.</p>
+          <div class="spec">
+            <span class="k">Mensajes incluidos</span>
+            <span class="v"><strong>Desde 8.000</strong> mensajes al mes, según acuerdo</span>
+          </div>
+          <div class="spec">
+            <span class="k">Infraestructura</span>
+            <span class="v">Servidor dedicado al afiliado o al capítulo · talla de <strong>16 a 32 slices</strong> · respaldos y monitoreo a medida</span>
+          </div>
+          <div class="spec">
+            <span class="k">Costo de IA medido</span>
+            <span class="v">Facturado al costo real · <span class="tag">transparencia total</span><br><span class="muted-sm">Se entrega el consumo medido desde la tabla <span class="mono">consumo_negocio</span>.</span></span>
+          </div>
+          <div class="risk warn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle class="r" cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5" stroke="#b45309"/></svg>
+            <span><strong>A considerar:</strong> un servidor dedicado cuesta más por negocio que uno compartido. Solo se justifica con volumen alto o con requisitos de aislamiento.</span>
+          </div>
+          <div class="price">
+            <div class="label">Precio mensual</div>
+            <div class="amount num">A convenir <span style="font-size:13px;color:var(--muted)">+ IVA COP</span></div>
+            <div class="range">Se calcula sobre el volumen acordado y la talla de servidor elegida.</div>
+          </div>
+          <a class="card-link" href="#detalle-op3">Ver detalle →</a>
+        </article>
+      </div>
+
+      <div class="topology reveal" aria-label="Arquitectura centralizada del servicio">
+        <div class="topo-node a">
+          <span class="role">Cliente · WhatsApp</span>
+          <span class="hw">El cliente escribe primero</span>
+          <span class="job">Abre la ventana de servicio de 24 h</span>
+        </div>
+        <div class="topo-arrow" aria-hidden="true"><svg width="22" height="16" viewBox="0 0 24 16" fill="none"><path d="M1 8h20M16 2l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="topo-node b">
+          <span class="role">Servidor central · 1 slice</span>
+          <span class="hw">Una sola instalación atiende a todos</span>
+          <span class="job">1,5 GB de RAM · ~50 negocios por núcleo</span>
+        </div>
+        <div class="topo-arrow" aria-hidden="true"><svg width="22" height="16" viewBox="0 0 24 16" fill="none"><path d="M1 8h20M16 2l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="topo-node c">
+          <span class="role">IA · DeepSeek V4.1 Flash</span>
+          <span class="hw">Responde en segundos, a cualquier hora</span>
+          <span class="job">3.180 tokens de entrada por mensaje</span>
         </div>
       </div>
+    </div>
+  </section>
 
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">Por qué se cobra por mensaje y no por token</p><p>Un bar entiende y presupuesta un número de mensajes; una factura que depende del consumo de tokens genera desconfianza. El tope de 1.000 mensajes protege el margen y le da al negocio un costo predecible. El consumo real se sigue midiendo internamente para detectar desvíos antes de que afecten el mes.</p></div>
-</div>
-
-      <div class="adm adm-warning">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-<div><p class="adm-title">El IVA no es ingreso</p><p>El precio de lista es de $80.000. Los $15.200 de IVA se recaudan para la DIAN y se trasladan íntegros, así que <strong>el margen se calcula siempre sobre $80.000</strong>, nunca sobre $95.200.</p></div>
-</div>
-    </section>
-
-    <section id="incluye">
-      <span class="sec-kicker">02 · Qué incluye</span>
-      <h2>Qué recibe el negocio por ese valor</h2>
-      <p class="section-sub">Todo lo necesario para operar el agente, sin costos de implementación ni licencias por usuario.</p>
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Concepto</th><th>Incluido</th><th>Detalle</th></tr></thead>
-          <tbody>
-<tr><td class='rowhead'>Instalación y alta</td><td><strong>Gratis</strong></td><td>Configuración inicial, carga de la carta y puesta en marcha. Sin costo de implementación.</td></tr>
-<tr><td class='rowhead'>Mensajes con IA</td><td><strong>1.000 / mes</strong></td><td>Cada mensaje que el agente responde. Un cliente que escribe 10 veces seguidas consume 10.</td></tr>
-<tr><td class='rowhead'>Negocio</td><td><strong>1</strong></td><td>Un establecimiento por plan. Una sede adicional es un plan aparte.</td></tr>
-<tr><td class='rowhead'>Usuarios del panel</td><td><strong>Ilimitados</strong></td><td>Todo el equipo del bar puede consultar conversaciones, reservas y escaladas.</td></tr>
-<tr><td class='rowhead'>Mensajería de WhatsApp</td><td><strong>Sin costo</strong></td><td>El agente solo responde dentro de la ventana de servicio de 24 h de Meta. Nunca envía plantillas de marketing.</td></tr>
-<tr><td class='rowhead'>Módulos</td><td><strong>Reservas y pedidos</strong></td><td>Toma de reservas de mesa y de pedidos contra el menú y los precios reales del negocio.</td></tr>
-<tr><td class='rowhead'>Escalado a humano</td><td><strong>Incluido</strong></td><td>Cuando el caso lo amerita, avisa al equipo con el historial completo de la conversación.</td></tr>
-<tr><td class='rowhead'>Servidor y operación</td><td><strong>Incluido</strong></td><td>Infraestructura, dominio, TLS, respaldos diarios, monitoreo y soporte durante el horario hábil.</td></tr>
-<tr><td class='rowhead'>Permanencia mínima</td><td><strong>Ninguna</strong></td><td>El servicio es mes a mes. Se cancela cuando el negocio quiera, sin penalidad.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section id="ia">
-      <span class="sec-kicker">03 · Costo de IA por tokens</span>
-      <h2>Cuánto cuesta realmente cada mensaje</h2>
-      <p class="section-sub">El costo se construye de abajo hacia arriba midiendo el código del agente, no estimando. Precios oficiales de DeepSeek para <code>deepseek-flash</code> (DeepSeek-V4.1-Flash), off-peak.</p>
-
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Concepto</th><th>Tarifa</th><th>Off-peak</th><th>Peak</th></tr></thead>
-          <tbody>
-<tr><td class='rowhead'>Entrada — cache miss</td><td>off-peak</td><td class='tnum'>$0,15</td><td class='tnum'><strong>$0,30</strong></td></tr>
-<tr><td class='rowhead'>Entrada — cache hit</td><td>off-peak</td><td class='tnum'>$0,003</td><td class='tnum'><strong>$0,006</strong></td></tr>
-<tr><td class='rowhead'>Salida</td><td>off-peak</td><td class='tnum'>$0,60</td><td class='tnum'><strong>$1,20</strong></td></tr>
-          </tbody>
-        </table>
+  <section id="detalle" style="background:var(--bg-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-kicker">Detalle por modalidad</div>
+        <h2 class="sec-title">Qué incluye cada opción y dónde está el riesgo</h2>
+        <p class="sec-sub">El costo de IA no es el factor dominante en ninguna de las tres: el servidor cuesta entre 33 y 48 veces más. La decisión real es cuánta infraestructura dedicar y cuánto volumen incluir.</p>
       </div>
 
-      <div class="adm adm-warning">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-<div><p class="adm-title">Corrección: el supuesto anterior subestimaba la entrada</p><p>El documento calculaba con <strong>1.630 tokens de entrada por mensaje</strong>. Al medir el prompt real y los esquemas de herramientas, la cifra correcta es <strong>~3.180</strong>: casi el doble. Los 1.630 no contaban el peso de las 7 herramientas (1.664 tokens) ni el tamaño real del prompt base (1.140, no 900). Esta sección reemplaza ese supuesto.</p></div>
-</div>
+      <article class="detail reveal" id="detalle-op1">
+        <div class="dnum num">01</div>
+        <div>
+          <h3>Esencial · $80.000 + IVA</h3>
+          <div class="dsub mono">1.000 mensajes · servidor compartido de 1 slice · instalación gratis</div>
+          <p>La modalidad de entrada para un bar que quiere probar el agente sin comprometer presupuesto. Incluye el agente completo: menú y precios reales, horarios, reservas de mesa, pedidos, escalado a un humano y panel web para el equipo. La instalación, la carga de la carta y la puesta en marcha están incluidas.</p>
+          <div class="chips">
+            <span class="tag">1.000 mensajes</span>
+            <span class="tag">Instalación gratis</span>
+            <span class="tag">Sin permanencia</span>
+            <span class="tag">Panel web</span>
+          </div>
+          <ul>
+            <li><strong>Costo de operar:</strong> $359 al mes de IA (0,4% del precio base) más $480 de infraestructura prorrateada. El margen bruto es del <strong>84,6%</strong>.</li>
+            <li><strong>Mensajería de WhatsApp:</strong> sin costo. El agente solo responde dentro de la ventana de servicio de 24 h; nunca envía plantillas de marketing.</li>
+            <li><strong>Límite:</strong> los 1.000 mensajes son el tope del plan. Si el negocio lo supera, se le avisa y se le muestra el consumo antes de facturar cualquier excedente.</li>
+            <li><strong>Instalación:</strong> gratis, en menos de 30 minutos, incluida la carga de la carta y la configuración del tono del agente.</li>
+          </ul>
+        </div>
+      </article>
 
-      <h3>De dónde salen los tokens</h3>
-      <p class="section-sub">Cada componente medido en el repositorio del agente.</p>
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Componente</th><th>Origen</th><th>Tokens</th><th>Nota</th></tr></thead>
-          <tbody>
-<tr><td class='rowhead'>System prompt base</td><td>prompts/base.txt · 3.982 caracteres</td><td class='tnum'><strong>1.140</strong></td><td>Medido. El documento asumía 900.</td></tr>
-<tr><td class='rowhead'>Datos del negocio</td><td>nombre, horario, instrucciones</td><td class='tnum'><strong>120</strong></td><td>Se inyectan en cada turno desde la base de datos.</td></tr>
-<tr><td class='rowhead'>Esquemas de herramientas</td><td>7 herramientas @tool con su JSON Schema</td><td class='tnum'><strong>1.664</strong></td><td>Medido. Pesa más que el prompt base y no estaba contado.</td></tr>
-<tr><td class='rowhead'>Historial de conversación</td><td>hasta 10 mensajes previos · ~30 tok cada uno</td><td class='tnum'><strong>300</strong></td><td>`historial_max_mensajes = 10` por defecto. Crece dentro de la conversación.</td></tr>
-<tr><td class='rowhead'>Mensaje del cliente</td><td>un mensaje típico de WhatsApp</td><td class='tnum'><strong>20</strong></td><td>Texto libre del usuario.</td></tr>
-          </tbody>
-        </table>
+      <article class="detail rec reveal" id="detalle-op2">
+        <div class="dnum num">02</div>
+        <div>
+          <h3>Profesional · $190.000 + IVA</h3>
+          <div class="dsub mono">3.000 mensajes · servidor de 8 slices con soporte gestionado · respuesta prioritaria</div>
+          <p>Para el bar donde el agente ya es parte de la operación diaria. Triplica el volumen incluido y sube a una talla de servidor con soporte gestionado de InterServer, lo que da holgura real en los picos de fin de semana y en temporada de eventos.</p>
+          <div class="chips">
+            <span class="tag">3.000 mensajes</span>
+            <span class="tag">8 slices · 16 GB</span>
+            <span class="tag">Soporte gestionado</span>
+            <span class="tag">Respuesta prioritaria</span>
+          </div>
+          <ul>
+            <li><strong>Costo de operar:</strong> $1.078 al mes de IA más $480 de infraestructura prorrateada sobre 200 negocios. El margen bruto es del <strong>99,2%</strong> sobre el precio base.</li>
+            <li><strong>Por qué escala bien:</strong> el costo de IA por mensaje es constante. Pasar de 1.000 a 3.000 mensajes multiplica el costo por tres, no por más: el precio sube 2,4× y el margen mejora.</li>
+            <li><strong>Infraestructura:</strong> la talla de 8 slices cubre hasta 200 negocios con 4 núcleos y 16 GB, e incluye soporte gestionado de InterServer para incidencias de servicio y base de datos.</li>
+            <li><strong>Límite:</strong> el servidor sigue siendo compartido. Si un afiliado necesita aislamiento físico o un requisito contractual de datos, corresponde la Opción 3.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="detail reveal" id="detalle-op3">
+        <div class="dnum num">03</div>
+        <div>
+          <h3>A la medida · a convenir</h3>
+          <div class="dsub mono">Desde 8.000 mensajes · servidor dedicado de 16 a 32 slices · costo de IA transparente</div>
+          <p>Para cadenas de bares, gastrobares de eventos o un capítulo regional completo que quiere su propia instancia, control del consumo y facturación del costo real de IA. El dimensionamiento se calcula con el mismo modelo de tokens que el resto de esta propuesta.</p>
+          <div class="chips">
+            <span class="tag">Desde 8.000 mensajes</span>
+            <span class="tag">16–32 slices</span>
+            <span class="tag">Instancia propia</span>
+            <span class="tag">Costo de IA al costo</span>
+          </div>
+          <ul>
+            <li><strong>Capacidad:</strong> 16 slices sostienen hasta 400 negocios y 32 slices hasta 800, con 8 y 16 núcleos respectivamente. El límite práctico es la CPU, no la memoria.</li>
+            <li><strong>Transparencia:</strong> el consumo se entrega medido por negocio y por día desde la tabla <span class="mono">consumo_negocio</span>, con tokens de entrada, salida y llamadas al LLM.</li>
+            <li><strong>Punto de equilibrio:</strong> un servidor dedicado solo se justifica con volumen alto. A 32 slices el costo es de $384.000 al mes, que repartido entre 10 negocios ya son $38.400 por negocio.</li>
+            <li><strong>Riesgo:</strong> pagar dedicación sin aprovecharla. La recomendación es empezar compartido y migrar a dedicado cuando el volumen lo exija.</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="capacidad">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-kicker">Infraestructura</div>
+        <h2 class="sec-title">Cuántos negocios caben en cada talla</h2>
+        <p class="sec-sub">InterServer vende el servidor por <em>slices</em>: cada slice añade recursos de forma predecible. Precios reales publicados, convertidos a una TRM de referencia de $4.000 COP/USD.</p>
       </div>
 
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">El prompt fijo se repite en cada llamada</p><p>El prompt base, los datos del negocio y las herramientas suman <code>2.924</code> tokens que se envían <strong>en cada mensaje</strong>. De esos, <code>2.804</code> forman un prefijo estable que DeepSeek puede cachear. Es la razón por la que el caché importa tanto: sin él, ese prefijo se paga a precio completo en cada turno.</p></div>
-</div>
-
-      <h3>Costo por conversación</h3>
-      <p class="section-sub">El historial crece mensaje a mensaje (hasta 10 previos por defecto), así que el costo no es lineal: cada turno pesa un poco más que el anterior.</p>
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Perfil</th><th>Mensajes</th><th>Salida/msg</th><th>Tokens entrada</th><th>Con caché</th><th>Sin caché</th></tr></thead>
+      <div class="table-scroll reveal">
+        <table class="cmp">
+          <thead>
+            <tr>
+              <th>Talla</th><th>Núcleos</th><th>RAM</th><th>SSD</th>
+              <th>USD / mes</th><th>COP / mes</th><th>Negocios</th><th>Para qué</th>
+            </tr>
+          </thead>
           <tbody>
-<tr><td class='rowhead'>Consulta simple</td><td class='tnum'>2</td><td class='tnum'>50</td><td class='tnum'>5.918</td><td class='tnum'>$0,49</td><td class='tnum'>$3,79</td></tr>
-<tr><td class='rowhead'>Conversación normal</td><td class='tnum'>6</td><td class='tnum'>82</td><td class='tnum'>18.114</td><td class='tnum'>$2,16</td><td class='tnum'>$12,05</td></tr>
-<tr><td class='rowhead'>Conversación larga</td><td class='tnum'>12</td><td class='tnum'>90</td><td class='tnum'>37.278</td><td class='tnum'>$5,17</td><td class='tnum'>$24,96</td></tr>
-<tr><td class='rowhead'>Con herramientas</td><td class='tnum'>20</td><td class='tnum'>110</td><td class='tnum'>63.230</td><td class='tnum'>$10,24</td><td class='tnum'>$43,22</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">Cómo se lee esta tabla</p><p>Una <strong>conversación normal de 6 mensajes cuesta $1,48</strong> con caché y $11,37 sin ella. La diferencia de 8× es el valor del caché de prompt. Una conversación con herramientas (reservas, pedidos) sube a $10,72 porque genera más salida y más idas y vueltas.</p></div>
-</div>
-
-      <h3>El plan de 1.000 mensajes</h3>
-      <p class="section-sub">Según el perfil de conversación que domine en cada bar.</p>
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Perfil dominante</th><th>Conversaciones</th><th>Con caché</th><th>Sin caché</th><th>% de $80.000</th></tr></thead>
-          <tbody>
-<tr><td class='rowhead'>Consulta simple</td><td class='tnum'>500</td><td class='tnum'>$247</td><td class='tnum'>$1.895</td><td class='tnum'>0,3%</td></tr>
-<tr><td class='rowhead'>Conversación normal</td><td class='tnum'>167</td><td class='tnum'>$359</td><td class='tnum'>$2.008</td><td class='tnum'>0,4%</td></tr>
-<tr><td class='rowhead'>Conversación larga</td><td class='tnum'>83</td><td class='tnum'>$431</td><td class='tnum'>$2.080</td><td class='tnum'>0,5%</td></tr>
-<tr><td class='rowhead'>Con herramientas</td><td class='tnum'>50</td><td class='tnum'>$512</td><td class='tnum'>$2.161</td><td class='tnum'>0,6%</td></tr>
+<tr><td class='rowhead'>1 slice</td><td class='num'>1</td><td class='num'>2 GB</td><td class='num'>40 GB</td><td class='num'>US$ 3,00</td><td class='num'>$12.000</td><td class='num'><span class='strong'>50</span></td><td class='muted-sm'>Piloto y primeros afiliados</td></tr>
+<tr><td class='rowhead'>2 slices</td><td class='num'>2</td><td class='num'>4 GB</td><td class='num'>80 GB</td><td class='num'>US$ 6,00</td><td class='num'>$24.000</td><td class='num'><span class='strong'>100</span></td><td class='muted-sm'>Crecimiento cómodo</td></tr>
+<tr><td class='rowhead'>4 slices</td><td class='num'>2</td><td class='num'>8 GB</td><td class='num'>160 GB</td><td class='num'>US$ 12,00</td><td class='num'>$48.000</td><td class='num'><span class='strong'>100</span></td><td class='muted-sm'>Talla del análisis original</td></tr>
+<tr><td class='rowhead'>8 slices</td><td class='num'>4</td><td class='num'>16 GB</td><td class='num'>320 GB</td><td class='num'>US$ 24,00</td><td class='num col-rec'>$96.000</td><td class='num col-rec'><span class='strong'>200</span></td><td class='muted-sm'>Soporte gestionado incluido</td></tr>
+<tr><td class='rowhead'>16 slices</td><td class='num'>8</td><td class='num'>32 GB</td><td class='num'>640 GB</td><td class='num'>US$ 48,00</td><td class='num'>$192.000</td><td class='num'><span class='strong'>400</span></td><td class='muted-sm'>Varios capítulos regionales</td></tr>
           </tbody>
         </table>
       </div>
 
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">El rango honesto va de $211 a $2.185 al mes</p><p>Según el perfil, agotar los 1.000 mensajes cuesta entre <strong>$247 y $512 con caché</strong>, o entre <strong>$1.895 y $2.161 sin él</strong>. Cualquier cifra única es un caso particular, no el costo esperado. El valor de referencia es el de la conversación normal <strong>con caché: $359/mes</strong>, el 0,4% del precio.</p></div>
-</div>
+      <div class="rec-note note-warn reveal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        <span><strong>El límite real es la CPU, no la memoria.</strong> Con el stack centralizado, 1 slice (1 núcleo, 2 GB) ya sostiene ~50 negocios y la RAM permitiría 60. Por eso se escala añadiendo slices por núcleo y no por memoria: cada mensaje es espera de red al modelo (~1,5 s), no cómputo.</span>
+      </div>
 
-      <h3>Qué pasa si cambian las condiciones</h3>
-      <p class="section-sub">Cada caso calculado por separado, sobre el plan de 1.000 mensajes.</p>
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Escenario</th><th>Costo mensual</th><th>vs. base</th><th>Condición</th></tr></thead>
+      <div class="rec-note reveal" style="margin-top:14px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+        <span><strong>Arquitectura centralizada:</strong> una sola instalación atiende a todos los negocios. El aislamiento de datos es lógico, garantizado por <span class="mono">Row Level Security</span> de PostgreSQL: cada fila lleva su <span class="mono">negocio_id</span> y la base filtra por política, el mismo mecanismo que usan los bancos. Aunque la aplicación tuviera un error, la base no devuelve filas de otro negocio. Instalar una copia por bar consumiría ~7 GB y dejaría el servidor al límite de 8 GB.</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="ia" style="background:var(--bg-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-kicker">Costo de IA medido</div>
+        <h2 class="sec-title">Cuánto cuesta realmente cada mensaje</h2>
+        <p class="sec-sub">El costo se construye de abajo hacia arriba midiendo el código del agente, y se valida contra una conversación de WhatsApp real. Precios oficiales de DeepSeek para <span class="mono">deepseek-flash</span>, tarifa off-peak.</p>
+      </div>
+
+      <div class="table-scroll reveal">
+        <table class="cmp">
+          <thead><tr><th>Componente del prompt</th><th>Origen</th><th>Tokens</th><th>Nota</th></tr></thead>
           <tbody>
-<tr><td class='rowhead'>Con caché de prompt, off-peak</td><td class='tnum'>$247</td><td class='tnum'>100%</td><td>El escenario publicado</td></tr>
-<tr><td class='rowhead'>Sin caché de prompt</td><td class='tnum'>$1.895</td><td class='tnum'>768%</td><td>Si el prefijo no se reutiliza</td></tr>
-<tr><td class='rowhead'>Prompt base 1.000 tokens más largo</td><td class='tnum'>$259</td><td class='tnum'>105%</td><td>Carta extensa o muchas instrucciones</td></tr>
-<tr><td class='rowhead'>Clasificador reactivado</td><td class='tnum'>$400</td><td class='tnum'>162%</td><td>2 llamadas por mensaje en vez de 1</td></tr>
-<tr><td class='rowhead'>Tarifa peak en todo el tráfico</td><td class='tnum'>$493</td><td class='tnum'>200%</td><td>Cota superior; el tráfico real es off-peak</td></tr>
+<tr><td class='rowhead'>System prompt base</td><td class='muted-sm'>prompts/base.txt · 3.982 caracteres</td><td class='num'><span class='strong'>1.140</span></td><td class='muted-sm'>Medido. El documento asumía 900.</td></tr>
+<tr><td class='rowhead'>Datos del negocio</td><td class='muted-sm'>nombre, horario, instrucciones</td><td class='num'><span class='strong'>120</span></td><td class='muted-sm'>Se inyectan en cada turno desde la base de datos.</td></tr>
+<tr><td class='rowhead'>Esquemas de herramientas</td><td class='muted-sm'>7 herramientas @tool con su JSON Schema</td><td class='num'><span class='strong'>1.664</span></td><td class='muted-sm'>Medido. Pesa más que el prompt base y no estaba contado.</td></tr>
+<tr><td class='rowhead'>Historial de conversación</td><td class='muted-sm'>hasta 10 mensajes previos · ~30 tok cada uno</td><td class='num'><span class='strong'>300</span></td><td class='muted-sm'>`historial_max_mensajes = 10` por defecto. Crece dentro de la conversación.</td></tr>
+<tr><td class='rowhead'>Mensaje del cliente</td><td class='muted-sm'>un mensaje típico de WhatsApp</td><td class='num'><span class='strong'>20</span></td><td class='muted-sm'>Texto libre del usuario.</td></tr>
           </tbody>
         </table>
       </div>
 
-      <div class="adm adm-warning">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-<div><p class="adm-title">El riesgo real es quedarse sin caché</p><p>Todo el modelo depende de que el prefijo de <code>2.804</code> tokens se reutilice. Si el caché no funciona —porque el prompt cambia en cada turno, porque se reordena el contexto o porque el proveedor no lo aplica— el costo salta de <strong>$359 a $2.008, un 459% más</strong>. Es el supuesto que hay que verificar primero en el piloto.</p></div>
-</div>
+      <div class="rec-note note-warn reveal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        <span><strong>Corrección sobre el cálculo anterior:</strong> el supuesto previo era de 1.630 tokens de entrada por mensaje. Medido, el prompt fijo pesa <strong>2.924</strong> y la entrada real es de ~3.180: casi el doble. Los 1.630 no contaban las 7 herramientas (1.664 tokens) ni el tamaño real del prompt base (1.140, no 900).</span>
+      </div>
 
-      <h3>Verificación con una conversación real</h3>
-      <p class="section-sub">Una conversación de WhatsApp del agente, tokenizada con <code>tiktoken</code> y simulada turno a turno. Es la primera medición real sobre el agente en operación.</p>
-      <div class="tbl-wrap">
-        <table class="doc-t">
+      <div class="sec-head reveal" style="margin:44px 0 22px">
+        <div class="sec-kicker">Verificación</div>
+        <h2 class="sec-title" style="font-size:clamp(20px,2.4vw,26px)">Una conversación real, tokenizada</h2>
+        <p class="sec-sub">Una conversación de WhatsApp del agente en operación, medida con <span class="mono">tiktoken</span> y simulada turno a turno. Es la primera medición real sobre el agente.</p>
+      </div>
+
+      <div class="table-scroll reveal">
+        <table class="cmp" style="min-width:640px">
           <thead><tr><th>Métrica</th><th>Medido</th><th>Qué significa</th></tr></thead>
           <tbody>
-<tr><td class='rowhead'>Mensajes en el chat</td><td class='tnum'><strong>16</strong></td><td>8 del cliente, 8 del agente</td></tr>
-<tr><td class='rowhead'>Tokens de texto intercambiado</td><td class='tnum'><strong>693</strong></td><td>Lo que se ve en la pantalla</td></tr>
-<tr><td class='rowhead'>Llamadas al LLM</td><td class='tnum'><strong>8</strong></td><td>Una por mensaje del cliente</td></tr>
-<tr><td class='rowhead'>Tokens de entrada facturados</td><td class='tnum'><strong>25.394</strong></td><td>36,6× el texto: el historial se reenvía</td></tr>
-<tr><td class='rowhead'>Tokens de salida</td><td class='tnum'><strong>506</strong></td><td>82 por respuesta en promedio</td></tr>
-<tr><td class='rowhead'>Costo de la conversación</td><td class='tnum'><strong>$3,26</strong></td><td>Con caché de prompt, off-peak</td></tr>
+<tr><td class='rowhead'>Mensajes en el chat</td><td class='num'><span class='strong'>16</span></td><td class='muted-sm'>8 del cliente, 8 del agente</td></tr>
+<tr><td class='rowhead'>Tokens de texto en pantalla</td><td class='num'><span class='strong'>693</span></td><td class='muted-sm'>Lo que se ve en el chat</td></tr>
+<tr><td class='rowhead'>Llamadas al LLM</td><td class='num'><span class='strong'>8</span></td><td class='muted-sm'>Una por mensaje del cliente</td></tr>
+<tr><td class='rowhead'>Entrada facturada</td><td class='num'><span class='strong'>25.394</span></td><td class='muted-sm'>36,6× el texto: el historial se reenvía</td></tr>
+<tr><td class='rowhead'>Salida</td><td class='num'><span class='strong'>506</span></td><td class='muted-sm'>82 tokens por respuesta</td></tr>
+<tr><td class='rowhead'>Costo de la conversación</td><td class='num'><span class='strong'>$3,26</span></td><td class='muted-sm'>Con caché de prompt, off-peak</td></tr>
           </tbody>
         </table>
       </div>
 
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">El texto del chat no es el costo: se paga 36,6 veces más</p><p>En pantalla la conversación tiene <strong>693 tokens</strong>. Al LLM se le enviaron <strong>25.394</strong>. La diferencia es el prompt fijo (2.924 tokens) repetido en cada una de las 8 llamadas, más el historial que se reenvía completo cada vez. Por eso el número de <em>mensajes</em> importa más que su longitud: cada mensaje nuevo arrastra todo lo anterior.</p></div>
-</div>
+      <div class="rec-note reveal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+        <span><strong>El texto del chat no es el costo.</strong> En pantalla la conversación tiene 693 tokens; al modelo se le enviaron <strong>25.394</strong> de entrada, 36,6 veces más. La diferencia es el prompt fijo repetido en cada una de las 8 llamadas, más el historial que se reenvía completo cada vez. Por eso importa el <em>número</em> de mensajes más que su longitud.</span>
+      </div>
 
-      <div class="adm adm-warning">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-<div><p class="adm-title">La salida real es el doble de lo que asumía el modelo</p><p>El modelo calculaba <strong>35 tokens de salida</strong> por respuesta. La medición da <strong>82</strong>: 2,3× más. El agente es conversacional —saluda, usa emoji, lista opciones y recuerda las promociones— así que escribe largo. La <em>entrada</em> del modelo quedó validada con un error de solo −7,9%, pero la salida estaba subestimada. Los perfiles de la tabla anterior ya usan la cifra corregida.</p></div>
-</div>
+      <div class="rec-note note-warn reveal" style="margin-top:14px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        <span><strong>La salida real duplica lo estimado.</strong> El modelo asumía 35 tokens de salida por respuesta; la medición da <strong>82</strong>. El agente es conversacional —saluda, usa emoji, lista opciones y recuerda las promociones— así que escribe largo. La entrada del modelo quedó validada con un error de −7,9%, pero la salida estaba subestimada 2,3×. Las cifras de esta propuesta ya usan la corrección.</span>
+      </div>
 
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">Validación cruzada del modelo</p><p>Entrada real por turno: <strong>3.174 tokens</strong>. El modelo predijo 2.924 de prompt fijo más el historial variable. El error es de <strong>−7,9%</strong>, dentro del margen esperado entre el tokenizer de referencia (<code>cl100k_base</code>) y el BPE propio de DeepSeek. El modelo de entrada es fiable; el de salida ya está corregido.</p></div>
-</div>
+      <div class="sec-head reveal" style="margin:44px 0 22px">
+        <div class="sec-kicker">Desglose</div>
+        <h2 class="sec-title" style="font-size:clamp(20px,2.4vw,26px)">Costo por perfil de conversación</h2>
+        <p class="sec-sub">El historial crece mensaje a mensaje, así que el costo no es lineal: cada turno pesa un poco más que el anterior. El caché de prompt es la diferencia entre las dos columnas de costo.</p>
+      </div>
 
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">Pendiente: confirmar con consumo medido</p><p>Estas cifras son un modelo construido sobre el código, no una factura. La tabla <code>consumo_negocio</code> ya registra tokens de entrada, salida y llamadas por negocio y día, pero <strong>todavía no se ha consultado con datos reales</strong>. Antes de fijar precios con estos números hay que leer esa tabla tras el piloto y comparar con lo simulado aquí.</p></div>
-</div>
-    </section>
-
-    <section id="infra">
-      <span class="sec-kicker">04 · Costo del servidor</span>
-      <h2>Infraestructura en InterServer</h2>
-      <p class="section-sub">Precios reales publicados por InterServer, convertidos a COP con la TRM de referencia.</p>
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Plan</th><th>Recursos</th><th>USD / mes</th><th>COP / mes</th><th>Notas</th></tr></thead>
+      <div class="table-scroll reveal">
+        <table class="cmp">
+          <thead><tr><th>Perfil</th><th>Mensajes</th><th>Salida/msg</th><th>Tokens entrada</th><th>Con caché</th><th>Sin caché</th></tr></thead>
           <tbody>
-<tr><td class='rowhead'>Web Hosting Standard</td><td>Renovación mensual</td><td class='tnum'>$7,00</td><td class='tnum'><strong>28.000</strong></td><td>Hosting compartido, DirectAdmin, correo y CDN incluidos</td></tr>
-<tr><td class='rowhead'>Cloud VPS · 1 slice</td><td>1 core · 2 GB RAM · 40 GB SSD · 2 TB</td><td class='tnum'>$3,00</td><td class='tnum'><strong>12.000</strong></td><td>KVM, IP pública, acceso root, RAID-10 SSD</td></tr>
-<tr><td class='rowhead'>Cloud VPS · 2 slices</td><td>2 cores · 4 GB RAM · 80 GB SSD · 4 TB</td><td class='tnum'>$6,00</td><td class='tnum'><strong>24.000</strong></td><td>Punto medio para varios negocios con holgura</td></tr>
-<tr><td class='rowhead'>Cloud VPS · 4 slices</td><td>2 cores · 8 GB RAM · 160 GB SSD · 8 TB</td><td class='tnum'>$12,00</td><td class='tnum'><strong>48.000</strong></td><td>Dimensionado para 20–25 negocios según el análisis</td></tr>
-<tr><td class='rowhead'>Cloud VPS · 8 slices</td><td>4 cores · 16 GB RAM · 320 GB SSD · 16 TB</td><td class='tnum'>$24,00</td><td class='tnum'><strong>96.000</strong></td><td>Incluye soporte gestionado de InterServer</td></tr>
+<tr><td class='rowhead'>Consulta simple</td><td class='num'>2</td><td class='num'>50</td><td class='num'>5.918</td><td class='num'><span class='strong'>$0,49</span></td><td class='num muted-sm'>$3,79</td></tr>
+<tr><td class='rowhead'>Conversación normal</td><td class='num'>6</td><td class='num'>82</td><td class='num'>18.114</td><td class='num'><span class='strong'>$2,16</span></td><td class='num muted-sm'>$12,05</td></tr>
+<tr><td class='rowhead'>Conversación larga</td><td class='num'>12</td><td class='num'>90</td><td class='num'>37.278</td><td class='num'><span class='strong'>$5,17</span></td><td class='num muted-sm'>$24,96</td></tr>
+<tr><td class='rowhead'>Con herramientas</td><td class='num'>20</td><td class='num'>110</td><td class='num'>63.230</td><td class='num'><span class='strong'>$10,24</span></td><td class='num muted-sm'>$43,22</td></tr>
           </tbody>
         </table>
       </div>
 
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">Por qué InterServer y no un proveedor más caro</p><p>El Cloud VPS de InterServer arranca en <strong>US$3 al mes</strong> con 1 core, 2 GB de RAM y 40 GB de SSD, con IP pública y acceso root. El análisis de capacidad del proyecto concluyó que el stack completo consume ~1,5 GB de RAM para 20–25 negocios, así que <strong>un solo slice ya sobra para el piloto</strong> y el plan de 4 slices cubre la operación completa.</p></div>
-</div>
+      <div class="sec-head reveal" style="margin:44px 0 22px">
+        <div class="sec-kicker">Escala</div>
+        <h2 class="sec-title" style="font-size:clamp(20px,2.4vw,26px)">El plan de 1.000 mensajes</h2>
+        <p class="sec-sub">Según el perfil de conversación que domine en cada bar.</p>
+      </div>
 
-      <div class="adm adm-warning">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-<div><p class="adm-title">El servidor es el costo dominante, no la IA</p><p>En el escenario más eficiente el servidor cuesta $12.000 COP al mes contra $359 de IA: <strong>33 veces más</strong>. Cualquier decisión de precio tiene que mirar primero el dimensionamiento del servidor. Cabe destacar que el VPS se comparte entre varios negocios, así que ese costo se prorratea.</p></div>
-</div>
-    </section>
-
-    <section id="arquitectura">
-      <span class="sec-kicker">05 · Arquitectura centralizada</span>
-      <h2>Una sola instalación para todos los negocios</h2>
-      <p class="section-sub">Todos los afiliados se atienden desde un mismo servidor. Es la decisión que hace viable el precio de $80.000.</p>
-
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Criterio</th><th>Un agente por negocio</th><th>Centralizado (elegido)</th></tr></thead>
+      <div class="table-scroll reveal">
+        <table class="cmp" style="min-width:720px">
+          <thead><tr><th>Perfil dominante</th><th>Conversaciones</th><th>Con caché</th><th>Sin caché</th><th>% de $80.000</th></tr></thead>
           <tbody>
-<tr><td class='rowhead'>Qué se instala</td><td>Una copia por bar</td><td><strong>Una sola instalación que atiende a todos</strong></td></tr>
-<tr><td class='rowhead'>Consumo de RAM</td><td>25 copias → 7,0 GB, al límite</td><td><strong>1 copia → 1,5 GB, con 5× de margen</strong></td></tr>
-<tr><td class='rowhead'>Actualizar el agente</td><td>25 despliegues</td><td><strong>1 despliegue</strong></td></tr>
-<tr><td class='rowhead'>Si un bar crece</td><td>Solo le afecta a él, sin cupo</td><td><strong>Se regula por cupo del plan</strong></td></tr>
-<tr><td class='rowhead'>Aislamiento de datos</td><td>Físico: una caja por bar</td><td><strong>Lógico: Row Level Security de PostgreSQL</strong></td></tr>
-<tr><td class='rowhead'>Costo de servidor</td><td>25 servidores</td><td><strong>1 servidor compartido</strong></td></tr>
+<tr><td class='rowhead'>Consulta simple</td><td class='num'>500</td><td class='num'><span class='strong'>$247</span></td><td class='num muted-sm'>$1.895</td><td class='num'>0,3%</td></tr>
+<tr><td class='rowhead'>Conversación normal</td><td class='num'>167</td><td class='num'><span class='strong'>$359</span></td><td class='num muted-sm'>$2.008</td><td class='num'>0,4%</td></tr>
+<tr><td class='rowhead'>Conversación larga</td><td class='num'>83</td><td class='num'><span class='strong'>$431</span></td><td class='num muted-sm'>$2.080</td><td class='num'>0,5%</td></tr>
+<tr><td class='rowhead'>Con herramientas</td><td class='num'>50</td><td class='num'><span class='strong'>$512</span></td><td class='num muted-sm'>$2.161</td><td class='num'>0,6%</td></tr>
           </tbody>
         </table>
       </div>
 
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">La analogía: una nevera por apartamento o un cuarto frío central</p><p>Instalar una copia completa del agente por cada bar es como poner una nevera en cada apartamento: funciona, pero no escala. Un cuarto frío central enfría lo mismo para todos con una fracción del costo. Aquí el servidor es el cuarto frío y cada bar ve únicamente su propia información.</p></div>
-</div>
+      <div class="sec-head reveal" style="margin:44px 0 22px">
+        <div class="sec-kicker">Sensibilidad</div>
+        <h2 class="sec-title" style="font-size:clamp(20px,2.4vw,26px)">Qué pasa si cambian las condiciones</h2>
+        <p class="sec-sub">Cada escenario calculado por separado sobre el plan de 1.000 mensajes, no con multiplicadores sueltos.</p>
+      </div>
 
-      <h3>Cómo se garantiza que un bar no vea los datos de otro</h3>
-      <p class="section-sub">El aislamiento es lógico, no físico. Lo garantiza la base de datos, no el código de la aplicación.</p>
-      <ol class="flow">
-        <li><strong>Una sola base de datos</strong> — Todos los negocios comparten el mismo PostgreSQL.</li>
-        <li><strong>Row Level Security</strong> — Cada fila lleva su <code>negocio_id</code> y PostgreSQL filtra por política. Es el mismo mecanismo que usan los bancos para separar datos de clientes en una misma base.</li>
-        <li><strong>Cada consulta pasa por la política</strong> — Aunque la aplicación tuviera un error, la base no devuelve filas de otro negocio.</li>
-        <li><strong>El panel de AsoBares ve agregados</strong> — El gremio consulta métricas consolidadas, sin acceso a las conversaciones privadas de cada afiliado.</li>
-      </ol>
-
-      <div class="adm adm-warning">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-<div><p class="adm-title">Qué se dejó fuera y por qué</p><p>El stack anterior corría <strong>un contenedor por negocio más Chatwoot</strong>: 25 contenedores × ~200 MB más ~2 GB del contact center daban ≈ 7 GB de RAM, al límite de un servidor de 8 GB. Chatwoot solo se usaba para avisar a un humano cuando el agente no resolvía. Al centralizar y retirar Chatwoot, el consumo baja a <strong>1,5 GB</strong> y el mismo servidor pasa de 5–10 negocios a más de 100.</p></div>
-</div>
-    </section>
-
-    <section id="slices">
-      <span class="sec-kicker">06 · Slices y capacidad</span>
-      <h2>Cuántos negocios caben en cada talla de servidor</h2>
-      <p class="section-sub">InterServer vende el VPS por <em>slices</em>: cada slice añade recursos de forma predecible. Estas son las tallas reales y su capacidad.</p>
-
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Plan</th><th>Cores</th><th>RAM</th><th>SSD</th><th>USD / mes</th><th>COP / mes</th><th>Negocios</th><th>Para qué</th></tr></thead>
+      <div class="table-scroll reveal">
+        <table class="cmp" style="min-width:720px">
+          <thead><tr><th>Escenario</th><th>Costo mensual</th><th>vs. base</th><th>Condición</th></tr></thead>
           <tbody>
-<tr><td class='rowhead'>1 slice</td><td class='tnum'>1</td><td class='tnum'>2 GB</td><td class='tnum'>40 GB</td><td class='tnum'>US$ 3,00</td><td class='tnum'>$12.000</td><td class='tnum'><strong>50</strong></td><td>Piloto y primeros afiliados</td></tr>
-<tr><td class='rowhead'>2 slices</td><td class='tnum'>2</td><td class='tnum'>4 GB</td><td class='tnum'>80 GB</td><td class='tnum'>US$ 6,00</td><td class='tnum'>$24.000</td><td class='tnum'><strong>100</strong></td><td>Crecimiento inicial cómodo</td></tr>
-<tr><td class='rowhead'>4 slices</td><td class='tnum'>2</td><td class='tnum'>8 GB</td><td class='tnum'>160 GB</td><td class='tnum'>US$ 12,00</td><td class='tnum'>$48.000</td><td class='tnum'><strong>100</strong></td><td>El análisis original pedía esta talla</td></tr>
-<tr><td class='rowhead'>8 slices</td><td class='tnum'>4</td><td class='tnum'>16 GB</td><td class='tnum'>320 GB</td><td class='tnum'>US$ 24,00</td><td class='tnum'>$96.000</td><td class='tnum'><strong>200</strong></td><td>Incluye soporte gestionado</td></tr>
-<tr><td class='rowhead'>16 slices</td><td class='tnum'>8</td><td class='tnum'>32 GB</td><td class='tnum'>640 GB</td><td class='tnum'>US$ 48,00</td><td class='tnum'>$192.000</td><td class='tnum'><strong>400</strong></td><td>Varios capítulos regionales</td></tr>
-<tr><td class='rowhead'>32 slices</td><td class='tnum'>16</td><td class='tnum'>64 GB</td><td class='tnum'>1.280 GB</td><td class='tnum'>US$ 96,00</td><td class='tnum'>$384.000</td><td class='tnum'><strong>800</strong></td><td>Escala nacional</td></tr>
+<tr><td class='rowhead'>Con caché de prompt, off-peak</td><td class='num'>$247</td><td class='num'>100%</td><td class='muted-sm'>El escenario publicado</td></tr>
+<tr><td class='rowhead'>Sin caché de prompt</td><td class='num'>$1.895</td><td class='num'>768%</td><td class='muted-sm'>Si el prefijo no se reutiliza</td></tr>
+<tr><td class='rowhead'>Prompt base 1.000 tokens más largo</td><td class='num'>$259</td><td class='num'>105%</td><td class='muted-sm'>Carta extensa o muchas instrucciones</td></tr>
+<tr><td class='rowhead'>Clasificador reactivado</td><td class='num'>$400</td><td class='num'>162%</td><td class='muted-sm'>2 llamadas por mensaje en vez de 1</td></tr>
+<tr><td class='rowhead'>Tarifa peak en todo el tráfico</td><td class='num'>$493</td><td class='num'>200%</td><td class='muted-sm'>Cota superior; el tráfico real es off-peak</td></tr>
           </tbody>
         </table>
       </div>
 
-      <div class="adm adm-warning">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-<div><p class="adm-title">El límite real es la CPU, no la memoria</p><p>La intuición dice que la RAM se agota primero. No es el caso: con el stack centralizado, <strong>1 slice (1 core, 2 GB) ya sostiene ~50 negocios</strong> y la RAM permitiría 60. A partir de ahí manda el núcleo, así que se escala añadiendo slices por CPU y no por memoria.</p></div>
-</div>
+      <div class="rec-note note-warn reveal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        <span><strong>El riesgo real es perder el caché de prompt.</strong> Todo el modelo depende de que el prefijo de 2.804 tokens se reutilice. Si no ocurre —porque el prompt cambia en cada turno, se reordena el contexto o el proveedor no lo aplica— el costo pasa de $359 a $2.008 al mes. Es el primer supuesto a verificar en el piloto.</span>
+      </div>
+    </div>
+  </section>
 
-      <h3>De dónde sale cada número</h3>
-      <p class="section-sub">Consumo medido del stack centralizado completo, no una estimación teórica.</p>
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Componente</th><th>Instancias</th><th>RAM en reposo</th><th>RAM bajo carga</th><th>CPU</th></tr></thead>
-          <tbody>
-<tr><td class='rowhead'>api · FastAPI + LangGraph</td><td>1 contenedor</td><td class='tnum'>250 MB</td><td class='tnum'>500 MB</td><td>Bajo — limitado por red, no por CPU</td></tr>
-<tr><td class='rowhead'>postgres · datos de los negocios</td><td>25 negocios</td><td class='tnum'>150 MB</td><td class='tnum'>400 MB</td><td>Bajo</td></tr>
-<tr><td class='rowhead'>redis · caché y pub/sub</td><td>1 instancia</td><td class='tnum'>30 MB</td><td class='tnum'>100 MB</td><td>Muy bajo</td></tr>
-<tr><td class='rowhead'>SPA · archivos estáticos</td><td>Nginx</td><td class='tnum'>15 MB</td><td class='tnum'>30 MB</td><td>Muy bajo</td></tr>
-<tr><td class='rowhead'>Sistema operativo + Docker</td><td>—</td><td class='tnum'>500 MB</td><td class='tnum'>500 MB</td><td>—</td></tr>
-          </tbody>
-        </table>
+  <section id="simulador">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-kicker">Simulador</div>
+        <h2 class="sec-title">Calcula el consumo de un bar</h2>
+        <p class="sec-sub">Usa exactamente las mismas constantes que las tablas de arriba: el modelo de tokens medido y los precios reales de DeepSeek e InterServer. Mueve el consumo y el tamaño del servidor.</p>
       </div>
 
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">Cómo se lee esa tabla</p><p>Sumando las aplicaciones y el sistema operativo, el servidor completo consume <strong>~0,95 GB en reposo y ~1,53 GB bajo carga</strong>. En un VPS de 2 GB eso deja margen; en el de 4 slices (8 GB) sobra con holgura de 5×.</p></div>
-</div>
-
-      <h3>La CPU en hora pico</h3>
-      <p class="section-sub">Los bares concentran el tráfico entre las 19:00 y las 02:00. Aun suponiendo que el 70% del tráfico diario cae en esas 4 horas:</p>
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Escala</th><th>Qué implica</th></tr></thead>
-          <tbody>
-<tr><td class='rowhead'>1 vCPU sostenida</td><td>1 worker async puede atender decenas de mensajes por segundo</td></tr>
-<tr><td class='rowhead'>50 negocios en pico</td><td>≈ 0,58 mensajes/segundo — el 12% de lo que aguanta un worker</td></tr>
-<tr><td class='rowhead'>100 negocios en pico</td><td>≈ 1,17 mensajes/segundo — el 23%</td></tr>
-<tr><td class='rowhead'>200 negocios en pico</td><td>≈ 2,33 mensajes/segundo — el 47%</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">Por qué la CPU rinde tanto</p><p>Cada mensaje es principalmente <strong>espera de red</strong> al modelo de IA (~1,5 s), no cómputo. FastAPI en modo asíncrono atiende cientos de conversaciones simultáneas sin bloquear un solo worker, porque mientras una espera la respuesta de DeepSeek el procesador atiende las demás. El trabajo de la CPU es mínimo comparado con el tiempo de espera.</p></div>
-</div>
-
-      <div class="adm adm-warning">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-<div><p class="adm-title">El único límite operativo: un solo worker</p><p>El agente corre con <code>--workers 1</code> a propósito: el estado en memoria (caché de prompts y el <code>negocio_id</code> asociado a cada número de WhatsApp) debe ser consistente. Con un worker async eso no es un problema hasta cientos de negocios. Solo al acercarse a <strong>300–500 negocios</strong> conviene separar el webhook de recepción (sin estado) del procesamiento con cola.</p></div>
-</div>
-
-      <h3>Recomendación de talla por etapa</h3>
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Etapa</th><th>Talla</th><th>Costo mensual</th><th>Capacidad</th></tr></thead>
-          <tbody>
-            <tr><td class="rowhead">Piloto (1–25 negocios)</td><td>1 slice</td><td class="tnum">$12.000</td><td class="tnum">50 negocios</td></tr>
-            <tr><td class="rowhead">Crecimiento (25–100)</td><td>2 slices</td><td class="tnum">$24.000</td><td class="tnum">100 negocios</td></tr>
-            <tr><td class="rowhead">Consolidación (100–200)</td><td>8 slices</td><td class="tnum">$96.000</td><td class="tnum">200 negocios</td></tr>
-            <tr><td class="rowhead">Escala nacional (200+)</td><td>16–32 slices</td><td class="tnum">$192.000–384.000</td><td class="tnum">400–800 negocios</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">El costo de servidor por negocio baja al crecer</p><p>Con 25 negocios en 1 slice, la infraestructura cuesta <strong>$480 por negocio al mes</strong>. Con 100 en 2 slices baja a $240. Con 200 en 8 slices son $480, pero con soporte gestionado incluido. En todos los casos la infraestructura se mantiene por debajo del 1% del precio del plan.</p></div>
-</div>
-    </section>
-
-    <section id="simulador">
-      <span class="sec-kicker">07 · Simulador de precios</span>
-      <h2>Calcula lo que pagaría tu bar</h2>
-      <p class="section-sub">Mueve el consumo mensual y mira el efecto sobre la factura del negocio y sobre el costo real de operarlo. Usa exactamente las mismas constantes que el resto del documento.</p>
-
-      <div class="sim">
+      <div class="sim reveal">
         <div class="sim-panel">
           <label class="sim-label" for="sim-msgs">Mensajes por mes</label>
-          <div class="sim-readout"><span id="sim-msgs-out" class="tnum">1.000</span> <span class="sim-unit">mensajes</span></div>
+          <div class="sim-readout"><span id="sim-msgs-out" class="num">1.000</span> <span class="sim-unit">mensajes</span></div>
           <input type="range" id="sim-msgs" min="100" max="8000" step="50" value="1000" aria-label="Mensajes por mes">
-          <div class="sim-scale"><span class="tnum">100</span><span class="tnum">8.000</span></div>
+          <div class="sim-scale"><span>100</span><span>8.000</span></div>
 
           <div class="sim-presets">
-<button type="button" class="sim-preset" data-msgs="400">Bar tranquilo<span>400 msgs</span></button><button type="button" class="sim-preset" data-msgs="1000">Bar activo<span>1,000 msgs</span></button><button type="button" class="sim-preset" data-msgs="2500">Bar de noche<span>2,500 msgs</span></button><button type="button" class="sim-preset" data-msgs="5000">Gastrobar de eventos<span>5,000 msgs</span></button>
+            <button type="button" class="sim-preset" data-msgs="400">Bar tranquilo<span>400 msgs</span></button>
+            <button type="button" class="sim-preset on" data-msgs="1000">Bar activo<span>1.000 msgs</span></button>
+            <button type="button" class="sim-preset" data-msgs="3000">Bar de noche<span>3.000 msgs</span></button>
+            <button type="button" class="sim-preset" data-msgs="8000">Gastrobar de eventos<span>8.000 msgs</span></button>
           </div>
 
           <label class="sim-label">Supuesto de caché de prompt</label>
@@ -692,162 +705,169 @@ select:focus{border-color:var(--primary);outline:none}
           </div>
           <p class="sim-hint" id="sim-cache-hint">El prefijo de 2.804 tokens se reutiliza: es el mejor caso.</p>
 
-          <label class="sim-label" for="sim-infra">Tamaño del servidor que comparte</label>
+          <label class="sim-label" for="sim-infra" style="margin-top:20px">Tamaño del servidor</label>
           <select id="sim-infra">
-<option value="50" data-costo="12000">1 slice · 1 core, 2 GB — 50 negocios</option><option value="100" data-costo="24000">2 slices · 2 cores, 4 GB — 100 negocios</option><option value="200" data-costo="96000">8 slices · 4 cores, 16 GB — 200 negocios</option><option value="400" data-costo="192000">16 slices · 8 cores, 32 GB — 400 negocios</option>
+            <option value="50" data-costo="12000">1 slice — 50 negocios</option>
+            <option value="100" data-costo="24000">2 slices — 100 negocios</option>
+            <option value="200" data-costo="96000">8 slices — 200 negocios · soporte gestionado</option>
+            <option value="400" data-costo="192000">16 slices — 400 negocios</option>
           </select>
 
           <label class="sim-label" for="sim-negocios">Negocios en ese servidor</label>
-          <div class="sim-readout sim-readout-sm"><span id="sim-negocios-out" class="tnum">25</span> <span class="sim-unit">negocios</span></div>
+          <div class="sim-readout sim-readout-sm"><span id="sim-negocios-out" class="num">25</span> <span class="sim-unit">negocios</span></div>
           <input type="range" id="sim-negocios" min="1" max="200" step="1" value="25" aria-label="Negocios en el servidor">
-          <p class="sim-hint" id="sim-capacidad">Capacidad del servidor: 50 negocios</p>
+          <p class="sim-hint" id="sim-capacidad">Capacidad de este servidor: 50 negocios</p>
         </div>
 
         <div class="sim-panel sim-result">
           <div class="sim-res-head">
             <span class="sim-res-tag">Factura del negocio</span>
-            <div class="sim-big"><span class="tnum" id="sim-factura">$95.200</span><span class="sim-per">/ mes con IVA</span></div>
+            <div class="sim-big"><span id="sim-factura" class="num">$95.200</span><span class="sim-per">/ mes con IVA</span></div>
             <p class="sim-big-sub" id="sim-factura-sub">Base $80.000 + IVA $15.200</p>
           </div>
 
           <dl class="sim-rows">
-            <div class="sim-row">
-              <dt>Mensajes incluidos</dt>
-              <dd class="tnum" id="sim-incluidos">1.000</dd>
-            </div>
-            <div class="sim-row">
-              <dt>Mensajes excedentes</dt>
-              <dd class="tnum" id="sim-excedente">0</dd>
-            </div>
-            <div class="sim-row sim-row-hi">
-              <dt>Cargo por excedente</dt>
-              <dd class="tnum" id="sim-cargo">$0</dd>
-            </div>
-            <div class="sim-row sim-sep">
-              <dt>Costo de IA <span class="sim-int">interno</span></dt>
-              <dd class="tnum"><span id="sim-ia">$359</span> <span class="sim-sup" id="sim-sup">con caché</span></dd>
-            </div>
-            <div class="sim-row">
-              <dt>Infraestructura <span class="sim-int">interno</span></dt>
-              <dd class="tnum" id="sim-infra-costo">$480</dd>
-            </div>
-            <div class="sim-row sim-row-total">
-              <dt>Costo total</dt>
-              <dd class="tnum" id="sim-costo">$839</dd>
-            </div>
-            <div class="sim-row sim-row-margen">
-              <dt>Margen bruto</dt>
-              <dd class="tnum"><span id="sim-margen">$79.161</span> <span class="sim-pct" id="sim-margen-pct">99,1%</span></dd>
-            </div>
+            <div class="sim-row"><dt>Mensajes incluidos</dt><dd id="sim-incluidos">1.000</dd></div>
+            <div class="sim-row"><dt>Mensajes excedentes</dt><dd id="sim-excedente">0</dd></div>
+            <div class="sim-row sim-row-hi"><dt>Cargo por excedente</dt><dd id="sim-cargo">$0</dd></div>
+            <div class="sim-row sim-sep"><dt>Costo de IA <span class="sim-int">interno</span></dt><dd><span id="sim-ia">$359</span> <span class="sim-sup" id="sim-sup">con caché</span></dd></div>
+            <div class="sim-row"><dt>Infraestructura <span class="sim-int">interno</span></dt><dd id="sim-infra-costo">$480</dd></div>
+            <div class="sim-row"><dt>Costo total</dt><dd id="sim-costo">$839</dd></div>
+            <div class="sim-row sim-row-margen"><dt>Margen bruto</dt><dd><span id="sim-margen">$79.161</span> <span class="sim-pct" id="sim-margen-pct">99,0%</span></dd></div>
           </dl>
 
           <div class="sim-bar">
             <span class="sim-bar-lbl">Composición del precio base</span>
             <div class="sim-bar-track"><span class="sim-bar-fill" id="sim-bar-fill"></span></div>
             <div class="sim-bar-legend">
-              <span><i class="sw sw-margen"></i>Margen <b class="tnum" id="sim-leg-margen">99,1%</b></span>
-              <span><i class="sw sw-ia"></i>IA <b class="tnum" id="sim-leg-ia">0,3%</b></span>
-              <span><i class="sw sw-infra"></i>Infra <b class="tnum" id="sim-leg-infra">0,6%</b></span>
+              <span><i class="sw sw-margen"></i>Margen <b id="sim-leg-margen">99,0%</b></span>
+              <span><i class="sw sw-ia"></i>IA <b id="sim-leg-ia">0,4%</b></span>
+              <span><i class="sw sw-infra"></i>Infra <b id="sim-leg-infra">0,6%</b></span>
             </div>
           </div>
         </div>
       </div>
 
-      <div id="sim-aviso" class="adm adm-warning" hidden>
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-        <div><p class="adm-title">Por encima de la capacidad del servidor</p>
-        <p id="sim-aviso-txt"></p></div>
+      <div id="sim-aviso" class="rec-note note-warn" hidden>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        <span id="sim-aviso-txt"></span>
       </div>
 
-      <div class="adm adm-note">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-        <div><p class="adm-title">Cómo se calcula</p>
-        <p>La IA se cobra por token, no por mensaje: <code>1.630</code> tokens de entrada y <code>35</code> de salida por mensaje, con los <code>900</code> tokens del system prompt a precio de caché porque se repiten en cada llamada del mismo negocio. El excedente sobre los 1.000 mensajes se cobra a <code>$60</code> cada uno. La infraestructura es el costo del servidor dividido entre los negocios que aloja. El IVA se muestra aparte porque se traslada a la DIAN y no es ingreso.</p></div>
+      <div class="rec-note reveal" style="margin-top:14px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+        <span><strong>Cómo se calcula.</strong> La IA se cobra por token, no por mensaje: 1.630 tokens de entrada y 35 de salida por mensaje en el modelo original; tras la medición, el prompt fijo es de 2.924 tokens (del que 2.804 es prefijo cacheable) y la salida real es de 82. El excedente sobre los 1.000 mensajes se cobra a <span class="mono">$60</span> cada uno. La infraestructura es el costo del servidor dividido entre los negocios que aloja. El IVA se muestra aparte porque se traslada a la DIAN y no es ingreso.</span>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section id="margen">
-      <span class="sec-kicker">08 · Margen por negocio</span>
-      <h2>Qué queda por cada afiliado</h2>
-      <p class="section-sub">Ingreso base de $80.000 menos el costo total, según cómo se reparta la infraestructura.</p>
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Supuesto de servidor</th><th>Infra</th><th>IA</th><th>Costo total</th><th>Margen</th><th>%</th></tr></thead>
+  <section id="comparativa" style="background:var(--bg-soft);border-top:1px solid var(--line)">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-kicker">Comparativa</div>
+        <h2 class="sec-title">Las tres modalidades, lado a lado</h2>
+        <p class="sec-sub">Todas incluyen el agente completo, la instalación gratis y el panel web. Cambian el volumen, la infraestructura y el soporte.</p>
+      </div>
+
+      <div class="table-scroll reveal">
+        <table class="cmp">
+          <thead>
+            <tr>
+              <th>Concepto</th>
+              <th>Esencial</th>
+              <th class="col-rec">Profesional ★</th>
+              <th>A la medida</th>
+            </tr>
+          </thead>
           <tbody>
-<tr><td class='rowhead'>VPS 1 slice (compartido entre negocios)</td><td class='tnum'>$12.000</td><td class='tnum'>$359</td><td class='tnum'>$12.359</td><td class='tnum'><strong>$67.641</strong></td><td class='tnum'>84,6%</td></tr>
-<tr><td class='rowhead'>Web Hosting Standard (instancia dedicada)</td><td class='tnum'>$28.000</td><td class='tnum'>$359</td><td class='tnum'>$28.359</td><td class='tnum'><strong>$51.641</strong></td><td class='tnum'>64,6%</td></tr>
-<tr><td class='rowhead'>VPS 4 slices (instancia dedicada)</td><td class='tnum'>$48.000</td><td class='tnum'>$359</td><td class='tnum'>$48.359</td><td class='tnum'><strong>$31.641</strong></td><td class='tnum'>39,6%</td></tr>
+            <tr>
+              <td class="rowhead">Precio base</td>
+              <td class="num"><span class="strong">$80.000</span></td>
+              <td class="num col-rec"><span class="strong">$190.000</span></td>
+              <td class="num">A convenir</td>
+            </tr>
+            <tr>
+              <td class="rowhead">Valor final con IVA</td>
+              <td class="num">$95.200</td>
+              <td class="num col-rec">$226.100</td>
+              <td class="num">—</td>
+            </tr>
+            <tr>
+              <td class="rowhead">Mensajes incluidos</td>
+              <td class="num">1.000</td>
+              <td class="num col-rec"><span class="strong">3.000</span></td>
+              <td class="num">Desde 8.000</td>
+            </tr>
+            <tr>
+              <td class="rowhead">Costo de IA al mes</td>
+              <td class="num">$359</td>
+              <td class="num col-rec">$1.078</td>
+              <td class="muted-sm">Al costo real</td>
+            </tr>
+            <tr>
+              <td class="rowhead">Infraestructura</td>
+              <td>Compartida · 1 slice</td>
+              <td class="col-rec">Compartida · 8 slices</td>
+              <td>Dedicada · 16–32 slices</td>
+            </tr>
+            <tr>
+              <td class="rowhead">Capacidad del servidor</td>
+              <td class="num">50 negocios</td>
+              <td class="num col-rec">200 negocios</td>
+              <td class="num">400–800 negocios</td>
+            </tr>
+            <tr>
+              <td class="rowhead">Soporte gestionado</td>
+              <td class="muted-sm">No incluido</td>
+              <td class="col-rec"><span class="strong">Incluido</span></td>
+              <td>Según acuerdo</td>
+            </tr>
+            <tr>
+              <td class="rowhead">Margen bruto</td>
+              <td class="num">84,6%</td>
+              <td class="num col-rec"><span class="strong">99,2%</span></td>
+              <td class="num">A calcular</td>
+            </tr>
+            <tr>
+              <td class="rowhead">Instalación</td>
+              <td><span class="tag">Gratis</span></td>
+              <td class="col-rec"><span class="tag">Gratis</span></td>
+              <td><span class="tag">Gratis</span></td>
+            </tr>
+            <tr>
+              <td class="rowhead">Permanencia</td>
+              <td>Ninguna</td>
+              <td class="col-rec">Ninguna</td>
+              <td>Según acuerdo</td>
+            </tr>
+            <tr>
+              <td class="rowhead">Para quién</td>
+              <td class="muted-sm">Bar que quiere probar el agente</td>
+              <td class="col-rec muted-sm">Bar donde el agente ya es parte de la operación</td>
+              <td class="muted-sm">Cadenas y capítulos regionales</td>
+            </tr>
           </tbody>
         </table>
       </div>
 
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">El VPS compartido es el escenario real del piloto</p><p>Un solo Cloud VPS de 1 slice aloja varios negocios. Si se prorratea entre cinco, el costo de infraestructura por negocio baja a $2.400 COP y el margen supera el 96%. La fila de <strong>VPS 1 slice (84,3%)</strong> ya asume el caso conservador de un negocio pagando el servidor completo.</p></div>
-</div>
-
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">Punto de equilibrio con menos de un negocio</p><p>Con costos fijos de infraestructura cercanos a $12.000 COP y un margen de contribución superior a $67.000 por negocio, <strong>el primer afiliado que paga cubre la operación completa</strong>. El riesgo financiero de arrancar el piloto es prácticamente nulo.</p></div>
-</div>
-    </section>
-
-    <section id="escenarios">
-      <span class="sec-kicker">09 · Escenarios de uso</span>
-      <h2>Qué pasa si el negocio usa más el agente</h2>
-      <p class="section-sub">El tope de 1.000 mensajes mantiene el costo acotado incluso con desvíos fuertes.</p>
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Escenario</th><th>Mensajes</th><th>Tokens entrada</th><th>Tokens salida</th><th>Costo IA</th><th>% del precio</th></tr></thead>
-          <tbody>
-<tr><td class='rowhead'>Consultas simples</td><td class='tnum'>700</td><td class='tnum'>1.140.000</td><td class='tnum'>24.500</td><td class='tnum'>$744</td><td class='tnum'>0,7%</td></tr>
-<tr><td class='rowhead'>Plan contratado</td><td class='tnum'>1.000</td><td class='tnum'>1.630.000</td><td class='tnum'>35.000</td><td class='tnum'>$1.062</td><td class='tnum'>1,1%</td></tr>
-<tr><td class='rowhead'>Uso intenso</td><td class='tnum'>2.000</td><td class='tnum'>3.260.000</td><td class='tnum'>70.000</td><td class='tnum'>$2.124</td><td class='tnum'>2,2%</td></tr>
-          </tbody>
-        </table>
+      <div class="rec-note reveal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+        <span><strong>Recomendación:</strong> empezar con la <strong>Opción 01 · Esencial</strong> para validar el uso real durante el piloto, y migrar a la <strong>Opción 02 · Profesional</strong> cuando el bar supere de forma sostenida los 1.000 mensajes. La razón es económica: el costo de IA crece de forma lineal con el volumen, pero el precio del plan Profesional sube 2,4× para 3× el volumen, así que el margen mejora a medida que el afiliado crece. La Opción 03 solo se justifica cuando hay un requisito de aislamiento o un volumen que sature un servidor compartido.</span>
       </div>
 
-      <div class="adm adm-warning">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-<div><p class="adm-title">El excedente se avisa antes de facturar</p><p>Si un negocio supera los 1.000 mensajes, el equipo lo contacta antes de emitir cualquier cobro adicional. Nunca se factura un excedente sin aviso previo: la política es <strong>avisar, mostrar el consumo y dejar que el negocio decida</strong> si amplía el plan o ajusta el uso.</p></div>
-</div>
-    </section>
-
-    <section id="metodo">
-      <span class="sec-kicker">10 · Método de cálculo</span>
-      <h2>Cómo se llegó a estos números</h2>
-      <p class="section-sub">Cinco pasos, todos verificables contra las fuentes de la sección siguiente.</p>
-      <ol class="flow">
-<li><strong>Se mide el consumo real</strong> — El agente registra tokens de entrada y salida por mensaje en la tabla consumo_negocio (migración 004).</li><li><strong>Se convierte a dólares</strong> — Los precios de DeepSeek están en USD por millón de tokens; se aplica la TRM de $4.000 COP/USD.</li><li><strong>Se aplica el descuento por caché</strong> — El system prompt es idéntico en cada llamada del mismo negocio, así que entra a precio de cache hit ($0,003/M).</li><li><strong>Se suma la infraestructura</strong> — El costo del servidor de InterServer se prorratea entre los negocios que aloja.</li><li><strong>Se compara contra el precio</strong> — El precio base de $80.000 menos el costo total da el margen bruto del plan.</li>
-      </ol>
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">Supuestos declarados</p><p>Tipo de cambio: <code>1 USD = $4.000 COP</code> (el cálculo es lineal, se ajusta con otra TRM). Tokens por mensaje: 1.630 de entrada y 35 de salida, medidos en las pruebas del agente real. System prompt cacheable: ~900 tokens. Tarifa de DeepSeek: off-peak, cache miss en el peor caso.</p></div>
-</div>
-    </section>
-
-    <section id="fuentes">
-      <span class="sec-kicker">11 · Fuentes verificadas</span>
-      <h2>De dónde salen los precios</h2>
-      <p class="section-sub">Todos los valores de esta página provienen de tarifas públicas consultadas directamente.</p>
-      <div class="tbl-wrap">
-        <table class="doc-t">
-          <thead><tr><th>Fuente</th><th>Detalle</th><th>URL</th></tr></thead>
-          <tbody>
-<tr><td class='rowhead'>Precios de DeepSeek API</td><td>deepseek-flash (DeepSeek-V4.1-Flash)</td><td><a href='https://api-docs.deepseek.com/quick_start/pricing' target='_blank' rel='noopener'>api-docs.deepseek.com/quick_start/pricing</a></td></tr>
-<tr><td class='rowhead'>Precios de InterServer — VPS</td><td>Cloud Compute, slices 1 a 32</td><td><a href='https://www.interserver.net/vps/' target='_blank' rel='noopener'>www.interserver.net/vps/</a></td></tr>
-<tr><td class='rowhead'>Precios de InterServer — Web Hosting</td><td>Standard Web Hosting, renovación mensual</td><td><a href='https://www.interserver.net/webhosting/' target='_blank' rel='noopener'>www.interserver.net/webhosting/</a></td></tr>
-          </tbody>
-        </table>
+      <div class="rec-note note-warn reveal" style="margin-top:14px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        <span><strong>Pendiente antes de fijar precios definitivos:</strong> estas cifras son un modelo construido sobre el código del agente y validado con una conversación real, no una factura. La tabla <span class="mono">consumo_negocio</span> ya registra tokens de entrada, salida y llamadas por negocio y día, pero aún no se ha leído con datos de un piloto completo. Los precios de las Opciones 01 y 02 son una recomendación derivada del modelo, no una tarifa ya validada en operación.</span>
       </div>
-      <div class="adm adm-note">
-<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-<div><p class="adm-title">Precios sujetos a cambio</p><p>DeepSeek e InterServer pueden ajustar sus tarifas. La conversión a pesos colombianos depende de la TRM del día de facturación, así que las cifras en COP son una referencia calculada, no un valor contractual.</p></div>
-</div>
-    </section>
+    </div>
+  </section>
+</main>
 
+<footer>
+  <div class="wrap foot">
+    <span>Agente de WhatsApp con IA · AsoBares — operado por Purosesu Labs</span>
+    <span class="mono">Purosesu-Labs/precios-riv</span>
   </div>
-</div>
+</footer>
 
 <script>
 /* Dither Canvas — adaptado de ObsidianUI (obsidianui.dev/docs/dither-canvas).
@@ -863,7 +883,7 @@ var motion = window.matchMedia('(prefers-reduced-motion: reduce)');
 var FC = 80, FR = 60, FN = FC * FR;
 var CC = 60, EDGE_LO = 36, EDGE_HI = 130;
 var EDGES = ['.', ',', '=', '+', '-'];
-var BRIGHTS = ['A','S','O','B','R','E','S'];
+var BRIGHTS = ['A','S','O','B','A','R','E','S'];
 var ALL_CHARS = EDGES.concat(BRIGHTS);
 var BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
 var TL = 320, TS = 10, TM = 72;
@@ -933,14 +953,14 @@ var FS = '#version 300 es\n' +
 '  float au = (float(ci) + cp.x) / float(CHAR_N);\n' +
 '  float ca = texture(uAtlas, vec2(au, cp.y)).a;\n' +
 '  if(ca < 0.05) discard;\n' +
-'  vec3 indigo = vec3(0.325, 0.227, 0.992);\n' +
-'  vec3 cyan = vec3(0.02, 0.64, 0.88);\n' +
-'  vec3 violet = vec3(0.36, 0.29, 0.95);\n' +
-'  vec3 ruby = vec3(0.917, 0.133, 0.380);\n' +
+'  vec3 teal   = vec3(0.059, 0.463, 0.431);\n' +
+'  vec3 cyan   = vec3(0.051, 0.580, 0.529);\n' +
+'  vec3 deep   = vec3(0.043, 0.369, 0.345);\n' +
+'  vec3 green  = vec3(0.102, 0.498, 0.306);\n' +
 '  float tint = smoothstep(0.15, 0.9, uv.x * 0.6 + uv.y * 0.4);\n' +
-'  vec3 col = mix(indigo, cyan, tint);\n' +
-'  col = mix(col, violet, hm * 0.65);\n' +
-'  col = mix(col, ruby, smoothstep(0.72, 1.0, uv.x) * 0.45);\n' +
+'  vec3 col = mix(teal, cyan, tint);\n' +
+'  col = mix(col, deep, hm * 0.65);\n' +
+'  col = mix(col, green, smoothstep(0.72, 1.0, uv.x) * 0.45);\n' +
 '  float a = (invDark ? 0.85 : 1.0) * ca;\n' +
 '  O = vec4(col * a, a);\n' +
 '}\n';
@@ -1436,36 +1456,19 @@ calcular();
 </script>
 <script>
 (function(){
-"use strict";
-var sb=document.querySelector('.sidebar'),ov=document.querySelector('.overlay'),mb=document.querySelector('.menu-btn');
-mb.addEventListener('click',function(){sb.classList.toggle('open');ov.classList.toggle('show');});
-ov.addEventListener('click',function(){sb.classList.remove('open');ov.classList.remove('show');});
-
-var q=document.getElementById('doc-search');
-var nores=document.getElementById('search-nores');
-var items=[].slice.call(document.querySelectorAll('.nav-item'));
-q.addEventListener('input',function(){
-  var v=q.value.trim().toLowerCase(),hits=0;
-  items.forEach(function(li){
-    var txt=li.firstChild.textContent.toLowerCase();
-    var match=txt.indexOf(v)>-1;
-    li.style.display=(match||!v)?'':'none';
-    if(v&&match)hits++;
-  });
-  nores.style.display=(v&&!hits)?'block':'none';
-});
-
-var links={};[].slice.call(document.querySelectorAll('[data-nav]')).forEach(function(a){links[a.getAttribute('href').slice(1)]=a;});
-var spy=new IntersectionObserver(function(es){
-  es.forEach(function(en){
-    if(en.isIntersecting){
-      var id=en.target.id;
-      [].slice.call(document.querySelectorAll('[data-nav].active')).forEach(function(a){a.classList.remove('active');});
-      if(links[id])links[id].classList.add('active');
-    }
-  });
-},{rootMargin:'-10% 0px -80% 0px'});
-document.querySelectorAll('section[id],article[id]').forEach(function(el){spy.observe(el);});
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var reveals = document.querySelectorAll(".reveal");
+  if (reduce || !("IntersectionObserver" in window)) {
+    reveals.forEach(function(el){ el.classList.add("in"); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    }, {threshold: 0.12, rootMargin: "0px 0px -40px 0px"});
+    reveals.forEach(function(el){ io.observe(el); });
+  }
 })();
 </script>
 </body>

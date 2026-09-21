@@ -1,6 +1,21 @@
 # precios-riv
 
-Página de precios del agente de WhatsApp con IA para **AsoBares**.
+Propuesta comercial de precios del agente de WhatsApp con IA para **AsoBares**.
+
+Diseño: superficies **Compare** (skill `diseno-propuestas-comerciales`) — tres
+modalidades alineadas con una marcada como RECOMENDADA, tipografía IBM Plex y
+acento teal `#0f766e`. El fondo del título usa **Dither Canvas** de ObsidianUI
+adaptado a la paleta teal.
+
+## Modalidades
+
+| | Esencial | Profesional ★ | A la medida |
+|---|---|---|---|
+| Precio base | $80.000 | $190.000 | A convenir |
+| Con IVA | $95.200 | $226.100 | — |
+| Mensajes | 1.000 | 3.000 | Desde 8.000 |
+| Servidor | 1 slice | 8 slices | 16–32 slices |
+| Margen | 84,6% | 99,2% | A calcular |
 
 Publicada con GitHub Pages en: https://purosesu-labs.github.io/precios-riv/
 
