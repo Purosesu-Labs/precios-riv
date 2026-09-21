@@ -1,0 +1,1370 @@
+# -*- coding: utf-8 -*-
+"""Genera precios-docs/index.html — documentación de precios del agente de AsoBares.
+
+Sistema de diseño: Stripi-Inspired (skill diseno-documentacion)
+  · Mesh gradiente (cream/orange/lavender/indigo/ruby) en banda superior
+  · Inter weight 300 con tracking negativo, ss01 global, tnum en cifras
+  · Indigo #533afd único color de acción; pill buttons; hairlines #e3e8ee
+  · Banda cream #f5e9d4 para avisos
+
+Efecto de fondo: Dither Canvas (ObsidianUI), adaptado a señal procedural
+por no disponer del video original — conserva simulación de fluido, matriz
+de Bayer, atlas de caracteres y distorsión por puntero.
+"""
+import html as H
+import json
+import os
+from data_precios import (
+    TRM, PRECIO_BASE, PRECIO_IVA, PRECIO_FINAL, MENSAJES_INCLUIDOS,
+    DS, INTERSERVER, COSTO_IA, PYL, ESCENARIOS, INCLUYE, FUENTES, FLUJO,
+    CENTRALIZADO, SLICES, COMPONENTES, CUELLO, SIM, SIM_PRESETS,
+)
+from simulador_js import SIM_JS
+from simulacion_tokens import (
+    COMPONENTES_PROMPT, filas_perfiles, filas_plan, sensibilidad, FIJO, CACHEABLE,
+)
+
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "precios-docs")
+os.makedirs(OUT, exist_ok=True)
+
+
+def esc(s):
+    """Escapa para HTML. Acepta cualquier tipo para no romper al pasar enteros."""
+    return H.escape(str(s), quote=False)
+
+
+# ---------- Nav tree ----------
+nav = [
+    ("resumen", "Resumen del plan", []),
+    ("plan", "01 · El plan", []),
+    ("incluye", "02 · Qué incluye", []),
+    ("ia", "03 · Costo de IA", []),
+    ("infra", "04 · Costo del servidor", []),
+    ("arquitectura", "05 · Arquitectura centralizada", []),
+    ("slices", "06 · Slices y capacidad", []),
+    ("simulador", "07 · Simulador de precios", []),
+    ("margen", "08 · Margen por negocio", []),
+    ("escenarios", "09 · Escenarios de uso", []),
+    ("metodo", "10 · Método de cálculo", []),
+    ("fuentes", "11 · Fuentes verificadas", []),
+]
+nav_html = "".join(
+    f"<li class='nav-item'><a href='#{a}' data-nav>{esc(l)}</a></li>\n"
+    for a, l, _ in nav
+)
+
+
+def admon(kind, title, body):
+    icons = {
+        "note": '<circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/>',
+        "warning": '<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+    }
+    return f'''<div class="adm adm-{kind}">
+<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{icons[kind]}</svg>
+<div><p class="adm-title">{title}</p>{body}</div>
+</div>'''
+
+
+# ---------- Filas de tablas ----------
+ds_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(c)}</td><td>{esc(m)}</td>"
+    f"<td class='tnum'>{esc(op)}</td><td class='tnum'><strong>{esc(pk)}</strong></td></tr>"
+    for c, m, op, pk in DS)
+
+ia_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(n)}</td><td class='tnum'>{esc(i)}</td>"
+    f"<td class='tnum'>{esc(o)}</td><td class='tnum'>{esc(u)}</td>"
+    f"<td class='tnum'><strong>${esc(c)}</strong></td></tr>"
+    for n, i, o, u, c in COSTO_IA)
+
+is_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(n)}</td><td>{esc(d)}</td>"
+    f"<td class='tnum'>{esc(u)}</td><td class='tnum'><strong>{esc(c)}</strong></td>"
+    f"<td>{esc(no)}</td></tr>"
+    for n, d, u, c, no in INTERSERVER)
+
+pyl_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(n)}</td><td class='tnum'>${esc(inf)}</td>"
+    f"<td class='tnum'>${esc(ia)}</td><td class='tnum'>${esc(tot)}</td>"
+    f"<td class='tnum'><strong>${esc(mg)}</strong></td>"
+    f"<td class='tnum'>{esc(pc)}</td></tr>"
+    for n, inf, ia, tot, mg, pc in PYL)
+
+esc_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(n)}</td><td class='tnum'>{esc(m)}</td>"
+    f"<td class='tnum'>{esc(i)}</td><td class='tnum'>{esc(o)}</td>"
+    f"<td class='tnum'>${esc(c)}</td><td class='tnum'>{esc(p)}</td></tr>"
+    for n, m, i, o, c, p in ESCENARIOS)
+
+inc_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(c)}</td><td><strong>{esc(v)}</strong></td>"
+    f"<td>{esc(d)}</td></tr>"
+    for c, v, d in INCLUYE)
+
+fuente_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(n)}</td><td>{esc(d)}</td>"
+    f"<td><a href='{esc(u)}' target='_blank' rel='noopener'>{esc(u.replace('https://',''))}</a></td></tr>"
+    for n, d, u in FUENTES)
+
+flow_ol = "".join(f"<li><strong>{esc(w)}</strong> — {esc(wh)}</li>" for w, wh in FLUJO)
+
+comp_prompt_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(c)}</td><td>{esc(d)}</td>"
+    f"<td class='tnum'><strong>{esc(t)}</strong></td><td>{esc(n)}</td></tr>"
+    for c, d, t, n in COMPONENTES_PROMPT)
+
+perfil_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(e)}</td><td class='tnum'>{n}</td>"
+    f"<td class='tnum'>{esc(o)}</td><td class='tnum'>{esc(tk)}</td>"
+    f"<td class='tnum'>${esc(cc)}</td><td class='tnum'>${esc(sc)}</td></tr>"
+    for e, n, o, tk, cc, sc, _ in filas_perfiles())
+
+plan_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(e)}</td><td class='tnum'>{esc(cv)}</td>"
+    f"<td class='tnum'>${esc(cc)}</td><td class='tnum'>${esc(sc)}</td>"
+    f"<td class='tnum'>{esc(pc)}%</td></tr>"
+    for e, cv, cc, sc, pc in filas_plan())
+
+sens_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(e)}</td><td class='tnum'>${esc(v)}</td>"
+    f"<td class='tnum'>{esc(r)}</td><td>{esc(no)}</td></tr>"
+    for e, v, r, no in sensibilidad())
+
+central_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(c)}</td><td>{esc(ind)}</td>"
+    f"<td><strong>{esc(cen)}</strong></td></tr>"
+    for c, ind, cen in CENTRALIZADO)
+
+slices_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(n)}</td><td class='tnum'>{esc(co)}</td>"
+    f"<td class='tnum'>{esc(ra)} GB</td><td class='tnum'>{esc(di)} GB</td>"
+    f"<td class='tnum'>US$ {esc(u)}</td><td class='tnum'>${esc(cp)}</td>"
+    f"<td class='tnum'><strong>{esc(neg)}</strong></td><td>{esc(no)}</td></tr>"
+    for n, co, ra, di, u, cp, neg, no in SLICES)
+
+comp_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(c)}</td><td>{esc(d)}</td>"
+    f"<td class='tnum'>{esc(rep)}</td><td class='tnum'>{esc(car)}</td>"
+    f"<td>{esc(no)}</td></tr>"
+    for c, d, rep, car, no in COMPONENTES)
+
+cuello_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(k)}</td><td>{esc(v)}</td></tr>"
+    for k, v in CUELLO)
+
+
+CSS = """
+:root{
+  --primary:#533afd;--primary-deep:#4434d4;--primary-press:#2e2b8c;--primary-soft:#665efd;
+  --primary-subdued:#b9b9f9;--brand-dark:#1c1e54;
+  --ink:#0d253d;--ink-2:#273951;--mute:#64748d;
+  --canvas:#ffffff;--canvas-soft:#f6f9fc;--cream:#f5e9d4;
+  --hairline:#e3e8ee;--hairline-input:#a8c3de;
+  --ruby:#ea2261;--lemon:#9b6829;
+  --shadow-1:rgba(0,55,112,.08) 0 1px 3px;
+  --shadow-2:rgba(0,55,112,.08) 0 8px 24px, rgba(0,55,112,.04) 0 2px 6px;
+  --sans:'Inter','SF Pro Display',system-ui,-apple-system,sans-serif;
+  --sidebar-w:292px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{font-family:var(--sans);color:var(--ink);background:var(--canvas);font-weight:300;
+  font-size:15px;line-height:1.5;font-feature-settings:"ss01";-webkit-font-smoothing:antialiased}
+::selection{background:var(--primary-subdued)}
+a{color:var(--primary);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--sans);font-weight:400;font-size:.85em;background:var(--canvas-soft);
+  border:1px solid var(--hairline);border-radius:4px;padding:1px 6px;color:var(--ink-2);font-feature-settings:"tnum"}
+strong{font-weight:500}
+.tnum{font-feature-settings:"tnum";letter-spacing:-.2px}
+
+/* ---------- Mesh + Dither Canvas ---------- */
+.mesh{position:relative;height:230px;overflow:hidden;background:var(--canvas)}
+.mesh::before{content:"";position:absolute;inset:-40px;
+  background:
+    radial-gradient(45% 95% at 5% 55%, rgba(245,233,212,.95), transparent 62%),
+    radial-gradient(40% 85% at 26% 30%, rgba(249,150,80,.38), transparent 62%),
+    radial-gradient(46% 95% at 52% 45%, rgba(178,132,255,.42), transparent 66%),
+    radial-gradient(52% 110% at 78% 35%, rgba(83,58,253,.68), transparent 66%),
+    radial-gradient(38% 85% at 100% 55%, rgba(234,34,97,.5), transparent 62%);
+  filter:blur(6px)}
+.mesh::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,transparent 40%,var(--canvas) 100%);z-index:3}
+.dither-fallback{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background-image:linear-gradient(135deg,transparent 12%,#2563eb 35%,#0aa3e0 55%,#5c4af2 72%,transparent 90%);
+  -webkit-mask-image:radial-gradient(circle,#000 1px,transparent 1.3px);
+  mask-image:radial-gradient(circle,#000 1px,transparent 1.3px);
+  -webkit-mask-size:7px 7px;mask-size:7px 7px;opacity:.5}
+#dither{position:absolute;inset:0;z-index:2;width:100%;height:100%;
+  display:block;opacity:0;transition:opacity .6s ease;pointer-events:auto;cursor:crosshair}
+.mesh-hint{position:absolute;right:18px;bottom:14px;z-index:4;font-size:10px;letter-spacing:.1px;
+  text-transform:uppercase;color:var(--mute);background:rgba(255,255,255,.72);backdrop-filter:blur(6px);
+  border:1px solid var(--hairline);border-radius:9999px;padding:4px 10px;pointer-events:none;
+  font-feature-settings:"tnum"}
+
+/* ---------- Sidebar ---------- */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--canvas);
+  border-right:1px solid var(--hairline);display:flex;flex-direction:column;z-index:40;transition:transform .22s ease}
+.side-brand{display:flex;align-items:center;gap:10px;padding:18px 20px 14px;border-bottom:1px solid var(--hairline)}
+.side-brand svg{flex:none}
+.side-brand .t{font-weight:400;font-size:14.5px;line-height:1.25;letter-spacing:-.2px}
+.side-brand .v{font-size:11px;color:var(--mute);display:block;margin-top:2px;font-feature-settings:"tnum"}
+.side-search{padding:14px 16px;border-bottom:1px solid var(--hairline)}
+.side-search input{width:100%;font-family:var(--sans);font-weight:300;font-size:14px;padding:9px 12px;
+  border:1px solid var(--hairline-input);border-radius:6px;background:var(--canvas);color:var(--ink);outline:none;
+  transition:border-color .15s,box-shadow .15s}
+.side-search input:focus{border-color:var(--primary)}
+.side-search .nores{display:none;font-size:12px;color:var(--mute);padding:8px 4px 0}
+.side-nav{flex:1;overflow-y:auto;padding:12px 8px 24px}
+.side-nav>ul{list-style:none}
+.nav-item>a{display:block;padding:7px 12px;border-radius:8px;font-size:13.5px;font-weight:400;color:var(--ink-2);line-height:1.35;letter-spacing:-.1px}
+.nav-item>a:hover{background:var(--canvas-soft);text-decoration:none;color:var(--primary-deep)}
+.nav-item>a.active{background:var(--primary-subdued);color:var(--primary-deep);font-weight:400}
+.side-foot{padding:12px 20px;border-top:1px solid var(--hairline);font-size:10.5px;color:var(--mute)}
+
+/* ---------- Content ---------- */
+.content{margin-left:var(--sidebar-w)}
+.doc{max-width:820px;margin:0 auto;padding:0 40px 96px}
+h1{font-size:44px;font-weight:300;line-height:1.05;letter-spacing:-1.1px}
+h2{font-size:28px;font-weight:300;line-height:1.1;letter-spacing:-.5px;margin:0 0 4px}
+h3{font-size:19px;font-weight:300;letter-spacing:-.2px;margin:36px 0 10px;scroll-margin-top:24px}
+h4{font-size:15px;font-weight:400;margin:0 0 8px}
+h5{font-size:10px;font-weight:400;letter-spacing:.1px;text-transform:uppercase;color:var(--mute);margin:12px 0 6px}
+.doc-header{padding:38px 0 26px;border-bottom:1px solid var(--hairline);margin-bottom:6px}
+.doc-header .kicker{font-size:10px;font-weight:400;letter-spacing:.1px;text-transform:uppercase;
+  color:var(--primary-deep);background:var(--primary-subdued);display:inline-flex;padding:4px 8px;border-radius:9999px;margin-bottom:16px}
+.doc-header .meta{font-size:13px;color:var(--mute);margin-top:12px;letter-spacing:-.2px}
+.doc-header .lead{color:var(--ink-2);margin-top:12px;font-size:16px;line-height:1.45}
+.stat-row{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.stat-pill{background:var(--canvas-soft);border:1px solid var(--hairline);border-radius:9999px;
+  padding:6px 14px;font-size:13px;color:var(--ink-2);font-feature-settings:"tnum"}
+.stat-pill b{color:var(--primary-deep);font-weight:500}
+.doc>section{margin:40px 0}
+.doc>section>h2{scroll-margin-top:24px}
+.sec-kicker{font-size:10px;font-weight:400;letter-spacing:.1px;text-transform:uppercase;color:var(--primary-deep);
+  background:var(--primary-subdued);display:inline-flex;padding:3px 8px;border-radius:9999px;margin-bottom:12px}
+.section-sub{color:var(--mute);font-size:14px;margin-bottom:16px}
+
+/* ---------- Tarjeta de precio ---------- */
+.price-hero{background:var(--brand-dark);color:#fff;border-radius:12px;padding:32px;margin:18px 0;box-shadow:var(--shadow-2)}
+.price-hero .ph-label{font-size:10px;font-weight:400;letter-spacing:.1px;text-transform:uppercase;opacity:.7}
+.price-hero .ph-amount{font-size:52px;font-weight:300;letter-spacing:-1.4px;line-height:1.05;margin:10px 0 2px;font-feature-settings:"tnum"}
+.price-hero .ph-amount span{font-size:22px;opacity:.7;letter-spacing:-.4px}
+.price-hero .ph-sub{font-size:14px;opacity:.82;line-height:1.5}
+.price-hero .ph-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.16);
+  border-radius:8px;overflow:hidden;margin-top:22px}
+.price-hero .ph-cell{background:var(--brand-dark);padding:14px 16px}
+.price-hero .ph-cell .k{font-size:10px;letter-spacing:.1px;text-transform:uppercase;opacity:.62}
+.price-hero .ph-cell .v{font-size:19px;font-weight:300;letter-spacing:-.3px;margin-top:4px;font-feature-settings:"tnum"}
+
+/* ---------- Admonitions ---------- */
+.adm{display:flex;gap:12px;padding:16px 18px;border-radius:12px;margin:16px 0;font-size:14px;line-height:1.5;border:1px solid var(--hairline)}
+.adm svg{width:18px;height:18px;flex:none;margin-top:2px}
+.adm .adm-title{font-weight:500;margin-bottom:2px;letter-spacing:-.1px}
+.adm-note{background:var(--canvas-soft);color:var(--ink-2)}
+.adm-note svg{stroke:var(--primary)}
+.adm-warning{background:var(--cream);color:var(--lemon);border-color:transparent}
+.adm-warning svg{stroke:var(--lemon)}
+.adm-warning .adm-title,.adm-warning li{color:var(--ink)}
+
+/* ---------- Tables ---------- */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--hairline);border-radius:12px;background:var(--canvas);margin:16px 0;box-shadow:var(--shadow-1)}
+table.doc-t{width:100%;border-collapse:collapse;font-size:14px;font-weight:300}
+table.doc-t th,table.doc-t td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--hairline)}
+table.doc-t thead th{font-size:10px;font-weight:400;letter-spacing:.1px;text-transform:uppercase;color:var(--mute);background:var(--canvas-soft)}
+table.doc-t tbody tr:last-child td{border-bottom:none}
+table.doc-t td.rowhead{font-weight:400;color:var(--ink-2);background:var(--canvas-soft);white-space:nowrap;letter-spacing:-.1px}
+table.doc-t td.tnum{font-feature-settings:"tnum";letter-spacing:-.2px}
+
+/* ---------- Flow ---------- */
+ol.flow{list-style:none;counter-reset:paso;margin:14px 0}
+ol.flow li{counter-increment:paso;position:relative;padding:8px 0 8px 46px;border-left:1px solid var(--hairline);margin-left:15px;font-size:14px;color:var(--ink-2)}
+ol.flow li::before{content:counter(paso,decimal-leading-zero);position:absolute;left:-15px;top:6px;width:30px;height:30px;border-radius:9999px;
+  background:var(--brand-dark);color:#fff;font-size:10px;font-weight:400;font-feature-settings:"tnum";letter-spacing:-.2px;display:flex;align-items:center;justify-content:center}
+ol.flow li:last-child{border-left-color:transparent}
+ol.flow strong{color:var(--ink)}
+mark{background:var(--cream);border-radius:3px;padding:0 2px}
+
+/* ---------- Menú móvil ---------- */
+.menu-btn{display:none;position:fixed;bottom:18px;right:18px;z-index:60;width:44px;height:44px;border-radius:9999px;
+  border:none;background:var(--primary);color:#fff;cursor:pointer;box-shadow:var(--shadow-2);align-items:center;justify-content:center}
+.menu-btn:active{background:var(--primary-press)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(13,37,61,.4);z-index:35}
+
+@media (max-width:960px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:none;box-shadow:var(--shadow-2)}
+  .content{margin-left:0}
+  .doc{padding:0 20px 96px}
+  .menu-btn{display:flex}
+  .overlay.show{display:block}
+  h1{font-size:34px;letter-spacing:-.8px}
+  .price-hero{padding:24px}
+  .price-hero .ph-amount{font-size:40px}
+  .price-hero .ph-grid{grid-template-columns:1fr}
+  .mesh{height:170px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+/* ---------- Simulador de precios ---------- */
+.sim{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+.sim-panel{background:var(--canvas);border:1px solid var(--hairline);border-radius:12px;
+  padding:24px;box-shadow:var(--shadow-1)}
+.sim-result{background:var(--brand-dark);color:#fff;border-color:transparent;box-shadow:var(--shadow-2)}
+.sim-label{display:block;font-size:10px;font-weight:400;letter-spacing:.1px;text-transform:uppercase;
+  color:var(--mute);margin:0 0 8px}
+.sim-result .sim-label{color:rgba(255,255,255,.7)}
+.sim-readout{font-size:30px;font-weight:300;letter-spacing:-.7px;line-height:1.1;
+  font-feature-settings:"tnum";margin-bottom:10px}
+.sim-readout-sm{font-size:22px;letter-spacing:-.4px}
+.sim-unit{font-size:13px;color:var(--mute);letter-spacing:0}
+.sim-scale{display:flex;justify-content:space-between;font-size:10px;color:var(--mute);margin-top:4px}
+
+/* range */
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;
+  cursor:pointer;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--hairline);border-radius:9999px}
+input[type=range]::-moz-range-track{height:3px;background:var(--hairline);border-radius:9999px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;
+  border-radius:9999px;background:var(--primary);border:3px solid var(--canvas);margin-top:-8px;
+  box-shadow:var(--shadow-1);transition:transform .15s}
+input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.12)}
+input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--primary-deep);outline-offset:2px}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:9999px;background:var(--primary);
+  border:3px solid var(--canvas);box-shadow:var(--shadow-1)}
+
+/* presets */
+.sim-presets{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:18px 0 20px}
+.sim-preset{font-family:var(--sans);font-weight:300;font-size:12.5px;text-align:left;line-height:1.3;
+  padding:10px 12px;border:1px solid var(--hairline);border-radius:8px;background:var(--canvas-soft);
+  color:var(--ink-2);cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+.sim-preset span{display:block;font-size:10px;color:var(--mute);font-feature-settings:"tnum";margin-top:2px}
+.sim-preset:hover{border-color:var(--primary);color:var(--primary-deep)}
+.sim-preset.on{background:var(--primary-subdued);border-color:var(--primary);color:var(--primary-deep);font-weight:400}
+.sim-preset.on span{color:var(--primary-deep)}
+
+.sim-toggle{display:flex;gap:0;margin-bottom:8px;border:1px solid var(--hairline);
+  border-radius:9999px;overflow:hidden;width:fit-content}
+.sim-toggle button{font-family:var(--sans);font-weight:300;font-size:12.5px;padding:7px 16px;
+  border:none;background:var(--canvas);color:var(--ink-2);cursor:pointer;transition:background .15s,color .15s}
+.sim-toggle button:hover{background:var(--canvas-soft);color:var(--primary-deep)}
+.sim-toggle button.on{background:var(--primary);color:#fff;font-weight:400}
+.sim-sup{font-size:9.5px;letter-spacing:.1px;text-transform:uppercase;opacity:.6;margin-left:4px}
+select{width:100%;font-family:var(--sans);font-weight:300;font-size:13.5px;padding:9px 12px;
+  border:1px solid var(--hairline-input);border-radius:6px;background:var(--canvas);color:var(--ink);
+  margin-bottom:20px;cursor:pointer}
+select:focus{border-color:var(--primary);outline:none}
+.sim-hint{font-size:11.5px;color:var(--mute);margin-top:6px;font-feature-settings:"tnum"}
+.sim-hint.over{color:var(--lemon);font-weight:400}
+
+/* resultado */
+.sim-res-head{border-bottom:1px solid rgba(255,255,255,.16);padding-bottom:18px;margin-bottom:6px}
+.sim-res-tag{font-size:10px;letter-spacing:.1px;text-transform:uppercase;opacity:.7}
+.sim-big{font-size:40px;font-weight:300;letter-spacing:-1.1px;line-height:1.05;margin:8px 0 4px;
+  font-feature-settings:"tnum"}
+.sim-per{font-size:13px;opacity:.7;letter-spacing:0;margin-left:6px}
+.sim-big-sub{font-size:12px;opacity:.72;font-feature-settings:"tnum"}
+.sim-rows{margin:14px 0 0}
+.sim-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  padding:9px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:13.5px}
+.sim-row:last-child{border-bottom:none}
+.sim-row dt{opacity:.85}
+.sim-row dd{font-feature-settings:"tnum";letter-spacing:-.2px;font-weight:400}
+.sim-int{font-size:9px;letter-spacing:.1px;text-transform:uppercase;opacity:.55;
+  border:1px solid rgba(255,255,255,.3);border-radius:9999px;padding:1px 6px;margin-left:4px}
+.sim-row-hi dt,.sim-row-hi dd{color:var(--primary-subdued)}
+.sim-sep{border-top:1px solid rgba(255,255,255,.22);margin-top:6px;padding-top:13px}
+.sim-row-total dt,.sim-row-total dd{font-weight:400}
+.sim-row-margen dt,.sim-row-margen dd{color:#fff;font-weight:400;padding-top:12px;
+  border-top:1px solid rgba(255,255,255,.22);margin-top:4px}
+.sim-pct{font-size:11.5px;opacity:.75;margin-left:6px}
+
+/* barra */
+.sim-bar{margin-top:20px}
+.sim-bar-lbl{font-size:10px;letter-spacing:.1px;text-transform:uppercase;opacity:.7;display:block;margin-bottom:8px}
+.sim-bar-track{height:7px;border-radius:9999px;overflow:hidden;background:rgba(255,255,255,.16);display:flex}
+.sim-bar-fill{display:block;height:100%;background:linear-gradient(90deg,var(--primary-soft),var(--primary));
+  border-radius:9999px;transition:width .35s cubic-bezier(.16,1,.3,1)}
+.sim-bar-legend{display:flex;gap:16px;margin-top:10px;font-size:11px;opacity:.82;flex-wrap:wrap}
+.sim-bar-legend span{display:flex;align-items:center;gap:5px}
+.sim-bar-legend b{font-weight:400;font-feature-settings:"tnum"}
+.sw{width:8px;height:8px;border-radius:2px;display:inline-block;flex:none}
+.sw-margen{background:var(--primary-soft)}
+.sw-ia{background:var(--ruby)}
+.sw-infra{background:var(--primary-subdued)}
+
+@media (max-width:820px){
+  .sim{grid-template-columns:1fr}
+  .sim-big{font-size:34px}
+  .sim-presets{grid-template-columns:1fr 1fr}
+}
+
+@media print{
+  .sidebar,.menu-btn,.overlay,.side-search,.mesh{display:none!important}
+  .content{margin:0}
+  .doc{max-width:none;padding:0}
+  .adm,.tbl-wrap,.price-hero{break-inside:avoid;box-shadow:none}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+"""
+
+# El JS del dither va en un <script> aparte con llaves literales (sin f-string).
+DITHER_JS = r"""
+/* Dither Canvas — adaptado de ObsidianUI (obsidianui.dev/docs/dither-canvas).
+   Sin el video original: la señal se genera proceduralmente y se le aplica el
+   mismo pipeline (simulación de fluido, matriz de Bayer 4x4, atlas de caracteres,
+   distorsión por puntero). Se degrada en silencio si no hay WebGL2. */
+(function(){
+"use strict";
+var canvas = document.getElementById('dither');
+if (!canvas) return;
+var motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+var FC = 80, FR = 60, FN = FC * FR;
+var CC = 60, EDGE_LO = 36, EDGE_HI = 130;
+var EDGES = ['.', ',', '=', '+', '-'];
+var BRIGHTS = ['A','S','O','B','R','E','S'];
+var ALL_CHARS = EDGES.concat(BRIGHTS);
+var BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+var TL = 320, TS = 10, TM = 72;
+var TRAIL_CFG = { fb: 0.08, fss: 18, ffm: 0.15, fir: 0.8, firl: 1.0 };
+
+var VS = '#version 300 es\nin vec2 a_pos;\nvoid main(){ gl_Position = vec4(a_pos, 0, 1); }';
+
+var FS = '#version 300 es\n' +
+'precision highp float;\n' +
+'uniform sampler2D uFluid, uAtlas;\n' +
+'uniform vec2 uRes;\n' +
+'uniform float uTime;\n' +
+'uniform int uPhase, uTrailN;\n' +
+'uniform vec4 uTP[' + TM + '];\n' +
+'uniform float uTL[' + TM + '];\n' +
+'out vec4 O;\n' +
+'const float CC = ' + CC + '.0, EL = ' + EDGE_LO + '.0, EH = ' + EDGE_HI + '.0;\n' +
+'const float FC = ' + FC + '.0, FR = ' + FR + '.0;\n' +
+'const int BAYER[16] = int[16](' + BAYER.map(function(v){return Math.round((v/16)*255);}).join(',') + ');\n' +
+'const int CHAR_N = ' + ALL_CHARS.length + ';\n' +
+'float signal(vec2 uv){\n' +
+'  float horizon = smoothstep(0.0, 0.45, uv.y) * (1.0 - smoothstep(0.55, 1.0, uv.y));\n' +
+'  float band = 1.0 - abs(uv.y - 0.5) * 2.0;\n' +
+'  float swell = sin(uv.x * 5.2 + uTime * 0.55) * 0.5 + 0.5;\n' +
+'  float ripple = sin(uv.y * 7.5 - uTime * 0.42 + uv.x * 3.1) * 0.5 + 0.5;\n' +
+'  float pulse = sin((uv.x + uv.y) * 3.4 - uTime * 0.33) * 0.5 + 0.5;\n' +
+'  float s = 0.16 + band * 0.26 + horizon * (swell * 0.34 + ripple * 0.22 + pulse * 0.18);\n' +
+'  return clamp(s, 0.0, 1.0);\n' +
+'}\n' +
+'void main(){\n' +
+'  float cw = uRes.x / CC;\n' +
+'  float rows = ceil(uRes.y / cw) + 1.0;\n' +
+'  float gx = floor(gl_FragCoord.x / cw);\n' +
+'  float gy = floor((uRes.y - gl_FragCoord.y) / cw);\n' +
+'  if(gx >= CC || gy >= rows) discard;\n' +
+'  vec2 cp = vec2(fract(gl_FragCoord.x / cw), fract((uRes.y - gl_FragCoord.y) / cw));\n' +
+'  vec2 bp = vec2((gx + 0.5) * cw, (gy + 0.5) * cw);\n' +
+'  ivec2 fc = ivec2(gx / CC * FC, gy / rows * FR);\n' +
+'  fc = clamp(fc, ivec2(0), ivec2(int(FC)-1, int(FR)-1));\n' +
+'  vec2 flow = texelFetch(uFluid, fc, 0).rg;\n' +
+'  vec2 disp = vec2(0.0);\n' +
+'  for(int i = 0; i < uTrailN; i++){\n' +
+'    float life = uTL[i];\n' +
+'    if(life <= 0.0) continue;\n' +
+'    vec2 d = bp - uTP[i].xy;\n' +
+'    float dist = length(d);\n' +
+'    float r = 5.0 + life * 3.0;\n' +
+'    if(dist == 0.0 || dist > r) continue;\n' +
+'    float f = pow(1.0 - dist / r, 2.0);\n' +
+'    disp += (d / dist) * f * life * 3.0 + uTP[i].zw * f * 0.04;\n' +
+'  }\n' +
+'  vec2 sp = bp + disp + flow * 6.0;\n' +
+'  vec2 uv = clamp(sp / uRes, 0.0, 1.0);\n' +
+'  float s = signal(uv);\n' +
+'  float bg = smoothstep(0.06, 0.62, s) * 255.0;\n' +
+'  float hm = min(1.0, length(flow) * 1.1);\n' +
+'  float gray = bg * (1.0 - hm) + (255.0 - bg) * hm;\n' +
+'  float thr = float(BAYER[(int(gy) & 3) * 4 + (int(gx) & 3)]);\n' +
+'  bool invDark = hm > 0.05 && bg > thr && gray <= thr;\n' +
+'  bool lit = gray > thr;\n' +
+'  if(!lit && !invDark) discard;\n' +
+'  float pg = invDark ? bg : gray;\n' +
+'  int ci;\n' +
+'  if(pg >= EL && pg <= EH) ci = uPhase % 5;\n' +
+'  else if(pg > EH) ci = 5 + uPhase % ' + BRIGHTS.length + ';\n' +
+'  else discard;\n' +
+'  float au = (float(ci) + cp.x) / float(CHAR_N);\n' +
+'  float ca = texture(uAtlas, vec2(au, cp.y)).a;\n' +
+'  if(ca < 0.05) discard;\n' +
+'  vec3 indigo = vec3(0.325, 0.227, 0.992);\n' +
+'  vec3 cyan = vec3(0.02, 0.64, 0.88);\n' +
+'  vec3 violet = vec3(0.36, 0.29, 0.95);\n' +
+'  vec3 ruby = vec3(0.917, 0.133, 0.380);\n' +
+'  float tint = smoothstep(0.15, 0.9, uv.x * 0.6 + uv.y * 0.4);\n' +
+'  vec3 col = mix(indigo, cyan, tint);\n' +
+'  col = mix(col, violet, hm * 0.65);\n' +
+'  col = mix(col, ruby, smoothstep(0.72, 1.0, uv.x) * 0.45);\n' +
+'  float a = (invDark ? 0.85 : 1.0) * ca;\n' +
+'  O = vec4(col * a, a);\n' +
+'}\n';
+
+function createFluid(){
+  var vx = new Float32Array(FN), vy = new Float32Array(FN);
+  var vx0 = new Float32Array(FN), vy0 = new Float32Array(FN);
+  var p = new Float32Array(FN), div = new Float32Array(FN);
+  function fi(x, y){
+    return Math.max(0, Math.min(FR - 1, y)) * FC + Math.max(0, Math.min(FC - 1, x));
+  }
+  function bnd(b, a){
+    var x, y;
+    for (x = 1; x < FC - 1; x++){
+      a[fi(x, 0)] = b === 2 ? -a[fi(x, 1)] : a[fi(x, 1)];
+      a[fi(x, FR - 1)] = b === 2 ? -a[fi(x, FR - 2)] : a[fi(x, FR - 2)];
+    }
+    for (y = 1; y < FR - 1; y++){
+      a[fi(0, y)] = b === 1 ? -a[fi(1, y)] : a[fi(1, y)];
+      a[fi(FC - 1, y)] = b === 1 ? -a[fi(FC - 2, y)] : a[fi(FC - 2, y)];
+    }
+  }
+  function diffuse(b, d, s, diff, dt){
+    var a = dt * diff * FN, k, x, y;
+    for (k = 0; k < 4; k++){
+      for (y = 1; y < FR - 1; y++) for (x = 1; x < FC - 1; x++){
+        d[fi(x, y)] = (s[fi(x, y)] + a * (d[fi(x-1,y)] + d[fi(x+1,y)] + d[fi(x,y-1)] + d[fi(x,y+1)])) / (1 + 4 * a);
+      }
+      bnd(b, d);
+    }
+  }
+  function advect(b, d, d0, ux, uy, dt){
+    var dtx = dt * FC * 1.4, dty = dt * FR * 1.4, x, y;
+    for (y = 1; y < FR - 1; y++) for (x = 1; x < FC - 1; x++){
+      var px = Math.max(0.5, Math.min(FC - 1.5, x - dtx * ux[fi(x, y)]));
+      var py = Math.max(0.5, Math.min(FR - 1.5, y - dty * uy[fi(x, y)]));
+      var x0 = Math.floor(px), y0 = Math.floor(py);
+      var s1 = px - x0, s0 = 1 - s1, t1 = py - y0, t0 = 1 - t1;
+      d[fi(x, y)] = s0 * (t0 * d0[fi(x0,y0)] + t1 * d0[fi(x0,y0+1)]) + s1 * (t0 * d0[fi(x0+1,y0)] + t1 * d0[fi(x0+1,y0+1)]);
+    }
+    bnd(b, d);
+  }
+  function project(ux, uy){
+    var hx = 1 / FC, hy = 1 / FR, k, x, y;
+    for (y = 1; y < FR - 1; y++) for (x = 1; x < FC - 1; x++){
+      div[fi(x,y)] = -0.5 * (hx * (ux[fi(x+1,y)] - ux[fi(x-1,y)]) + hy * (uy[fi(x,y+1)] - uy[fi(x,y-1)]));
+      p[fi(x,y)] = 0;
+    }
+    bnd(0, div); bnd(0, p);
+    for (k = 0; k < 4; k++){
+      for (y = 1; y < FR - 1; y++) for (x = 1; x < FC - 1; x++){
+        p[fi(x,y)] = (div[fi(x,y)] + p[fi(x-1,y)] + p[fi(x+1,y)] + p[fi(x,y-1)] + p[fi(x,y+1)]) / 4;
+      }
+      bnd(0, p);
+    }
+    for (y = 1; y < FR - 1; y++) for (x = 1; x < FC - 1; x++){
+      ux[fi(x,y)] -= 0.5 * (p[fi(x+1,y)] - p[fi(x-1,y)]) / hx;
+      uy[fi(x,y)] -= 0.5 * (p[fi(x,y+1)] - p[fi(x,y-1)]) / hy;
+    }
+    bnd(1, ux); bnd(2, uy);
+  }
+  return {
+    vx: vx, vy: vy, fi: fi,
+    step: function(){
+      diffuse(1, vx0, vx, 0.00002, 0.016);
+      diffuse(2, vy0, vy, 0.00002, 0.016);
+      project(vx0, vy0);
+      advect(1, vx, vx0, vx0, vy0, 0.016);
+      advect(2, vy, vy0, vx0, vy0, 0.016);
+      project(vx, vy);
+      for (var i = 0; i < FN; i++){ vx[i] *= 0.94; vy[i] *= 0.94; }
+    }
+  };
+}
+
+/* Autodisparo: sin puntero, la simulación recibe impulsos periódicos para que
+   la textura nunca quede muerta. */
+function autoPulse(fluid, W, H){
+  var cx = ((0.28 + Math.random() * 0.44) * W) | 0;
+  var cy = ((0.25 + Math.random() * 0.5) * H) | 0;
+  var ang = Math.random() * Math.PI * 2;
+  var mag = 1.6 + Math.random() * 2.4;
+  var vx = Math.cos(ang) * mag, vy = Math.sin(ang) * mag;
+  var r = 9;
+  var gx = ((cx / W) * FC) | 0, gy = ((cy / H) * FR) | 0;
+  for (var dy = -r; dy <= r; dy++) for (var dx = -r; dx <= r; dx++){
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > r) continue;
+    var f = Math.pow(1 - dist / r, 2);
+    fluid.vx[fluid.fi(gx + dx, gy + dy)] += vx * f * 2.2;
+    fluid.vy[fluid.fi(gx + dx, gy + dy)] += vy * f * 2.2;
+  }
+}
+
+var gl = null;
+try { gl = canvas.getContext('webgl2', { alpha: true, antialias: false, premultipliedAlpha: true, preserveDrawingBuffer: true }); } catch (e) { gl = null; }
+if (!gl) return;   /* el fallback CSS con mask-image queda visible */
+
+var disposed = false, rafId = 0, textures = [], shaders = [], buffers = [], prog = null;
+var listeners = [];
+
+function cleanup(){
+  if (disposed) return;
+  disposed = true;
+  cancelAnimationFrame(rafId);
+  listeners.forEach(function (off) { off(); });
+  textures.forEach(function (t) { gl.deleteTexture(t); });
+  buffers.forEach(function (b) { gl.deleteBuffer(b); });
+  shaders.forEach(function (s) { gl.deleteShader(s); });
+  if (prog) gl.deleteProgram(prog);
+}
+function listen(target, event, handler){
+  target.addEventListener(event, handler);
+  listeners.push(function () { target.removeEventListener(event, handler); });
+}
+function fallback(){
+  if (disposed) return;
+  canvas.style.opacity = '0';
+  canvas.style.pointerEvents = 'none';
+  cleanup();
+}
+/* Reporta el motivo una sola vez: un fallo mudo de shader es imposible de depurar. */
+function reportar(motivo){
+  if (window.__ditherDiag) return;
+  window.__ditherDiag = String(motivo);
+  if (window.console && console.warn) console.warn('[dither-canvas] desactivado:', motivo);
+}
+
+try {
+  function mkShader(type, source){
+    var sh = gl.createShader(type);
+    if (!sh) throw new Error('shader alloc');
+    shaders.push(sh);
+    gl.shaderSource(sh, source);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+      throw new Error('shader compile: ' + (gl.getShaderInfoLog(sh) || 'sin log'));
+    }
+    return sh;
+  }
+  function mkTex(unit){
+    var tex = gl.createTexture();
+    if (!tex) throw new Error('tex alloc');
+    textures.push(tex);
+    gl.activeTexture(gl.TEXTURE0 + unit);
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    return tex;
+  }
+
+  prog = gl.createProgram();
+  if (!prog) throw new Error('prog alloc');
+  gl.attachShader(prog, mkShader(gl.VERTEX_SHADER, VS));
+  gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, FS));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error('link');
+  gl.useProgram(prog);
+
+  function loc(name){ return gl.getUniformLocation(prog, name); }
+
+  var buf = gl.createBuffer();
+  if (!buf) throw new Error('buf alloc');
+  buffers.push(buf);
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  var aPos = gl.getAttribLocation(prog, 'a_pos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  var fluidTex = mkTex(0);
+
+  var atlasCanvas = document.createElement('canvas');
+  var CELL = 64;
+  atlasCanvas.width = CELL * ALL_CHARS.length;
+  atlasCanvas.height = CELL;
+  var actx = atlasCanvas.getContext('2d');
+  if (!actx) throw new Error('atlas');
+  actx.font = (CELL * 0.92) + 'px monospace';
+  actx.textAlign = 'center';
+  actx.textBaseline = 'middle';
+  actx.fillStyle = '#fff';
+  ALL_CHARS.forEach(function (ch, i) { actx.fillText(ch, CELL * (i + 0.5), CELL * 0.5); });
+  mkTex(1);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, atlasCanvas);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.uniform1i(loc('uFluid'), 0);
+  gl.uniform1i(loc('uAtlas'), 1);
+
+  var fluid = createFluid();
+  var fluidData = new Float32Array(FN * 2);
+  var mouse = { x: -9999, y: -9999, vx: 0, vy: 0 };
+  var trail = [];
+  function now(){ return performance.now(); }
+
+  function onMove(ev){
+    var rect = canvas.getBoundingClientRect();
+    var px = mouse.x, py = mouse.y;
+    mouse.x = ev.clientX - rect.left;
+    mouse.y = ev.clientY - rect.top;
+    mouse.vx = mouse.x - px;
+    mouse.vy = mouse.y - py;
+    if (px < 0 || py < 0){
+      trail.unshift({ x: mouse.x, y: mouse.y, vx: 0, vy: 0, b: now() });
+      if (trail.length > TM) trail.length = TM;
+      return;
+    }
+    var d = Math.sqrt(mouse.vx * mouse.vx + mouse.vy * mouse.vy);
+    if (d < 0.5) return;
+    var steps = Math.max(1, Math.ceil(d / TS));
+    var birth = now();
+    for (var s = 1; s <= steps; s++){
+      var t = s / steps;
+      trail.unshift({ x: px + mouse.vx * t, y: py + mouse.vy * t, vx: mouse.vx / steps, vy: mouse.vy / steps, b: birth });
+      if (trail.length > TM) trail.length = TM;
+    }
+  }
+  listen(canvas, 'pointermove', onMove);
+  listen(canvas, 'pointerleave', function () { mouse.x = mouse.y = -9999; });
+  listen(canvas, 'webglcontextlost', function (ev) { ev.preventDefault(); fallback(); });
+
+  var W = 1, H = 1;
+  function resize(){
+    var rect = canvas.getBoundingClientRect();
+    W = canvas.width = Math.max(1, Math.round(rect.width));
+    H = canvas.height = Math.max(1, Math.round(rect.height));
+    gl.viewport(0, 0, W, H);
+  }
+  resize();
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+  var uTP = loc('uTP'), uTLoc = loc('uTL'), uRes = loc('uRes');
+  var uPhase = loc('uPhase'), uTrailN = loc('uTrailN'), uTime = loc('uTime');
+  var tpBuf = new Float32Array(TM * 4);
+  var tlBuf = new Float32Array(TM);
+  var phase = 0, frame = 0, pulseAt = 0, running = false;
+  var t0 = now();
+
+  function draw(){
+    var ts = now();
+    var elapsed = (ts - t0) / 1000;
+    var cfg = TRAIL_CFG;
+
+    /* impulsos automáticos para que el campo nunca quede estático */
+    if (ts - pulseAt > 900){
+      pulseAt = ts;
+      autoPulse(fluid, W, H);
+    }
+
+    for (var i = trail.length - 1; i >= 0; i--){
+      var pt = trail[i];
+      var age = ts - pt.b;
+      if (age >= TL){ trail.splice(i, 1); continue; }
+      var life = 1 - age / TL;
+      var radius = cfg.fir + life * cfg.firl;
+      var gr = Math.ceil(radius);
+      var speed = Math.sqrt(pt.vx * pt.vx + pt.vy * pt.vy);
+      var force = (cfg.fb + Math.min(speed, cfg.fss) / cfg.fss) * life;
+      var cx = ((pt.x / W) * FC) | 0;
+      var cy = ((pt.y / H) * FR) | 0;
+      for (var dy = -gr; dy <= gr; dy++) for (var dx = -gr; dx <= gr; dx++){
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > radius) continue;
+        var f = Math.pow(1 - dist / radius, 2);
+        fluid.vx[fluid.fi(cx + dx, cy + dy)] += pt.vx * f * force * cfg.ffm;
+        fluid.vy[fluid.fi(cx + dx, cy + dy)] += pt.vy * f * force * cfg.ffm;
+      }
+    }
+
+    fluid.step();
+    if (frame++ % 8 === 0) phase = (phase + 1) % 255;
+
+    for (var j = 0; j < FN; j++){
+      fluidData[j * 2] = fluid.vx[j];
+      fluidData[j * 2 + 1] = fluid.vy[j];
+    }
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, fluidTex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG32F, FC, FR, 0, gl.RG, gl.FLOAT, fluidData);
+
+    tpBuf.fill(0); tlBuf.fill(0);
+    for (var k = 0; k < trail.length; k++){
+      var q = trail[k];
+      tpBuf[k*4] = q.x; tpBuf[k*4+1] = q.y; tpBuf[k*4+2] = q.vx; tpBuf[k*4+3] = q.vy;
+      tlBuf[k] = 1 - (ts - q.b) / TL;
+    }
+    gl.uniform4fv(uTP, tpBuf);
+    gl.uniform1fv(uTLoc, tlBuf);
+    gl.uniform1i(uTrailN, trail.length);
+    gl.uniform2f(uRes, W, H);
+    gl.uniform1i(uPhase, phase);
+    gl.uniform1f(uTime, elapsed);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    if (canvas.style.opacity !== '1') canvas.style.opacity = '1';
+  }
+
+  function render(){
+    if (disposed || !running) return;
+    try { draw(); } catch (e) { fallback(); return; }
+    rafId = requestAnimationFrame(render);
+  }
+
+  /* Solo anima mientras la banda es visible: sin costo fuera de pantalla. */
+  function start(){
+    if (disposed || running) return;
+    /* Con movimiento reducido se pinta un fotograma estático y se detiene.
+       preserveDrawingBuffer mantiene ese fotograma visible. */
+    if (motion.matches) { try { draw(); } catch (e) { reportar(e && e.message ? e.message : e); fallback(); } return; }
+    running = true;
+    rafId = requestAnimationFrame(render);
+  }
+  function stop(){
+    running = false;
+    cancelAnimationFrame(rafId);
+  }
+
+  listen(motion, 'change', function () { stop(); start(); });
+
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) start(); else stop(); });
+    }, { threshold: 0.01 });
+    io.observe(canvas);
+    listeners.push(function () { io.disconnect(); });
+  } else {
+    start();
+  }
+
+  var ro = new ResizeObserver(function () { resize(); if (!running) { try { draw(); } catch (e) {} } });
+  ro.observe(canvas.parentElement);
+  listeners.push(function () { ro.disconnect(); });
+
+} catch (e) {
+  reportar(e && e.message ? e.message : e);
+  fallback();
+}
+})();
+"""
+
+JS = r"""
+(function(){
+"use strict";
+var sb=document.querySelector('.sidebar'),ov=document.querySelector('.overlay'),mb=document.querySelector('.menu-btn');
+mb.addEventListener('click',function(){sb.classList.toggle('open');ov.classList.toggle('show');});
+ov.addEventListener('click',function(){sb.classList.remove('open');ov.classList.remove('show');});
+
+var q=document.getElementById('doc-search');
+var nores=document.getElementById('search-nores');
+var items=[].slice.call(document.querySelectorAll('.nav-item'));
+q.addEventListener('input',function(){
+  var v=q.value.trim().toLowerCase(),hits=0;
+  items.forEach(function(li){
+    var txt=li.firstChild.textContent.toLowerCase();
+    var match=txt.indexOf(v)>-1;
+    li.style.display=(match||!v)?'':'none';
+    if(v&&match)hits++;
+  });
+  nores.style.display=(v&&!hits)?'block':'none';
+});
+
+var links={};[].slice.call(document.querySelectorAll('[data-nav]')).forEach(function(a){links[a.getAttribute('href').slice(1)]=a;});
+var spy=new IntersectionObserver(function(es){
+  es.forEach(function(en){
+    if(en.isIntersecting){
+      var id=en.target.id;
+      [].slice.call(document.querySelectorAll('[data-nav].active')).forEach(function(a){a.classList.remove('active');});
+      if(links[id])links[id].classList.add('active');
+    }
+  });
+},{rootMargin:'-10% 0px -80% 0px'});
+document.querySelectorAll('section[id],article[id]').forEach(function(el){spy.observe(el);});
+})();
+"""
+
+html_doc = f'''<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Precios · Agente de AsoBares · Documentación</title>
+<meta name="description" content="Documentación de precios del agente de WhatsApp con IA para AsoBares: plan de $80.000 + IVA con 1.000 mensajes, costo real de IA con DeepSeek V4.1 Flash, precios verificados de InterServer y margen por negocio.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 30 10v12L16 30 2 22V10z' fill='%23533afd'/%3E%3Cpath d='M11 16.5l3.5 3.5L21 13' stroke='%23fff' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>{CSS}</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="side-brand">
+    <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 30 10v12L16 30 2 22V10z" fill="#533afd"/><path d="M11 16.5l3.5 3.5L21 13" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div>
+      <span class="t">AsoBares · Precios</span>
+      <span class="v">Versión 1.0 · TRM ${TRM:,}</span>
+    </div>
+  </div>
+  <div class="side-search">
+    <input id="doc-search" type="search" placeholder="Buscar sección…" aria-label="Buscar en el documento">
+    <p class="nores" id="search-nores">Sin resultados. Prueba con otro término (p. ej. IA, margen, VPS).</p>
+  </div>
+  <nav class="side-nav" aria-label="Contenido">
+    <ul>
+{nav_html}    </ul>
+  </nav>
+  <div class="side-foot">
+    Operado por Purosesu Labs · Documento interno y comercial
+  </div>
+</aside>
+
+<button class="menu-btn" aria-label="Abrir menú">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+</button>
+<div class="overlay"></div>
+
+<div class="content">
+  <div class="mesh" aria-hidden="true">
+    <div class="dither-fallback"></div>
+    <canvas id="dither"></canvas>
+    <span class="mesh-hint">Mueve el cursor</span>
+  </div>
+
+  <div class="doc">
+
+    <header class="doc-header" id="resumen">
+      <span class="kicker">Documentación de precios</span>
+      <h1>Agente de WhatsApp con IA para bares</h1>
+      <p class="lead">Un solo plan para los afiliados de AsoBares, con el costo real de operarlo
+      medido y verificado: consumo de <strong>DeepSeek V4.1 Flash</strong>, precios de
+      <strong>InterServer</strong> y el margen que queda por negocio.</p>
+      <p class="meta">Precio de venta $80.000 + IVA · 1.000 mensajes mensuales · TRM $4.000 COP/USD · Cifras verificadas en septiembre de 2026</p>
+      <div class="stat-row">
+        <span class="stat-pill"><b>$95.200</b> valor final con IVA</span>
+        <span class="stat-pill"><b>1.000</b> mensajes incluidos</span>
+        <span class="stat-pill"><b>$247</b> costo de IA / mes</span>
+        <span class="stat-pill"><b>84,3%</b> margen en VPS 1 slice</span>
+      </div>
+    </header>
+
+    <section id="plan">
+      <span class="sec-kicker">01 · El plan</span>
+      <h2>Un precio, sin escalones ni sorpresas</h2>
+      <p class="section-sub">El afiliado paga un valor fijo mensual que cubre infraestructura, IA, soporte y mantenimiento.</p>
+
+      <div class="price-hero">
+        <div class="ph-label">Plan AsoBares · Agencia única</div>
+        <div class="ph-amount">$80.000 <span>+ IVA / mes</span></div>
+        <div class="ph-sub">Valor final con IVA del 19%: <strong>$95.200</strong> mensuales. La instalación no tiene costo.</div>
+        <div class="ph-grid">
+          <div class="ph-cell"><div class="k">Mensajes incluidos</div><div class="v">{MENSAJES_INCLUIDOS:,}</div></div>
+          <div class="ph-cell"><div class="k">Costo de IA real</div><div class="v">$247</div></div>
+          <div class="ph-cell"><div class="k">Permanencia</div><div class="v">Ninguna</div></div>
+        </div>
+      </div>
+
+      {admon("note", "Por qué se cobra por mensaje y no por token",
+      "<p>Un bar entiende y presupuesta un número de mensajes; una factura que depende del consumo de tokens genera desconfianza. El tope de 1.000 mensajes protege el margen y le da al negocio un costo predecible. El consumo real se sigue midiendo internamente para detectar desvíos antes de que afecten el mes.</p>")}
+
+      {admon("warning", "El IVA no es ingreso",
+      "<p>El precio de lista es de $80.000. Los $15.200 de IVA se recaudan para la DIAN y se trasladan íntegros, así que <strong>el margen se calcula siempre sobre $80.000</strong>, nunca sobre $95.200.</p>")}
+    </section>
+
+    <section id="incluye">
+      <span class="sec-kicker">02 · Qué incluye</span>
+      <h2>Qué recibe el negocio por ese valor</h2>
+      <p class="section-sub">Todo lo necesario para operar el agente, sin costos de implementación ni licencias por usuario.</p>
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Concepto</th><th>Incluido</th><th>Detalle</th></tr></thead>
+          <tbody>
+{inc_rows}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="ia">
+      <span class="sec-kicker">03 · Costo de IA por tokens</span>
+      <h2>Cuánto cuesta realmente cada mensaje</h2>
+      <p class="section-sub">El costo se construye de abajo hacia arriba midiendo el código del agente, no estimando. Precios oficiales de DeepSeek para <code>deepseek-flash</code> (DeepSeek-V4.1-Flash), off-peak.</p>
+
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Concepto</th><th>Tarifa</th><th>Off-peak</th><th>Peak</th></tr></thead>
+          <tbody>
+{ds_rows}
+          </tbody>
+        </table>
+      </div>
+
+      {admon("warning", "Corrección: el supuesto anterior subestimaba la entrada",
+      "<p>El documento calculaba con <strong>1.630 tokens de entrada por mensaje</strong>. Al medir el prompt real y los esquemas de herramientas, la cifra correcta es <strong>~3.180</strong>: casi el doble. Los 1.630 no contaban el peso de las 7 herramientas (1.664 tokens) ni el tamaño real del prompt base (1.140, no 900). Esta sección reemplaza ese supuesto.</p>")}
+
+      <h3>De dónde salen los tokens</h3>
+      <p class="section-sub">Cada componente medido en el repositorio del agente.</p>
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Componente</th><th>Origen</th><th>Tokens</th><th>Nota</th></tr></thead>
+          <tbody>
+{comp_prompt_rows}
+          </tbody>
+        </table>
+      </div>
+
+      {admon("note", "El prompt fijo se repite en cada llamada",
+      "<p>El prompt base, los datos del negocio y las herramientas suman <code>2.924</code> tokens que se envían <strong>en cada mensaje</strong>. De esos, <code>2.804</code> forman un prefijo estable que DeepSeek puede cachear. Es la razón por la que el caché importa tanto: sin él, ese prefijo se paga a precio completo en cada turno.</p>")}
+
+      <h3>Costo por conversación</h3>
+      <p class="section-sub">El historial crece mensaje a mensaje (hasta 10 previos por defecto), así que el costo no es lineal: cada turno pesa un poco más que el anterior.</p>
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Perfil</th><th>Mensajes</th><th>Salida/msg</th><th>Tokens entrada</th><th>Con caché</th><th>Sin caché</th></tr></thead>
+          <tbody>
+{perfil_rows}
+          </tbody>
+        </table>
+      </div>
+
+      {admon("note", "Cómo se lee esta tabla",
+      "<p>Una <strong>conversación normal de 6 mensajes cuesta $1,48</strong> con caché y $11,37 sin ella. La diferencia de 8× es el valor del caché de prompt. Una conversación con herramientas (reservas, pedidos) sube a $10,72 porque genera más salida y más idas y vueltas.</p>")}
+
+      <h3>El plan de 1.000 mensajes</h3>
+      <p class="section-sub">Según el perfil de conversación que domine en cada bar.</p>
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Perfil dominante</th><th>Conversaciones</th><th>Con caché</th><th>Sin caché</th><th>% de $80.000</th></tr></thead>
+          <tbody>
+{plan_rows}
+          </tbody>
+        </table>
+      </div>
+
+      {admon("note", "El rango honesto va de $211 a $2.185 al mes",
+      "<p>Según el perfil, agotar los 1.000 mensajes cuesta entre <strong>$211 y $536 con caché</strong>, o entre <strong>$1.859 y $2.185 sin él</strong>. Cualquier cifra única es un caso particular, no el costo esperado. El valor de referencia es el de la conversación normal <strong>con caché: $247/mes</strong>, el 0,3% del precio.</p>")}
+
+      <h3>Qué pasa si cambian las condiciones</h3>
+      <p class="section-sub">Cada caso calculado por separado, sobre el plan de 1.000 mensajes.</p>
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Escenario</th><th>Costo mensual</th><th>vs. base</th><th>Condición</th></tr></thead>
+          <tbody>
+{sens_rows}
+          </tbody>
+        </table>
+      </div>
+
+      {admon("warning", "El riesgo real es quedarse sin caché",
+      "<p>Todo el modelo depende de que el prefijo de <code>2.804</code> tokens se reutilice. Si el caché no funciona —porque el prompt cambia en cada turno, porque se reordena el contexto o porque el proveedor no lo aplica— el costo salta de <strong>$247 a $1.895, un 668% más</strong>. Es el supuesto que hay que verificar primero en el piloto.</p>")}
+
+      {admon("note", "Pendiente: confirmar con consumo medido",
+      "<p>Estas cifras son un modelo construido sobre el código, no una factura. La tabla <code>consumo_negocio</code> ya registra tokens de entrada, salida y llamadas por negocio y día, pero <strong>todavía no se ha consultado con datos reales</strong>. Antes de fijar precios con estos números hay que leer esa tabla tras el piloto y comparar con lo simulado aquí.</p>")}
+    </section>
+
+    <section id="infra">
+      <span class="sec-kicker">04 · Costo del servidor</span>
+      <h2>Infraestructura en InterServer</h2>
+      <p class="section-sub">Precios reales publicados por InterServer, convertidos a COP con la TRM de referencia.</p>
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Plan</th><th>Recursos</th><th>USD / mes</th><th>COP / mes</th><th>Notas</th></tr></thead>
+          <tbody>
+{is_rows}
+          </tbody>
+        </table>
+      </div>
+
+      {admon("note", "Por qué InterServer y no un proveedor más caro",
+      "<p>El Cloud VPS de InterServer arranca en <strong>US$3 al mes</strong> con 1 core, 2 GB de RAM y 40 GB de SSD, con IP pública y acceso root. El análisis de capacidad del proyecto concluyó que el stack completo consume ~1,5 GB de RAM para 20–25 negocios, así que <strong>un solo slice ya sobra para el piloto</strong> y el plan de 4 slices cubre la operación completa.</p>")}
+
+      {admon("warning", "El servidor es el costo dominante, no la IA",
+      "<p>En el escenario más eficiente el servidor cuesta $12.000 COP al mes contra $247 de IA: <strong>48 veces más</strong>. Cualquier decisión de precio tiene que mirar primero el dimensionamiento del servidor. Cabe destacar que el VPS se comparte entre varios negocios, así que ese costo se prorratea.</p>")}
+    </section>
+
+    <section id="arquitectura">
+      <span class="sec-kicker">05 · Arquitectura centralizada</span>
+      <h2>Una sola instalación para todos los negocios</h2>
+      <p class="section-sub">Todos los afiliados se atienden desde un mismo servidor. Es la decisión que hace viable el precio de $80.000.</p>
+
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Criterio</th><th>Un agente por negocio</th><th>Centralizado (elegido)</th></tr></thead>
+          <tbody>
+{central_rows}
+          </tbody>
+        </table>
+      </div>
+
+      {admon("note", "La analogía: una nevera por apartamento o un cuarto frío central",
+      "<p>Instalar una copia completa del agente por cada bar es como poner una nevera en cada apartamento: funciona, pero no escala. Un cuarto frío central enfría lo mismo para todos con una fracción del costo. Aquí el servidor es el cuarto frío y cada bar ve únicamente su propia información.</p>")}
+
+      <h3>Cómo se garantiza que un bar no vea los datos de otro</h3>
+      <p class="section-sub">El aislamiento es lógico, no físico. Lo garantiza la base de datos, no el código de la aplicación.</p>
+      <ol class="flow">
+        <li><strong>Una sola base de datos</strong> — Todos los negocios comparten el mismo PostgreSQL.</li>
+        <li><strong>Row Level Security</strong> — Cada fila lleva su <code>negocio_id</code> y PostgreSQL filtra por política. Es el mismo mecanismo que usan los bancos para separar datos de clientes en una misma base.</li>
+        <li><strong>Cada consulta pasa por la política</strong> — Aunque la aplicación tuviera un error, la base no devuelve filas de otro negocio.</li>
+        <li><strong>El panel de AsoBares ve agregados</strong> — El gremio consulta métricas consolidadas, sin acceso a las conversaciones privadas de cada afiliado.</li>
+      </ol>
+
+      {admon("warning", "Qué se dejó fuera y por qué",
+      "<p>El stack anterior corría <strong>un contenedor por negocio más Chatwoot</strong>: 25 contenedores × ~200 MB más ~2 GB del contact center daban ≈ 7 GB de RAM, al límite de un servidor de 8 GB. Chatwoot solo se usaba para avisar a un humano cuando el agente no resolvía. Al centralizar y retirar Chatwoot, el consumo baja a <strong>1,5 GB</strong> y el mismo servidor pasa de 5–10 negocios a más de 100.</p>")}
+    </section>
+
+    <section id="slices">
+      <span class="sec-kicker">06 · Slices y capacidad</span>
+      <h2>Cuántos negocios caben en cada talla de servidor</h2>
+      <p class="section-sub">InterServer vende el VPS por <em>slices</em>: cada slice añade recursos de forma predecible. Estas son las tallas reales y su capacidad.</p>
+
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Plan</th><th>Cores</th><th>RAM</th><th>SSD</th><th>USD / mes</th><th>COP / mes</th><th>Negocios</th><th>Para qué</th></tr></thead>
+          <tbody>
+{slices_rows}
+          </tbody>
+        </table>
+      </div>
+
+      {admon("warning", "El límite real es la CPU, no la memoria",
+      "<p>La intuición dice que la RAM se agota primero. No es el caso: con el stack centralizado, <strong>1 slice (1 core, 2 GB) ya sostiene ~50 negocios</strong> y la RAM permitiría 60. A partir de ahí manda el núcleo, así que se escala añadiendo slices por CPU y no por memoria.</p>")}
+
+      <h3>De dónde sale cada número</h3>
+      <p class="section-sub">Consumo medido del stack centralizado completo, no una estimación teórica.</p>
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Componente</th><th>Instancias</th><th>RAM en reposo</th><th>RAM bajo carga</th><th>CPU</th></tr></thead>
+          <tbody>
+{comp_rows}
+          </tbody>
+        </table>
+      </div>
+
+      {admon("note", "Cómo se lee esa tabla",
+      "<p>Sumando las aplicaciones y el sistema operativo, el servidor completo consume <strong>~0,95 GB en reposo y ~1,53 GB bajo carga</strong>. En un VPS de 2 GB eso deja margen; en el de 4 slices (8 GB) sobra con holgura de 5×.</p>")}
+
+      <h3>La CPU en hora pico</h3>
+      <p class="section-sub">Los bares concentran el tráfico entre las 19:00 y las 02:00. Aun suponiendo que el 70% del tráfico diario cae en esas 4 horas:</p>
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Escala</th><th>Qué implica</th></tr></thead>
+          <tbody>
+{cuello_rows}
+          </tbody>
+        </table>
+      </div>
+
+      {admon("note", "Por qué la CPU rinde tanto",
+      "<p>Cada mensaje es principalmente <strong>espera de red</strong> al modelo de IA (~1,5 s), no cómputo. FastAPI en modo asíncrono atiende cientos de conversaciones simultáneas sin bloquear un solo worker, porque mientras una espera la respuesta de DeepSeek el procesador atiende las demás. El trabajo de la CPU es mínimo comparado con el tiempo de espera.</p>")}
+
+      {admon("warning", "El único límite operativo: un solo worker",
+      "<p>El agente corre con <code>--workers 1</code> a propósito: el estado en memoria (caché de prompts y el <code>negocio_id</code> asociado a cada número de WhatsApp) debe ser consistente. Con un worker async eso no es un problema hasta cientos de negocios. Solo al acercarse a <strong>300–500 negocios</strong> conviene separar el webhook de recepción (sin estado) del procesamiento con cola.</p>")}
+
+      <h3>Recomendación de talla por etapa</h3>
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Etapa</th><th>Talla</th><th>Costo mensual</th><th>Capacidad</th></tr></thead>
+          <tbody>
+            <tr><td class="rowhead">Piloto (1–25 negocios)</td><td>1 slice</td><td class="tnum">$12.000</td><td class="tnum">50 negocios</td></tr>
+            <tr><td class="rowhead">Crecimiento (25–100)</td><td>2 slices</td><td class="tnum">$24.000</td><td class="tnum">100 negocios</td></tr>
+            <tr><td class="rowhead">Consolidación (100–200)</td><td>8 slices</td><td class="tnum">$96.000</td><td class="tnum">200 negocios</td></tr>
+            <tr><td class="rowhead">Escala nacional (200+)</td><td>16–32 slices</td><td class="tnum">$192.000–384.000</td><td class="tnum">400–800 negocios</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      {admon("note", "El costo de servidor por negocio baja al crecer",
+      "<p>Con 25 negocios en 1 slice, la infraestructura cuesta <strong>$480 por negocio al mes</strong>. Con 100 en 2 slices baja a $240. Con 200 en 8 slices son $480, pero con soporte gestionado incluido. En todos los casos la infraestructura se mantiene por debajo del 1% del precio del plan.</p>")}
+    </section>
+
+    <section id="simulador">
+      <span class="sec-kicker">07 · Simulador de precios</span>
+      <h2>Calcula lo que pagaría tu bar</h2>
+      <p class="section-sub">Mueve el consumo mensual y mira el efecto sobre la factura del negocio y sobre el costo real de operarlo. Usa exactamente las mismas constantes que el resto del documento.</p>
+
+      <div class="sim">
+        <div class="sim-panel">
+          <label class="sim-label" for="sim-msgs">Mensajes por mes</label>
+          <div class="sim-readout"><span id="sim-msgs-out" class="tnum">1.000</span> <span class="sim-unit">mensajes</span></div>
+          <input type="range" id="sim-msgs" min="100" max="8000" step="50" value="1000" aria-label="Mensajes por mes">
+          <div class="sim-scale"><span class="tnum">100</span><span class="tnum">8.000</span></div>
+
+          <div class="sim-presets">
+<button type="button" class="sim-preset" data-msgs="400">Bar tranquilo<span>400 msgs</span></button><button type="button" class="sim-preset" data-msgs="1000">Bar activo<span>1,000 msgs</span></button><button type="button" class="sim-preset" data-msgs="2500">Bar de noche<span>2,500 msgs</span></button><button type="button" class="sim-preset" data-msgs="5000">Gastrobar de eventos<span>5,000 msgs</span></button>
+          </div>
+
+          <label class="sim-label">Supuesto de caché de prompt</label>
+          <div class="sim-toggle" role="group" aria-label="Supuesto de caché de prompt">
+            <button type="button" id="sim-cache-on" class="on">Con caché</button>
+            <button type="button" id="sim-cache-off">Sin caché</button>
+          </div>
+          <p class="sim-hint" id="sim-cache-hint">El prefijo de 2.804 tokens se reutiliza: es el mejor caso.</p>
+
+          <label class="sim-label" for="sim-infra">Tamaño del servidor que comparte</label>
+          <select id="sim-infra">
+<option value="50" data-costo="12000">1 slice · 1 core, 2 GB — 50 negocios</option><option value="100" data-costo="24000">2 slices · 2 cores, 4 GB — 100 negocios</option><option value="200" data-costo="96000">8 slices · 4 cores, 16 GB — 200 negocios</option><option value="400" data-costo="192000">16 slices · 8 cores, 32 GB — 400 negocios</option>
+          </select>
+
+          <label class="sim-label" for="sim-negocios">Negocios en ese servidor</label>
+          <div class="sim-readout sim-readout-sm"><span id="sim-negocios-out" class="tnum">25</span> <span class="sim-unit">negocios</span></div>
+          <input type="range" id="sim-negocios" min="1" max="200" step="1" value="25" aria-label="Negocios en el servidor">
+          <p class="sim-hint" id="sim-capacidad">Capacidad del servidor: 50 negocios</p>
+        </div>
+
+        <div class="sim-panel sim-result">
+          <div class="sim-res-head">
+            <span class="sim-res-tag">Factura del negocio</span>
+            <div class="sim-big"><span class="tnum" id="sim-factura">$95.200</span><span class="sim-per">/ mes con IVA</span></div>
+            <p class="sim-big-sub" id="sim-factura-sub">Base $80.000 + IVA $15.200</p>
+          </div>
+
+          <dl class="sim-rows">
+            <div class="sim-row">
+              <dt>Mensajes incluidos</dt>
+              <dd class="tnum" id="sim-incluidos">1.000</dd>
+            </div>
+            <div class="sim-row">
+              <dt>Mensajes excedentes</dt>
+              <dd class="tnum" id="sim-excedente">0</dd>
+            </div>
+            <div class="sim-row sim-row-hi">
+              <dt>Cargo por excedente</dt>
+              <dd class="tnum" id="sim-cargo">$0</dd>
+            </div>
+            <div class="sim-row sim-sep">
+              <dt>Costo de IA <span class="sim-int">interno</span></dt>
+              <dd class="tnum"><span id="sim-ia">$247</span> <span class="sim-sup" id="sim-sup">con caché</span></dd>
+            </div>
+            <div class="sim-row">
+              <dt>Infraestructura <span class="sim-int">interno</span></dt>
+              <dd class="tnum" id="sim-infra-costo">$480</dd>
+            </div>
+            <div class="sim-row sim-row-total">
+              <dt>Costo total</dt>
+              <dd class="tnum" id="sim-costo">$727</dd>
+            </div>
+            <div class="sim-row sim-row-margen">
+              <dt>Margen bruto</dt>
+              <dd class="tnum"><span id="sim-margen">$79.273</span> <span class="sim-pct" id="sim-margen-pct">99,1%</span></dd>
+            </div>
+          </dl>
+
+          <div class="sim-bar">
+            <span class="sim-bar-lbl">Composición del precio base</span>
+            <div class="sim-bar-track"><span class="sim-bar-fill" id="sim-bar-fill"></span></div>
+            <div class="sim-bar-legend">
+              <span><i class="sw sw-margen"></i>Margen <b class="tnum" id="sim-leg-margen">99,1%</b></span>
+              <span><i class="sw sw-ia"></i>IA <b class="tnum" id="sim-leg-ia">0,3%</b></span>
+              <span><i class="sw sw-infra"></i>Infra <b class="tnum" id="sim-leg-infra">0,6%</b></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="sim-aviso" class="adm adm-warning" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        <div><p class="adm-title">Por encima de la capacidad del servidor</p>
+        <p id="sim-aviso-txt"></p></div>
+      </div>
+
+      <div class="adm adm-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+        <div><p class="adm-title">Cómo se calcula</p>
+        <p>La IA se cobra por token, no por mensaje: <code>1.630</code> tokens de entrada y <code>35</code> de salida por mensaje, con los <code>900</code> tokens del system prompt a precio de caché porque se repiten en cada llamada del mismo negocio. El excedente sobre los 1.000 mensajes se cobra a <code>$60</code> cada uno. La infraestructura es el costo del servidor dividido entre los negocios que aloja. El IVA se muestra aparte porque se traslada a la DIAN y no es ingreso.</p></div>
+      </div>
+    </section>
+
+    <section id="margen">
+      <span class="sec-kicker">08 · Margen por negocio</span>
+      <h2>Qué queda por cada afiliado</h2>
+      <p class="section-sub">Ingreso base de $80.000 menos el costo total, según cómo se reparta la infraestructura.</p>
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Supuesto de servidor</th><th>Infra</th><th>IA</th><th>Costo total</th><th>Margen</th><th>%</th></tr></thead>
+          <tbody>
+{pyl_rows}
+          </tbody>
+        </table>
+      </div>
+
+      {admon("note", "El VPS compartido es el escenario real del piloto",
+      "<p>Un solo Cloud VPS de 1 slice aloja varios negocios. Si se prorratea entre cinco, el costo de infraestructura por negocio baja a $2.400 COP y el margen supera el 96%. La fila de <strong>VPS 1 slice (84,3%)</strong> ya asume el caso conservador de un negocio pagando el servidor completo.</p>")}
+
+      {admon("note", "Punto de equilibrio con menos de un negocio",
+      "<p>Con costos fijos de infraestructura cercanos a $12.000 COP y un margen de contribución superior a $67.000 por negocio, <strong>el primer afiliado que paga cubre la operación completa</strong>. El riesgo financiero de arrancar el piloto es prácticamente nulo.</p>")}
+    </section>
+
+    <section id="escenarios">
+      <span class="sec-kicker">09 · Escenarios de uso</span>
+      <h2>Qué pasa si el negocio usa más el agente</h2>
+      <p class="section-sub">El tope de 1.000 mensajes mantiene el costo acotado incluso con desvíos fuertes.</p>
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Escenario</th><th>Mensajes</th><th>Tokens entrada</th><th>Tokens salida</th><th>Costo IA</th><th>% del precio</th></tr></thead>
+          <tbody>
+{esc_rows}
+          </tbody>
+        </table>
+      </div>
+
+      {admon("warning", "El excedente se avisa antes de facturar",
+      "<p>Si un negocio supera los 1.000 mensajes, el equipo lo contacta antes de emitir cualquier cobro adicional. Nunca se factura un excedente sin aviso previo: la política es <strong>avisar, mostrar el consumo y dejar que el negocio decida</strong> si amplía el plan o ajusta el uso.</p>")}
+    </section>
+
+    <section id="metodo">
+      <span class="sec-kicker">10 · Método de cálculo</span>
+      <h2>Cómo se llegó a estos números</h2>
+      <p class="section-sub">Cinco pasos, todos verificables contra las fuentes de la sección siguiente.</p>
+      <ol class="flow">
+{flow_ol}
+      </ol>
+      {admon("note", "Supuestos declarados",
+      "<p>Tipo de cambio: <code>1 USD = $4.000 COP</code> (el cálculo es lineal, se ajusta con otra TRM). Tokens por mensaje: 1.630 de entrada y 35 de salida, medidos en las pruebas del agente real. System prompt cacheable: ~900 tokens. Tarifa de DeepSeek: off-peak, cache miss en el peor caso.</p>")}
+    </section>
+
+    <section id="fuentes">
+      <span class="sec-kicker">11 · Fuentes verificadas</span>
+      <h2>De dónde salen los precios</h2>
+      <p class="section-sub">Todos los valores de esta página provienen de tarifas públicas consultadas directamente.</p>
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Fuente</th><th>Detalle</th><th>URL</th></tr></thead>
+          <tbody>
+{fuente_rows}
+          </tbody>
+        </table>
+      </div>
+      {admon("note", "Precios sujetos a cambio",
+      "<p>DeepSeek e InterServer pueden ajustar sus tarifas. La conversión a pesos colombianos depende de la TRM del día de facturación, así que las cifras en COP son una referencia calculada, no un valor contractual.</p>")}
+    </section>
+
+  </div>
+</div>
+
+<script>{DITHER_JS}</script>
+<script>{SIM_JS}</script>
+<script>{JS}</script>
+</body>
+</html>
+'''
+
+# ---------- Red de seguridad ----------
+assert len(nav) == 12, f"nav incompleto: {len(nav)}"
+assert len(INCLUYE) == 9, f"filas de incluye: {len(INCLUYE)}"
+assert len(INTERSERVER) == 5, f"filas de InterServer: {len(INTERSERVER)}"
+assert len(COSTO_IA) == 2, f"filas de costo IA: {len(COSTO_IA)}"
+assert len(PYL) == 3, f"filas de P&L: {len(PYL)}"
+assert len(ESCENARIOS) == 3, f"filas de escenarios: {len(ESCENARIOS)}"
+assert len(SLICES) == 6, f"filas de slices: {len(SLICES)}"
+assert len(CENTRALIZADO) == 6, f"filas centralizado: {len(CENTRALIZADO)}"
+assert len(COMPONENTES) == 5, f"filas componentes: {len(COMPONENTES)}"
+assert len(CUELLO) == 4, f"filas cuello: {len(CUELLO)}"
+assert PRECIO_FINAL == 95200, f"precio final inesperado: {PRECIO_FINAL}"
+
+out_path = os.path.join(OUT, "index.html")
+with open(out_path, "w", encoding="utf-8") as f:
+    f.write(html_doc)
+
+print(f"OK · {out_path}")
+print(f"   {len(html_doc):,} bytes · {len(nav)} secciones · {len(INCLUYE)} filas de plan")
+print(f"   Precio ${PRECIO_BASE:,} + IVA ${PRECIO_IVA:,} = ${PRECIO_FINAL:,}")

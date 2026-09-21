@@ -18,7 +18,10 @@ Un solo plan para los afiliados:
 
 ## Costos verificados
 
-- **IA — DeepSeek V4.1 Flash** (`deepseek-flash`): $0,15 / M tokens de entrada (cache miss off-peak), $0,003 / M (cache hit), $0,60 / M de salida. El costo para 1.000 mensajes es de **$533 COP/mes** con caché de prompt.
+- **IA — DeepSeek V4.1 Flash** (`deepseek-flash`): $0,15 / M tokens de entrada (cache miss off-peak), $0,003 / M (cache hit), $0,60 / M de salida.
+  - Modelo de tokens medido sobre el código: prompt base 1.140 + datos 120 + herramientas 1.664 + historial + mensaje = **~3.180 tokens de entrada por mensaje**.
+  - Conversación normal (6 mensajes): **$1,48 con caché** / **$11,37 sin caché**.
+  - Plan de 1.000 mensajes: **$247/mes con caché** / **$1.895 sin caché**.
 - **Servidor — InterServer**: Cloud VPS desde **US$3/mes** (1 core, 2 GB RAM, 40 GB SSD); Web Hosting Standard US$7/mes de renovación.
 
 Fuentes:
