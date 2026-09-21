@@ -71,10 +71,10 @@ medida_rows = "\n".join(
 
 # Slices de InterServer
 SLICES = [
-    ("1 slice", "1", "2", "40", "3,00", "12.000", "50", "Piloto y primeros afiliados", ""),
+    ("1 slice", "1", "2", "40", "3,00", "12.000", "50", "El plan Esencial corre aquí", "rec"),
     ("2 slices", "2", "4", "80", "6,00", "24.000", "100", "Crecimiento cómodo", ""),
-    ("4 slices", "2", "8", "160", "12,00", "48.000", "100", "Talla del análisis original", ""),
-    ("8 slices", "4", "16", "320", "24,00", "96.000", "200", "Soporte gestionado incluido", "rec"),
+    ("4 slices", "2", "8", "160", "12,00", "48.000", "100", "El análisis original pedía esta talla", ""),
+    ("8 slices", "4", "16", "320", "24,00", "96.000", "200", "Soporte gestionado incluido", ""),
     ("16 slices", "8", "32", "640", "48,00", "192.000", "400", "Varios capítulos regionales", ""),
 ]
 slices_rows = "\n".join(
@@ -422,14 +422,14 @@ html_doc = f'''<!DOCTYPE html>
     <div class="wrap">
       <div class="eyebrow">Propuesta comercial · Afiliados AsoBares</div>
       <h1>Un agente de WhatsApp que atiende tu bar <em>24/7</em></h1>
-      <p class="lead">Tres modalidades de servicio para el mismo agente con inteligencia artificial: responde el menú, los horarios, toma reservas y registra pedidos. El costo real de operarlo está medido sobre el código del agente y sobre una conversación de WhatsApp real, no estimado. A continuación, las tres opciones con su capacidad, sus límites y su precio.</p>
+      <p class="lead">Un solo plan de $80.000 + IVA con 1.000 mensajes incluidos, y bloques de 1.000 mensajes a $30.000 para cuando el bar necesite más. El agente responde el menú, los horarios, toma reservas y registra pedidos. El costo real de operarlo está medido sobre el código del agente y sobre una conversación de WhatsApp real, no estimado.</p>
       <div class="drivers" aria-label="Principios del servicio">
         <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Servidor compartido</span>
         <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Costo medido, no estimado</span>
         <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Ley 1581 de 2012</span>
       </div>
       <div class="hero-cta">
-        <a class="cta primary" href="#opciones">Ver las 3 modalidades
+        <a class="cta primary" href="#opciones">Ver precios
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
         <a class="cta ghost" href="#simulador">Calcular mi consumo</a>
@@ -441,15 +441,16 @@ html_doc = f'''<!DOCTYPE html>
     <div class="wrap">
       <div class="sec-head reveal">
         <div class="sec-kicker">Modalidades</div>
-        <h2 class="sec-title">Tres formas de contratar el mismo agente</h2>
-        <p class="sec-sub">Las tres incluyen el agente completo y la instalación gratis. Cambian el volumen de mensajes incluidos, el soporte y el grado de dedicación de la infraestructura.</p>
+        <h2 class="sec-title">Un plan, bloques de mensajes y una medida a la carta</h2>
+        <p class="sec-sub">Hay un solo plan que contratar: <strong>Esencial</strong>, a $80.000 + IVA con 1.000 mensajes. Cuando un bar necesita más, se le añaden bloques de 1.000 mensajes a $30.000, sin cambiar de plan ni volver a pagar servidor. La medida a la carta es para cadenas y capítulos regionales.</p>
       </div>
 
       <div class="compare">
-        <article class="card muted reveal">
+        <article class="card rec reveal">
+          <span class="badge-rec">★ Recomendada</span>
           <div class="opt-no">OPCIÓN 01</div>
           <h3>Esencial</h3>
-          <p class="concept">El plan de entrada. Cubre la operación de un bar con consultas de menú, horarios y reservas ocasionales.</p>
+          <p class="concept">El plan de entrada, y el único que hay que contratar. Cubre la operación de un bar con consultas de menú, horarios, reservas y pedidos. Si el uso supera el tope, se añaden bloques de mensajes sin cambiar de plan.</p>
           <div class="spec">
             <span class="k">Mensajes incluidos</span>
             <span class="v"><strong>1.000</strong> mensajes al mes</span>
@@ -464,16 +465,16 @@ html_doc = f'''<!DOCTYPE html>
           </div>
           <div class="risk warn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle class="r" cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5" stroke="#b45309"/></svg>
-            <span><strong>Límite:</strong> el servidor se comparte, así que el dimensionamiento depende del conjunto de afiliados. Si el bar supera los 1.000 mensajes, se avisa antes de facturar.</span>
+            <span><strong>Límite:</strong> el servidor se comparte, así que el dimensionamiento depende del conjunto de afiliados. Si el bar supera los 1.000 mensajes, se le avisa y se le ofrecen bloques adicionales antes de facturar cualquier cobro.</span>
           </div>
           <div class="price">
             <div class="price-label">Precio mensual</div>
             <div class="price-amount num">$80.000<span class="price-cur">COP + IVA</span></div>
             <div class="price-note">Factura final con IVA 19%: <span class="num">$95.200</span> · sin permanencia · instalación gratis.</div>
             <div class="price-metrics">
-              <div><span class="k">Por mensaje</span><span class="v num">$80</span></div>
+              <div><span class="k">Mensajes incluidos</span><span class="v num">1.000</span></div>
               <div><span class="k">Costo interno</span><span class="v num">$839</span></div>
-              <div><span class="k">Mensaje extra</span><span class="v num">$60</span></div>
+              <div><span class="k">Bloque adicional</span><span class="v num">$30.000</span></div>
               <div><span class="k">Margen bruto</span><span class="v num">99,0%</span></div>
             </div>
           </div>
@@ -482,36 +483,35 @@ html_doc = f'''<!DOCTYPE html>
           </a>
         </article>
 
-        <article class="card rec reveal">
-          <span class="badge-rec">★ Recomendada</span>
+        <article class="card reveal">
           <div class="opt-no">OPCIÓN 02</div>
-          <h3>Profesional</h3>
-          <p class="concept">El plan para el bar que ya vive del agente: más volumen, respuesta prioritaria y un servidor con holgura real.</p>
+          <h3>Mensajes adicionales</h3>
+          <p class="concept">El plan no cambia: se añaden bloques de 1.000 mensajes cuando el bar los necesita. La infraestructura ya la pagó el plan Esencial, así que el bloque solo cubre su propio consumo.</p>
           <div class="spec">
-            <span class="k">Mensajes incluidos</span>
-            <span class="v"><strong>3.000</strong> mensajes al mes</span>
+            <span class="k">Unidad</span>
+            <span class="v"><strong>1.000</strong> mensajes por <strong>$30.000</strong> + IVA · se pueden añadir varios bloques al mes</span>
           </div>
           <div class="spec">
             <span class="k">Infraestructura</span>
-            <span class="v">Servidor compartido de <strong>8 slices</strong> · 4 núcleos · 16 GB · <strong>soporte gestionado de InterServer incluido</strong></span>
+            <span class="v">Sin costo adicional: la cubre el plan Esencial. El bloque no vuelve a pagar servidor ni instalación.</span>
           </div>
           <div class="spec">
-            <span class="k">Costo de IA medido</span>
-            <span class="v"><strong>$1.078</strong> al mes con caché de prompt · <span class="tag">0,3% del precio</span><br><span class="muted-sm">Escala lineal: el costo por mensaje no cambia, el volumen sí.</span></span>
+            <span class="k">Costo de IA del bloque</span>
+            <span class="v"><strong>$359</strong> por bloque con caché de prompt · <span class="tag">1,2% del precio</span><br><span class="muted-sm">El costo de IA es lineal, así que el margen no se degrada al crecer.</span></span>
           </div>
           <div class="risk ok">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle class="r" cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5.5" stroke="#1a7f4e"/></svg>
-            <span><strong>Ventaja clave:</strong> la talla de 8 slices ya tiene soporte gestionado y capacidad para 200 negocios, así que el afiliado no compite por recursos durante los picos de fin de semana.</span>
+            <span><strong>Por qué conviene:</strong> el bloque de 1.000 cuesta <strong>$30.000</strong> contra los $80.000 del plan base, porque no repite servidor ni instalación. Es la vía para crecer sin saltar a otro plan.</span>
           </div>
           <div class="price">
-            <div class="price-label">Precio mensual</div>
-            <div class="price-amount num">$190.000<span class="price-cur">COP + IVA</span></div>
-            <div class="price-note">Factura final con IVA 19%: <span class="num">$226.100</span> · sin permanencia · instalación gratis.</div>
+            <div class="price-label">Precio por bloque de 1.000</div>
+            <div class="price-amount num">$30.000<span class="price-cur">COP + IVA</span></div>
+            <div class="price-note">IVA 19%: <span class="num">$35.700</span> final por bloque · se factura solo con aviso previo.</div>
             <div class="price-metrics">
-              <div><span class="k">Por mensaje</span><span class="v num">$63</span></div>
-              <div><span class="k">Costo interno</span><span class="v num">$1.558</span></div>
-              <div><span class="k">Mensaje extra</span><span class="v num">$60</span></div>
-              <div><span class="k">Margen bruto</span><span class="v num">99,2%</span></div>
+              <div><span class="k">Frente al plan base</span><span class="v num">−63%</span></div>
+              <div><span class="k">Costo interno</span><span class="v num">$359</span></div>
+              <div><span class="k">Mensajes por bloque</span><span class="v num">1.000</span></div>
+              <div><span class="k">Margen bruto</span><span class="v num">98,8%</span></div>
             </div>
           </div>
           <a class="card-link" href="#detalle-op2">Ver detalle
@@ -544,9 +544,9 @@ html_doc = f'''<!DOCTYPE html>
             <div class="price-amount is-text">A convenir<span class="price-cur">COP + IVA</span></div>
             <div class="price-note">Se calcula sobre el volumen acordado y la talla de servidor elegida.</div>
             <div class="price-metrics">
-              <div><span class="k">Por mensaje</span><span class="v">A convenir</span></div>
+              <div><span class="k">Mensajes</span><span class="v">Desde 8.000</span></div>
               <div><span class="k">Costo de IA</span><span class="v">Al costo</span></div>
-              <div><span class="k">Mensaje extra</span><span class="v">A convenir</span></div>
+              <div><span class="k">Bloque adicional</span><span class="v">A convenir</span></div>
               <div><span class="k">Margen bruto</span><span class="v">A calcular</span></div>
             </div>
           </div>
@@ -583,15 +583,15 @@ html_doc = f'''<!DOCTYPE html>
       <div class="sec-head reveal">
         <div class="sec-kicker">Detalle por modalidad</div>
         <h2 class="sec-title">Qué incluye cada opción y dónde está el riesgo</h2>
-        <p class="sec-sub">El costo de IA no es el factor dominante en ninguna de las tres: el servidor cuesta entre 33 y 48 veces más. La decisión real es cuánta infraestructura dedicar y cuánto volumen incluir.</p>
+        <p class="sec-sub">El costo de IA no es el factor dominante: el servidor cuesta decenas de veces más. La decisión real es cuánta infraestructura dedicar y cuántos mensajes incluir.</p>
       </div>
 
-      <article class="detail reveal" id="detalle-op1">
+      <article class="detail rec reveal" id="detalle-op1">
         <div class="dnum num">01</div>
         <div>
           <h3>Esencial · $80.000 + IVA</h3>
           <div class="dsub mono">1.000 mensajes · servidor compartido de 1 slice · instalación gratis</div>
-          <p>La modalidad de entrada para un bar que quiere probar el agente sin comprometer presupuesto. Incluye el agente completo: menú y precios reales, horarios, reservas de mesa, pedidos, escalado a un humano y panel web para el equipo. La instalación, la carga de la carta y la puesta en marcha están incluidas.</p>
+          <p>El plan de entrada, y el único que hay que contratar para empezar. Incluye el agente completo: menú y precios reales, horarios, reservas de mesa, pedidos, escalado a un humano y panel web para el equipo. La instalación, la carga de la carta y la puesta en marcha están incluidas.</p>
           <div class="chips">
             <span class="tag">1.000 mensajes</span>
             <span class="tag">Instalación gratis</span>
@@ -601,29 +601,29 @@ html_doc = f'''<!DOCTYPE html>
           <ul>
             <li><strong>Costo de operar:</strong> $359 al mes de IA (0,4% del precio base) más $480 de infraestructura prorrateada, para un costo total de $839. El margen bruto es del <strong>99,0%</strong>; si el negocio tuviera que cubrir el servidor completo, bajaría a 84,6%.</li>
             <li><strong>Mensajería de WhatsApp:</strong> sin costo. El agente solo responde dentro de la ventana de servicio de 24 h; nunca envía plantillas de marketing.</li>
-            <li><strong>Límite:</strong> los 1.000 mensajes son el tope del plan. Si el negocio lo supera, se le avisa y se le muestra el consumo antes de facturar cualquier excedente.</li>
+            <li><strong>Cuando el bar crece:</strong> los 1.000 mensajes son el tope del plan, pero no un límite duro. Se añaden bloques de 1.000 mensajes a $30.000 + IVA, sin cambiar de plan y sin volver a pagar servidor.</li>
             <li><strong>Instalación:</strong> gratis, en menos de 30 minutos, incluida la carga de la carta y la configuración del tono del agente.</li>
           </ul>
         </div>
       </article>
 
-      <article class="detail rec reveal" id="detalle-op2">
+      <article class="detail reveal" id="detalle-op2">
         <div class="dnum num">02</div>
         <div>
-          <h3>Profesional · $190.000 + IVA</h3>
-          <div class="dsub mono">3.000 mensajes · servidor de 8 slices con soporte gestionado · respuesta prioritaria</div>
-          <p>Para el bar donde el agente ya es parte de la operación diaria. Triplica el volumen incluido y sube a una talla de servidor con soporte gestionado de InterServer, lo que da holgura real en los picos de fin de semana y en temporada de eventos.</p>
+          <h3>Mensajes adicionales · $30.000 + IVA por cada 1.000</h3>
+          <div class="dsub mono">Bloques de 1.000 mensajes · sin cambiar de plan · sin volver a pagar servidor</div>
+          <p>El bar no cambia de plan cuando crece: se le añaden bloques de 1.000 mensajes a $30.000 + IVA cada uno. La razón del precio es simple: la infraestructura, la instalación y el soporte ya están pagados por el plan Esencial, así que el bloque solo cubre su propio consumo de IA. Por eso el bloque de 1.000 cuesta $30.000 y no los $80.000 del plan base.</p>
           <div class="chips">
-            <span class="tag">3.000 mensajes</span>
-            <span class="tag">8 slices · 16 GB</span>
-            <span class="tag">Soporte gestionado</span>
-            <span class="tag">Respuesta prioritaria</span>
+            <span class="tag">1.000 mensajes</span>
+            <span class="tag">$30.000 por bloque</span>
+            <span class="tag">Infraestructura ya cubierta</span>
+            <span class="tag">Aviso previo</span>
           </div>
           <ul>
-            <li><strong>Costo de operar:</strong> $1.078 al mes de IA más $480 de infraestructura prorrateada sobre 200 negocios. El margen bruto es del <strong>99,2%</strong> sobre el precio base.</li>
-            <li><strong>Por qué escala bien:</strong> el costo de IA por mensaje es constante. Pasar de 1.000 a 3.000 mensajes multiplica el costo por tres, no por más: el precio sube 2,4× y el margen mejora.</li>
-            <li><strong>Infraestructura:</strong> la talla de 8 slices cubre hasta 200 negocios con 4 núcleos y 16 GB, e incluye soporte gestionado de InterServer para incidencias de servicio y base de datos.</li>
-            <li><strong>Límite:</strong> el servidor sigue siendo compartido. Si un afiliado necesita aislamiento físico o un requisito contractual de datos, corresponde la Opción 3.</li>
+            <li><strong>Costo de operar:</strong> $359 de IA por bloque con caché de prompt, y ningún costo de infraestructura. El margen bruto es del <strong>98,8%</strong> sobre los $30.000.</li>
+            <li><strong>El margen no se degrada:</strong> el costo de IA es lineal con el volumen, así que cada bloque mantiene el mismo margen que el anterior. Crecer no diluye la rentabilidad.</li>
+            <li><strong>Ejemplo:</strong> 2.000 mensajes al mes son $80.000 + $30.000 = <strong>$110.000</strong> + IVA ($130.900 finales). 3.000 mensajes son $140.000 + IVA ($166.600 finales).</li>
+            <li><strong>Política:</strong> nunca se factura un bloque sin aviso. Si el consumo se acerca al tope, el equipo contacta al negocio, le muestra el consumo y le ofrece el bloque; el negocio decide si lo toma o ajusta el uso.</li>
           </ul>
         </div>
       </article>
@@ -836,8 +836,8 @@ html_doc = f'''<!DOCTYPE html>
 
           <dl class="sim-rows">
             <div class="sim-row"><dt>Mensajes incluidos</dt><dd id="sim-incluidos">1.000</dd></div>
-            <div class="sim-row"><dt>Mensajes excedentes</dt><dd id="sim-excedente">0</dd></div>
-            <div class="sim-row sim-row-hi"><dt>Cargo por excedente</dt><dd id="sim-cargo">$0</dd></div>
+            <div class="sim-row"><dt>Mensajes adicionales</dt><dd id="sim-excedente">0</dd></div>
+            <div class="sim-row sim-row-hi"><dt>Cargo por adicionales</dt><dd id="sim-cargo">$0</dd></div>
             <div class="sim-row sim-sep"><dt>Costo de IA <span class="sim-int">interno</span></dt><dd><span id="sim-ia">$359</span> <span class="sim-sup" id="sim-sup">con caché</span></dd></div>
             <div class="sim-row"><dt>Infraestructura <span class="sim-int">interno</span></dt><dd id="sim-infra-costo">$480</dd></div>
             <div class="sim-row"><dt>Costo total</dt><dd id="sim-costo">$839</dd></div>
@@ -863,7 +863,7 @@ html_doc = f'''<!DOCTYPE html>
 
       <div class="rec-note reveal" style="margin-top:14px">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-        <span><strong>Cómo se calcula.</strong> La IA se cobra por token, no por mensaje: 1.630 tokens de entrada y 35 de salida por mensaje en el modelo original; tras la medición, el prompt fijo es de 2.924 tokens (del que 2.804 es prefijo cacheable) y la salida real es de 82. El excedente sobre los 1.000 mensajes se cobra a <span class="mono">$60</span> cada uno. La infraestructura es el costo del servidor dividido entre los negocios que aloja. El IVA se muestra aparte porque se traslada a la DIAN y no es ingreso.</span>
+        <span><strong>Cómo se calcula.</strong> La IA se cobra por token, no por mensaje: 1.630 tokens de entrada y 35 de salida por mensaje en el modelo original; tras la medición, el prompt fijo es de 2.924 tokens (del que 2.804 es prefijo cacheable) y la salida real es de 82. Los mensajes por encima de los 1.000 incluidos se cobran en bloques de 1.000 a <span class="mono">$30.000</span> cada uno. La infraestructura es el costo del servidor dividido entre los negocios que aloja. El IVA se muestra aparte porque se traslada a la DIAN y no es ingreso.</span>
       </div>
     </div>
   </section>
@@ -872,8 +872,8 @@ html_doc = f'''<!DOCTYPE html>
     <div class="wrap">
       <div class="sec-head reveal">
         <div class="sec-kicker">Comparativa</div>
-        <h2 class="sec-title">Las tres modalidades, lado a lado</h2>
-        <p class="sec-sub">Todas incluyen el agente completo, la instalación gratis y el panel web. Cambian el volumen, la infraestructura y el soporte.</p>
+        <h2 class="sec-title">El plan, los bloques y la medida, lado a lado</h2>
+        <p class="sec-sub">El plan Esencial incluye el agente completo y la instalación gratis. Los bloques de mensajes se suman sobre el plan. La medida a la carta cambia la infraestructura.</p>
       </div>
 
       <div class="table-scroll reveal">
@@ -881,94 +881,94 @@ html_doc = f'''<!DOCTYPE html>
           <thead>
             <tr>
               <th>Concepto</th>
-              <th>Esencial</th>
-              <th class="col-rec">Profesional ★</th>
+              <th class="col-rec">Esencial ★</th>
+              <th>Mensajes adicionales</th>
               <th>A la medida</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td class="rowhead">Precio base</td>
-              <td class="num"><span class="strong">$80.000</span></td>
-              <td class="num col-rec"><span class="strong">$190.000</span></td>
+              <td class="rowhead">Precio</td>
+              <td class="num col-rec"><span class="strong">$80.000</span></td>
+              <td class="num"><span class="strong">$30.000</span></td>
               <td class="num">A convenir</td>
             </tr>
             <tr>
+              <td class="rowhead">Unidad de cobro</td>
+              <td class="col-rec">Mensual</td>
+              <td>Por cada 1.000 mensajes</td>
+              <td>Según acuerdo</td>
+            </tr>
+            <tr>
               <td class="rowhead">IVA 19%</td>
-              <td class="num">$15.200</td>
-              <td class="num col-rec">$36.100</td>
+              <td class="num col-rec">$15.200</td>
+              <td class="num">$5.700</td>
               <td class="num">—</td>
             </tr>
             <tr>
               <td class="rowhead">Valor final con IVA</td>
-              <td class="num"><span class="strong">$95.200</span></td>
-              <td class="num col-rec"><span class="strong">$226.100</span></td>
+              <td class="num col-rec"><span class="strong">$95.200</span></td>
+              <td class="num"><span class="strong">$35.700</span></td>
               <td class="num">—</td>
             </tr>
             <tr>
-              <td class="rowhead">Mensajes incluidos</td>
-              <td class="num">1.000</td>
-              <td class="num col-rec"><span class="strong">3.000</span></td>
+              <td class="rowhead">Mensajes</td>
+              <td class="num col-rec">1.000 incluidos</td>
+              <td class="num"><span class="strong">1.000</span> por bloque</td>
               <td class="num">Desde 8.000</td>
             </tr>
             <tr>
-              <td class="rowhead">Precio por mensaje</td>
-              <td class="num"><span class="strong">$80</span></td>
-              <td class="num col-rec"><span class="strong">$63</span> <span class="muted-sm">−21%</span></td>
+              <td class="rowhead">Precio por 1.000 mensajes</td>
+              <td class="num col-rec">$80.000</td>
+              <td class="num"><span class="strong">$30.000</span> <span class="muted-sm">−63%</span></td>
               <td class="num">A convenir</td>
             </tr>
             <tr>
-              <td class="rowhead">Costo de IA al mes</td>
-              <td class="num">$359</td>
-              <td class="num col-rec">$1.078</td>
+              <td class="rowhead">Costo de IA</td>
+              <td class="num col-rec">$359</td>
+              <td class="num">$359 por bloque</td>
               <td class="muted-sm">Al costo real</td>
             </tr>
             <tr>
               <td class="rowhead">Infraestructura</td>
-              <td>Compartida · 1 slice</td>
-              <td class="col-rec">Compartida · 8 slices</td>
+              <td class="col-rec">Compartida · 1 slice</td>
+              <td>Ya cubierta por el plan base</td>
               <td>Dedicada · 16–32 slices</td>
             </tr>
             <tr>
               <td class="rowhead">Costo total interno</td>
-              <td class="num">$839</td>
-              <td class="num col-rec">$1.558</td>
+              <td class="num col-rec">$839</td>
+              <td class="num">$359</td>
               <td class="num">A calcular</td>
             </tr>
             <tr>
               <td class="rowhead">Capacidad del servidor</td>
-              <td class="num">50 negocios</td>
-              <td class="num col-rec">200 negocios</td>
+              <td class="num col-rec">50 negocios</td>
+              <td class="num">La del plan base</td>
               <td class="num">400–800 negocios</td>
             </tr>
             <tr>
-              <td class="rowhead">Soporte gestionado</td>
-              <td class="muted-sm">No incluido</td>
-              <td class="col-rec"><span class="strong">Incluido</span></td>
-              <td>Según acuerdo</td>
-            </tr>
-            <tr>
               <td class="rowhead">Margen bruto</td>
-              <td class="num">99,0%</td>
-              <td class="num col-rec"><span class="strong">99,2%</span></td>
+              <td class="num col-rec"><span class="strong">99,0%</span></td>
+              <td class="num"><span class="strong">98,8%</span></td>
               <td class="num">A calcular</td>
             </tr>
             <tr>
               <td class="rowhead">Instalación</td>
-              <td><span class="tag">Gratis</span></td>
               <td class="col-rec"><span class="tag">Gratis</span></td>
+              <td class="muted-sm">No aplica</td>
               <td><span class="tag">Gratis</span></td>
             </tr>
             <tr>
               <td class="rowhead">Permanencia</td>
-              <td>Ninguna</td>
               <td class="col-rec">Ninguna</td>
+              <td>Según consumo</td>
               <td>Según acuerdo</td>
             </tr>
             <tr>
               <td class="rowhead">Para quién</td>
-              <td class="muted-sm">Bar que quiere probar el agente</td>
-              <td class="col-rec muted-sm">Bar donde el agente ya es parte de la operación</td>
+              <td class="col-rec muted-sm">El plan que contrata cualquier bar</td>
+              <td class="muted-sm">El bar que superó los 1.000 mensajes del plan</td>
               <td class="muted-sm">Cadenas y capítulos regionales</td>
             </tr>
           </tbody>
@@ -977,12 +977,12 @@ html_doc = f'''<!DOCTYPE html>
 
       <div class="rec-note reveal">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
-        <span><strong>Recomendación:</strong> empezar con la <strong>Opción 01 · Esencial</strong> para validar el uso real durante el piloto, y migrar a la <strong>Opción 02 · Profesional</strong> cuando el bar supere de forma sostenida los 1.000 mensajes. La razón es económica: el costo de IA crece de forma lineal con el volumen, pero el precio del plan Profesional sube 2,4× para 3× el volumen, así que el margen mejora a medida que el afiliado crece. La Opción 03 solo se justifica cuando hay un requisito de aislamiento o un volumen que sature un servidor compartido.</span>
+        <span><strong>Recomendación:</strong> contratar el <strong>plan Esencial</strong> y crecer por bloques. Es la estructura más simple de vender y la más fácil de presupuestar para el bar: un precio fijo de $80.000 al mes y, cuando el uso lo pida, bloques de 1.000 mensajes a $30.000. La razón económica es que el bloque de 1.000 cuesta <strong>$30.000</strong> contra los $80.000 del plan base, porque la infraestructura, la instalación y el soporte ya están pagados; y como el costo de IA es lineal con el volumen, cada bloque mantiene un margen del <strong>98,8%</strong> sin degradarse. La Opción 03 solo se justifica cuando hay un requisito de aislamiento o un volumen que sature un servidor compartido.</span>
       </div>
 
       <div class="rec-note note-warn reveal" style="margin-top:14px">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-        <span><strong>Pendiente antes de fijar precios definitivos:</strong> estas cifras son un modelo construido sobre el código del agente y validado con una conversación real, no una factura. La tabla <span class="mono">consumo_negocio</span> ya registra tokens de entrada, salida y llamadas por negocio y día, pero aún no se ha leído con datos de un piloto completo. Los precios de las Opciones 01 y 02 son una recomendación derivada del modelo, no una tarifa ya validada en operación.</span>
+        <span><strong>Pendiente antes de fijar precios definitivos:</strong> estas cifras son un modelo construido sobre el código del agente y validado con una conversación real, no una factura. La tabla <span class="mono">consumo_negocio</span> ya registra tokens de entrada, salida y llamadas por negocio y día, pero aún no se ha leído con datos de un piloto completo. Los precios del plan Esencial y de los bloques de mensajes son una recomendación derivada del modelo, no una tarifa ya validada en operación.</span>
       </div>
     </div>
   </section>

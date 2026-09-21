@@ -157,8 +157,10 @@ SIM = {
     "sys_tok": 900,        # system prompt, idéntico por negocio → cacheable
     "msg_in": 1630,        # tokens de entrada por mensaje
     "msg_out": 35,         # tokens de salida por mensaje
-    # Excedente: se cobra por mensaje por encima del tope
-    "precio_excedente": 60,
+    # Mensajes adicionales: bloque de 1.000 por encima del plan base, a $30 c/u.
+    # Un bloque completo son $30.000 (antes de IVA).
+    "precio_excedente": 30,
+    "mensajes_por_bloque": MENSAJES_INCLUIDOS,
     # Pool de infraestructura: talla del servidor y su costo
     "infra": [
         # (etiqueta, costo COP/mes, capacidad en negocios)

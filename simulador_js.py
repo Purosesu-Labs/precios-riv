@@ -99,7 +99,7 @@ function calcular(){
   document.getElementById('sim-margen-pct').textContent = pct(mPct);
   document.getElementById('sim-factura').textContent = cop(factura);
   document.getElementById('sim-factura-sub').textContent =
-    'Base ' + cop(base) + ' + IVA ' + cop(iva) + (cargo > 0 ? ' (incluye excedente)' : '');
+    'Base ' + cop(base) + ' + IVA ' + cop(iva) + (cargo > 0 ? ' (incluye adicionales)' : '');
 
   /* Barra: porcion del precio base consumida por costos. */
   var usado = base > 0 ? Math.min(100, costo / base * 100) : 0;

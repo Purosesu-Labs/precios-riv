@@ -846,11 +846,11 @@ html_doc = f'''<!DOCTYPE html>
               <dd class="tnum" id="sim-incluidos">1.000</dd>
             </div>
             <div class="sim-row">
-              <dt>Mensajes excedentes</dt>
+              <dt>Mensajes adicionales</dt>
               <dd class="tnum" id="sim-excedente">0</dd>
             </div>
             <div class="sim-row sim-row-hi">
-              <dt>Cargo por excedente</dt>
+              <dt>Cargo por adicionales</dt>
               <dd class="tnum" id="sim-cargo">$0</dd>
             </div>
             <div class="sim-row sim-sep">
@@ -892,7 +892,7 @@ html_doc = f'''<!DOCTYPE html>
       <div class="adm adm-note">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
         <div><p class="adm-title">Cómo se calcula</p>
-        <p>La IA se cobra por token, no por mensaje: <code>1.630</code> tokens de entrada y <code>35</code> de salida por mensaje, con los <code>900</code> tokens del system prompt a precio de caché porque se repiten en cada llamada del mismo negocio. El excedente sobre los 1.000 mensajes se cobra a <code>$60</code> cada uno. La infraestructura es el costo del servidor dividido entre los negocios que aloja. El IVA se muestra aparte porque se traslada a la DIAN y no es ingreso.</p></div>
+        <p>La IA se cobra por token, no por mensaje: <code>1.630</code> tokens de entrada y <code>35</code> de salida por mensaje, con los <code>900</code> tokens del system prompt a precio de caché porque se repiten en cada llamada del mismo negocio. Los mensajes por encima de los 1.000 incluidos se cobran en bloques de 1.000 a <code>$30.000</code> cada uno. La infraestructura es el costo del servidor dividido entre los negocios que aloja. El IVA se muestra aparte porque se traslada a la DIAN y no es ingreso.</p></div>
       </div>
     </section>
 

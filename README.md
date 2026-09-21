@@ -6,29 +6,41 @@ Publicada con GitHub Pages en: https://purosesu-labs.github.io/precios-riv/
 
 ## Diseño
 
-Superficie **Compare** (skill `diseno-propuestas-comerciales`): tres modalidades
+Superficie **Compare** (skill `diseno-propuestas-comerciales`): tres columnas
 alineadas con una marcada como RECOMENDADA, tipografía IBM Plex y acento teal
 `#0f766e`. La banda superior usa el **Dither Canvas** de
 [ObsidianUI](https://www.obsidianui.dev/docs/dither-canvas).
 
-## Modalidades
+## Estructura de precios
 
-| | Esencial | Profesional ★ | A la medida |
+Hay un solo plan que contratar: **Esencial**. Cuando un bar necesita más volumen, se
+le añaden bloques de 1.000 mensajes, sin cambiar de plan y sin volver a pagar
+servidor. La medida a la carta es para cadenas y capítulos regionales.
+
+| | Esencial ★ | Mensajes adicionales | A la medida |
 |---|---|---|---|
-| Precio base | $80.000 | $190.000 | A convenir |
-| IVA 19% | $15.200 | $36.100 | — |
-| **Valor final con IVA** | **$95.200** | **$226.100** | — |
-| Mensajes incluidos | 1.000 | 3.000 | Desde 8.000 |
-| **Precio por mensaje** | **$80** | **$63** | A convenir |
-| Costo de IA al mes | $359 | $1.078 | Al costo real |
-| Mensaje extra | $60 | $60 | A convenir |
-| Servidor | 1 slice | 8 slices | 16–32 slices |
-| Soporte gestionado | No incluido | Incluido | Según acuerdo |
-| Margen bruto | 99,0% | 99,2% | A calcular |
+| Precio | $80.000 / mes | $30.000 por bloque | A convenir |
+| Unidad de cobro | Mensual | Por cada 1.000 mensajes | Según acuerdo |
+| IVA 19% | $15.200 | $5.700 | — |
+| **Valor final con IVA** | **$95.200** | **$35.700** | — |
+| Mensajes | 1.000 incluidos | 1.000 por bloque | Desde 8.000 |
+| **Precio por 1.000 mensajes** | **$80.000** | **$30.000** (−63%) | A convenir |
+| Costo de IA | $359 | $359 por bloque | Al costo real |
+| Infraestructura | Compartida · 1 slice | Ya cubierta por el plan base | Dedicada · 16–32 slices |
+| Costo total interno | $839 | $359 | A calcular |
+| Margen bruto | 99,0% | 98,8% | A calcular |
 
-El margen se calcula con la infraestructura prorrateada ($480 por negocio). Si un
-negocio tuviera que cubrir el servidor completo, el margen de Esencial baja a
+Ejemplos: 2.000 mensajes = $80.000 + $30.000 = **$110.000** + IVA ($130.900 finales).
+3.000 mensajes = $140.000 + IVA ($166.600 finales).
+
+El margen del plan se calcula con la infraestructura prorrateada ($480 por negocio).
+Si un negocio tuviera que cubrir el servidor completo, el margen de Esencial baja a
 84,6%.
+
+Por qué el bloque cuesta $30.000 y no $80.000: la infraestructura, la instalación
+y el soporte ya están pagados por el plan Esencial, así que el bloque solo cubre su
+propio consumo de IA. Como el costo de IA es lineal con el volumen, cada bloque
+mantiene el mismo margen sin degradarse.
 
 ## Costos verificados
 
