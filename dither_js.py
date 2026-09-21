@@ -1,107 +1,203 @@
 # -*- coding: utf-8 -*-
-"""JS del Dither Canvas (ObsidianUI), adaptado a la paleta teal de la propuesta.
+"""Dither Canvas (ObsidianUI) — implementación compartida y parametrizable.
 
-Separado del generador para que las llaves de JavaScript no colisionen con
-las del f-string que arma el HTML. Sin el video original: la senal se genera
-proceduralmente y conserva el pipeline completo (simulacion de fluido,
-matriz de Bayer 4x4, atlas de caracteres, distorsion por puntero).
+Réplica fiel del efecto original (obsidianui.dev/docs/dither-canvas):
+
+  · superficie blanca **opaca** (alpha:false, clearColor blanco), como el original
+  · rejilla fina de caracteres sobre atlas monoespaciado (110 columnas)
+  · matriz de Bayer 4x4 como umbral → la densidad de glifos forma la imagen
+  · simulación de fluido (diffuse → project → advect) que distorsiona con el puntero
+  · conjunto de glifos en dos familias: bordes (.,=+-) y brillos (letras de marca)
+
+Lo único que cambia respecto al original es la fuente de la señal. El original
+anima un <video> y usa su luminancia; aquí el proyecto no cuenta con ese video,
+así que la señal se genera proceduralmente con ruido value-fBm, domain warping
+y bandas direccionales. El resto del pipeline es idéntico.
+
+Se degrada en silencio si no hay WebGL2 o si el shader falla: el canvas queda
+en opacidad 0 y se ve el fallback CSS con mask-image.
 """
+import json
 
-DITHER_JS = r"""
-/* Dither Canvas — adaptado de ObsidianUI (obsidianui.dev/docs/dither-canvas).
-   Sin el video original: la señal se genera proceduralmente y se le aplica el
-   mismo pipeline (simulación de fluido, matriz de Bayer 4x4, atlas de caracteres,
-   distorsión por puntero). Se degrada en silencio si no hay WebGL2. */
+# --------------------------------------------------------------------------
+# Paletas: (base, matiz, flujo, acento). Valores 0..1 para el shader.
+# --------------------------------------------------------------------------
+TEAL = {
+    "a": (0.059, 0.463, 0.431),   # teal del sistema de propuestas comerciales
+    "b": (0.051, 0.580, 0.529),   # matiz claro hacia la derecha
+    "c": (0.043, 0.369, 0.345),   # oscurece donde empuja el flujo
+    "d": (0.102, 0.498, 0.306),   # acento verde al borde derecho
+}
+
+INDIGO = {
+    "a": (0.145, 0.388, 0.922),   # azul del sistema Stripi
+    "b": (0.020, 0.640, 0.880),   # cian
+    "c": (0.360, 0.290, 0.950),   # violeta donde empuja el flujo
+    "d": (0.917, 0.133, 0.380),   # rubí al borde derecho
+}
+
+FC = 80          # columnas de la rejilla de fluido
+FR = 60          # filas de la rejilla de fluido
+TM = 72          # máximo de puntos de estela del puntero
+BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
+
+VS = "#version 300 es\nin vec2 a_pos;\nvoid main(){ gl_Position = vec4(a_pos, 0, 1); }"
+
+
+def _unique(text):
+    """Letras de marca sin repetir: 'ASOBARES' -> A,S,O,B,R,E."""
+    seen, out = set(), []
+    for ch in text:
+        if ch not in seen:
+            seen.add(ch)
+            out.append(ch)
+    return out
+
+
+def _fragment_shader(edges, brights, pal, side_lo=1.0):
+    """Shader de fragmento. Sin f-strings: el GLSL usa llaves en bucles."""
+    bayer = ",".join(str(round(v / 16 * 255)) for v in BAYER)
+    c = lambda k: ", ".join("%.3f" % v for v in pal[k])
+    n_edges = str(len(edges))
+    n_brights = str(len(brights))
+    chars = str(len(edges) + len(brights))
+
+    return "\n".join([
+        "#version 300 es",
+        "precision highp float;",
+        "uniform sampler2D uFluid, uAtlas;",
+        "uniform vec2 uRes;",
+        "uniform float uCC;",
+        "uniform float uTime;",
+        "uniform int uPhase, uTrailN;",
+        "uniform vec4 uTP[" + str(TM) + "];",
+        "uniform float uTL[" + str(TM) + "];",
+        "out vec4 O;",
+        "const float EL = 36.0, EH = 130.0;",
+        "const float FC = " + str(FC) + ".0, FR = " + str(FR) + ".0;",
+        "const int BAYER[16] = int[16](" + bayer + ");",
+        "const int EDGE_N = " + n_edges + ", BRIGHT_N = " + n_brights + ";",
+        "const int CHAR_N = " + chars + ";",
+        "",
+        "/* --- Señal procedural: sustituye a la luminancia del video original --- */",
+        "float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }",
+        "float vnoise(vec2 p){",
+        "  vec2 i = floor(p), f = fract(p);",
+        "  vec2 u = f * f * (3.0 - 2.0 * f);",
+        "  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),",
+        "             mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);",
+        "}",
+        "float fbm(vec2 p){",
+        "  float v = 0.0, a = 0.5;",
+        "  for(int i = 0; i < 5; i++){ v += a * vnoise(p); p = p * 2.03 + 17.7; a *= 0.5; }",
+        "  return v;",
+        "}",
+        "float signal(vec2 uv){",
+        "  vec2 q = uv * vec2(2.3, 1.7);",
+        "  float t = uTime * 0.06;",
+        "  vec2 w = vec2(fbm(q + vec2(t, 4.1)), fbm(q + vec2(9.3, -t)));",
+        "  /* dos escalas de estructura: masas grandes y detalle fino */",
+        "  float macro = smoothstep(0.34, 0.66, fbm(q + w * 2.2));",
+        "  float micro = smoothstep(0.25, 0.80, fbm(q * 3.1 - w * 1.4));",
+        "  float n = clamp(macro * 0.78 + micro * 0.34, 0.0, 1.0);",
+        "  float bandA = sin((uv.x * 3.1 + uv.y * 2.2) * 3.141592 + uTime * 0.35) * 0.5 + 0.5;",
+        "  float bandB = sin((uv.y * 4.3 - uv.x * 1.7) * 3.141592 - uTime * 0.27) * 0.5 + 0.5;",
+        "  float s = n * (0.70 + 0.20 * bandA + 0.14 * bandB);",
+        "  float band = smoothstep(0.0, 1.0, clamp(1.0 - abs(uv.y - 0.46) * 1.05, 0.0, 1.0));",
+        "  float edge = smoothstep(0.015, 0.22, uv.y) * (1.0 - smoothstep(0.82, 1.0, uv.y));",
+        "  /* Sesgo de lado: la masa densa se concentra a la derecha para que el",
+        "     titular de la izquierda no dependa del fotograma. */",
+        "  float side = mix(" + ("%.3f" % side_lo) + ", 1.0, smoothstep(0.08, 0.90, uv.x));",
+        "  return clamp(s * (0.34 + 0.66 * band) * mix(0.30, 1.0, edge) * side * 1.45, 0.0, 1.0);",
+        "}",
+        "",
+        "void main(){",
+        "  float cw = uRes.x / uCC;",
+        "  float rows = ceil(uRes.y / cw) + 1.0;",
+        "  float gx = floor(gl_FragCoord.x / cw);",
+        "  float gy = floor((uRes.y - gl_FragCoord.y) / cw);",
+        "  if(gx >= uCC || gy >= rows) discard;",
+        "  vec2 cp = vec2(fract(gl_FragCoord.x / cw), fract((uRes.y - gl_FragCoord.y) / cw));",
+        "  vec2 bp = vec2((gx + 0.5) * cw, (gy + 0.5) * cw);",
+        "  ivec2 fc = ivec2(gx / uCC * FC, gy / rows * FR);",
+        "  fc = clamp(fc, ivec2(0), ivec2(int(FC) - 1, int(FR) - 1));",
+        "  vec2 flow = texelFetch(uFluid, fc, 0).rg;",
+        "",
+        "  /* estela del puntero: empuja la celda y la desplaza */",
+        "  vec2 disp = vec2(0.0);",
+        "  for(int i = 0; i < uTrailN; i++){",
+        "    float life = uTL[i];",
+        "    if(life <= 0.0) continue;",
+        "    vec2 d = bp - uTP[i].xy;",
+        "    float dist = length(d);",
+        "    float r = 5.0 + life * 3.0;",
+        "    if(dist == 0.0 || dist > r) continue;",
+        "    float f = pow(1.0 - dist / r, 2.0);",
+        "    disp += (d / dist) * f * life * 3.0 + uTP[i].zw * f * 0.04;",
+        "  }",
+        "",
+        "  vec2 sp = bp + disp + flow * 6.0;",
+        "  vec2 uv = clamp(sp / uRes, 0.0, 1.0);",
+        "  float s = signal(uv);",
+        "",
+        "  /* luminancia → umbral de Bayer. La densidad de glifos forma la imagen. */",
+        "  float bg = smoothstep(0.14, 0.90, s) * 255.0;",
+        "  float hm = min(1.0, length(flow) * 1.1);",
+        "  float gray = bg * (1.0 - hm) + (255.0 - bg) * hm;",
+        "  float thr = float(BAYER[(int(gy) & 3) * 4 + (int(gx) & 3)]);",
+        "  bool invDark = hm > 0.05 && bg > thr && gray <= thr;",
+        "  bool lit = gray > thr;",
+        "  if(!lit && !invDark) discard;",
+        "",
+        "  /* elección de glifo: bordes para medios tonos, letras para las luces */",
+        "  float pg = invDark ? bg : gray;",
+        "  int ci;",
+        "  if(pg >= EL && pg <= EH) ci = uPhase % EDGE_N;",
+        "  else if(pg > EH) ci = EDGE_N + uPhase % BRIGHT_N;",
+        "  else discard;",
+        "",
+        "  float au = (float(ci) + cp.x) / float(CHAR_N);",
+        "  float ca = texture(uAtlas, vec2(au, cp.y)).a;",
+        "  if(ca < 0.05) discard;",
+        "",
+        "  vec3 colA = vec3(" + c("a") + ");",
+        "  vec3 colB = vec3(" + c("b") + ");",
+        "  vec3 colC = vec3(" + c("c") + ");",
+        "  vec3 colD = vec3(" + c("d") + ");",
+        "  float tint = smoothstep(0.15, 0.9, uv.x * 0.6 + uv.y * 0.4);",
+        "  vec3 col = mix(colA, colB, tint);",
+        "  col = mix(col, colC, hm * 0.65);",
+        "  col = mix(col, colD, smoothstep(0.72, 1.0, uv.x) * 0.45);",
+        "  float a = (invDark ? 0.85 : 1.0) * ca;",
+        "  O = vec4(col * a, a);",
+        "}",
+    ])
+
+
+_JS = r"""
+/* Dither Canvas — ObsidianUI (obsidianui.dev/docs/dither-canvas).
+   Fiel al original salvo la fuente de la señal: aquí es procedural (ruido fBm
+   con domain warping y bandas direccionales) porque el proyecto no cuenta con
+   el video. Se conserva todo el pipeline: superficie blanca opaca, rejilla de
+   caracteres, matriz de Bayer 4x4, simulación de fluido y distorsión por puntero.
+   Se degrada en silencio si no hay WebGL2, dejando visible el fallback CSS. */
 (function(){
 "use strict";
-var canvas = document.getElementById('dither');
+var canvas = document.getElementById(__ELEMENT__);
 if (!canvas) return;
 var motion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-var FC = 80, FR = 60, FN = FC * FR;
-var CC = 60, EDGE_LO = 36, EDGE_HI = 130;
-var EDGES = ['.', ',', '=', '+', '-'];
-var BRIGHTS = ['A','S','O','B','A','R','E','S'];
+var FC = __FC__, FR = __FR__, FN = FC * FR;
+var CELL = __CELL__;
+var EDGES = __EDGES__;
+var BRIGHTS = __BRIGHTS__;
 var ALL_CHARS = EDGES.concat(BRIGHTS);
-var BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
-var TL = 320, TS = 10, TM = 72;
+var BAYER = __BAYER__;
+var TL = 320, TS = 10, TM = __TM__;
 var TRAIL_CFG = { fb: 0.08, fss: 18, ffm: 0.15, fir: 0.8, firl: 1.0 };
 
-var VS = '#version 300 es\nin vec2 a_pos;\nvoid main(){ gl_Position = vec4(a_pos, 0, 1); }';
-
-var FS = '#version 300 es\n' +
-'precision highp float;\n' +
-'uniform sampler2D uFluid, uAtlas;\n' +
-'uniform vec2 uRes;\n' +
-'uniform float uTime;\n' +
-'uniform int uPhase, uTrailN;\n' +
-'uniform vec4 uTP[' + TM + '];\n' +
-'uniform float uTL[' + TM + '];\n' +
-'out vec4 O;\n' +
-'const float CC = ' + CC + '.0, EL = ' + EDGE_LO + '.0, EH = ' + EDGE_HI + '.0;\n' +
-'const float FC = ' + FC + '.0, FR = ' + FR + '.0;\n' +
-'const int BAYER[16] = int[16](' + BAYER.map(function(v){return Math.round((v/16)*255);}).join(',') + ');\n' +
-'const int CHAR_N = ' + ALL_CHARS.length + ';\n' +
-'float signal(vec2 uv){\n' +
-'  float horizon = smoothstep(0.0, 0.45, uv.y) * (1.0 - smoothstep(0.55, 1.0, uv.y));\n' +
-'  float band = 1.0 - abs(uv.y - 0.5) * 2.0;\n' +
-'  float swell = sin(uv.x * 5.2 + uTime * 0.55) * 0.5 + 0.5;\n' +
-'  float ripple = sin(uv.y * 7.5 - uTime * 0.42 + uv.x * 3.1) * 0.5 + 0.5;\n' +
-'  float pulse = sin((uv.x + uv.y) * 3.4 - uTime * 0.33) * 0.5 + 0.5;\n' +
-'  float s = 0.16 + band * 0.26 + horizon * (swell * 0.34 + ripple * 0.22 + pulse * 0.18);\n' +
-'  return clamp(s, 0.0, 1.0);\n' +
-'}\n' +
-'void main(){\n' +
-'  float cw = uRes.x / CC;\n' +
-'  float rows = ceil(uRes.y / cw) + 1.0;\n' +
-'  float gx = floor(gl_FragCoord.x / cw);\n' +
-'  float gy = floor((uRes.y - gl_FragCoord.y) / cw);\n' +
-'  if(gx >= CC || gy >= rows) discard;\n' +
-'  vec2 cp = vec2(fract(gl_FragCoord.x / cw), fract((uRes.y - gl_FragCoord.y) / cw));\n' +
-'  vec2 bp = vec2((gx + 0.5) * cw, (gy + 0.5) * cw);\n' +
-'  ivec2 fc = ivec2(gx / CC * FC, gy / rows * FR);\n' +
-'  fc = clamp(fc, ivec2(0), ivec2(int(FC)-1, int(FR)-1));\n' +
-'  vec2 flow = texelFetch(uFluid, fc, 0).rg;\n' +
-'  vec2 disp = vec2(0.0);\n' +
-'  for(int i = 0; i < uTrailN; i++){\n' +
-'    float life = uTL[i];\n' +
-'    if(life <= 0.0) continue;\n' +
-'    vec2 d = bp - uTP[i].xy;\n' +
-'    float dist = length(d);\n' +
-'    float r = 5.0 + life * 3.0;\n' +
-'    if(dist == 0.0 || dist > r) continue;\n' +
-'    float f = pow(1.0 - dist / r, 2.0);\n' +
-'    disp += (d / dist) * f * life * 3.0 + uTP[i].zw * f * 0.04;\n' +
-'  }\n' +
-'  vec2 sp = bp + disp + flow * 6.0;\n' +
-'  vec2 uv = clamp(sp / uRes, 0.0, 1.0);\n' +
-'  float s = signal(uv);\n' +
-'  float bg = smoothstep(0.06, 0.62, s) * 255.0;\n' +
-'  float hm = min(1.0, length(flow) * 1.1);\n' +
-'  float gray = bg * (1.0 - hm) + (255.0 - bg) * hm;\n' +
-'  float thr = float(BAYER[(int(gy) & 3) * 4 + (int(gx) & 3)]);\n' +
-'  bool invDark = hm > 0.05 && bg > thr && gray <= thr;\n' +
-'  bool lit = gray > thr;\n' +
-'  if(!lit && !invDark) discard;\n' +
-'  float pg = invDark ? bg : gray;\n' +
-'  int ci;\n' +
-'  if(pg >= EL && pg <= EH) ci = uPhase % 5;\n' +
-'  else if(pg > EH) ci = 5 + uPhase % ' + BRIGHTS.length + ';\n' +
-'  else discard;\n' +
-'  float au = (float(ci) + cp.x) / float(CHAR_N);\n' +
-'  float ca = texture(uAtlas, vec2(au, cp.y)).a;\n' +
-'  if(ca < 0.05) discard;\n' +
-'  vec3 teal   = vec3(0.059, 0.463, 0.431);\n' +
-'  vec3 cyan   = vec3(0.051, 0.580, 0.529);\n' +
-'  vec3 deep   = vec3(0.043, 0.369, 0.345);\n' +
-'  vec3 green  = vec3(0.102, 0.498, 0.306);\n' +
-'  float tint = smoothstep(0.15, 0.9, uv.x * 0.6 + uv.y * 0.4);\n' +
-'  vec3 col = mix(teal, cyan, tint);\n' +
-'  col = mix(col, deep, hm * 0.65);\n' +
-'  col = mix(col, green, smoothstep(0.72, 1.0, uv.x) * 0.45);\n' +
-'  float a = (invDark ? 0.85 : 1.0) * ca;\n' +
-'  O = vec4(col * a, a);\n' +
-'}\n';
+var VS = __VS__;
+var FS = __FS__;
 
 function createFluid(){
   var vx = new Float32Array(FN), vy = new Float32Array(FN);
@@ -194,7 +290,10 @@ function autoPulse(fluid, W, H){
 }
 
 var gl = null;
-try { gl = canvas.getContext('webgl2', { alpha: true, antialias: false, premultipliedAlpha: true, preserveDrawingBuffer: true }); } catch (e) { gl = null; }
+try {
+  /* alpha:false como el original: superficie blanca opaca, sin velo encima. */
+  gl = canvas.getContext('webgl2', { alpha: false, antialias: false, premultipliedAlpha: true, preserveDrawingBuffer: true });
+} catch (e) { gl = null; }
 if (!gl) return;   /* el fallback CSS con mask-image queda visible */
 
 var disposed = false, rafId = 0, textures = [], shaders = [], buffers = [], prog = null;
@@ -324,18 +423,25 @@ try {
   listen(canvas, 'webglcontextlost', function (ev) { ev.preventDefault(); fallback(); });
 
   var W = 1, H = 1;
+  /* Columnas según el ancho, no un número fijo: con un ancho estrecho (la
+     columna de documentación) un número fijo de columnas daría glifos
+     diminutos y el efecto se leería como polvo en vez de textura. */
   function resize(){
     var rect = canvas.getBoundingClientRect();
     W = canvas.width = Math.max(1, Math.round(rect.width));
     H = canvas.height = Math.max(1, Math.round(rect.height));
     gl.viewport(0, 0, W, H);
+    var cc = Math.round(W / CELL);
+    gl.uniform1f(uCC, Math.max(34, Math.min(142, cc)));
   }
-  resize();
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
   var uTP = loc('uTP'), uTLoc = loc('uTL'), uRes = loc('uRes');
   var uPhase = loc('uPhase'), uTrailN = loc('uTrailN'), uTime = loc('uTime');
+  var uCC = loc('uCC');
+
+  resize();
   var tpBuf = new Float32Array(TM * 4);
   var tlBuf = new Float32Array(TM);
   var phase = 0, frame = 0, pulseAt = 0, running = false;
@@ -395,7 +501,7 @@ try {
     gl.uniform2f(uRes, W, H);
     gl.uniform1i(uPhase, phase);
     gl.uniform1f(uTime, elapsed);
-    gl.clearColor(0, 0, 0, 0);
+    gl.clearColor(1, 1, 1, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     if (canvas.style.opacity !== '1') canvas.style.opacity = '1';
@@ -443,3 +549,38 @@ try {
 }
 })();
 """
+
+
+def dither_js(palette=TEAL, cell=13.0, brights="ASOBRES",
+              edges=(".", ",", "=", "+", "-"), element="dither", side_lo=0.35):
+    """Devuelve el JS del Dither Canvas listo para incrustar en un <script>.
+
+    palette  : TEAL o INDIGO
+    cell     : lado de la celda de carácter en px CSS. El número de columnas se
+               deriva del ancho del canvas, así el glifo mide igual en una banda
+               ancha (portada) y en una estrecha (columna de documentación).
+    brights  : letras que se usan en las zonas más luminosas (se deduplican)
+    edges    : glifos para los medios tonos
+    element  : id del <canvas> en la página
+    side_lo  : densidad relativa en el borde izquierdo. < 1 deja la izquierda
+               más limpia (donde va el titular); 1.0 reparte por igual.
+    """
+    edge_list = list(edges)
+    bright_list = _unique(brights)
+    fs = _fragment_shader(edge_list, bright_list, palette, side_lo)
+
+    js = _JS
+    for token, value in (
+        ("__ELEMENT__", json.dumps(element)),
+        ("__FC__", str(FC)),
+        ("__FR__", str(FR)),
+        ("__TM__", str(TM)),
+        ("__CELL__", "%g" % cell),
+        ("__EDGES__", json.dumps(edge_list)),
+        ("__BRIGHTS__", json.dumps(bright_list)),
+        ("__BAYER__", json.dumps(BAYER)),
+        ("__VS__", json.dumps(VS)),
+        ("__FS__", json.dumps(fs)),
+    ):
+        js = js.replace(token, value)
+    return js

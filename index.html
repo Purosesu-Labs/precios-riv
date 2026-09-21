@@ -66,17 +66,20 @@ a:hover{text-decoration:underline}
   -webkit-mask-size:7px 7px;mask-size:7px 7px;opacity:.4}
 #dither{position:absolute;inset:0;z-index:2;width:100%;height:100%;display:block;
   opacity:0;transition:opacity .6s ease;pointer-events:auto;cursor:crosshair}
-/* Velo: cubre el H1 y se abre hacia los bordes. */
+/* Velo direccional: opaco donde va el texto (izquierda) y abierto hacia la
+   derecha, para que el dither se vea nítido en lugar de lavado. */
 .hero::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
   background:
-    linear-gradient(180deg, rgba(246,248,248,.72) 0%, rgba(255,255,255,.62) 40%,
-                    rgba(255,255,255,.40) 72%, var(--bg) 100%)}
-/* Bajo el bloque de texto el velo se refuerza solo lo necesario para leer. */
+    linear-gradient(90deg, rgba(255,255,255,.76) 0%, rgba(255,255,255,.56) 38%,
+                    rgba(255,255,255,.30) 62%, rgba(255,255,255,.10) 84%,
+                    rgba(255,255,255,0) 100%),
+    linear-gradient(180deg, rgba(255,255,255,.48) 0%, rgba(255,255,255,0) 26%,
+                    rgba(255,255,255,0) 58%, var(--bg) 100%)}
 .hero .wrap{position:relative;z-index:4}
-.hero .wrap::before{content:"";position:absolute;inset:-18px -26px -14px -26px;z-index:-1;
-  border-radius:18px;
-  background:radial-gradient(72% 88% at 34% 46%, rgba(255,255,255,.74), rgba(255,255,255,.30) 62%, transparent 100%)}
-.hero .wrap{position:relative;z-index:4}
+/* Refuerzo local bajo el bloque de texto, no en toda la banda. */
+.hero .wrap::before{content:"";position:absolute;inset:-22px -34px -18px -34px;z-index:-1;
+  border-radius:20px;
+  background:radial-gradient(72% 88% at 30% 44%, rgba(255,255,255,.90), rgba(255,255,255,.58) 58%, rgba(255,255,255,.12) 100%)}
 .mesh-hint{position:absolute;right:24px;top:74px;z-index:5;font-family:var(--mono);font-size:10px;
   letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,.8);
   backdrop-filter:blur(6px);border:1px solid var(--line-strong);border-radius:99px;padding:5px 11px;
@@ -122,11 +125,25 @@ section{padding:64px 0}
 .risk svg{flex:none;margin-top:3px}
 .risk.warn svg circle.r{stroke:var(--warn)}
 .risk.ok svg circle.r{stroke:var(--ok)}
-.price{border-top:1px solid var(--line);padding-top:16px;margin-top:auto}
-.price .label{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted)}
-.price .amount{font-size:21px;font-weight:600;letter-spacing:-.3px;margin-top:4px}
-.price .range{font-size:13px;color:var(--muted);margin-top:2px}
-.card-link{margin-top:6px;font-size:13.5px;font-weight:600}
+.price{border-top:1px solid var(--line);padding-top:18px;margin-top:auto}
+.price-label{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted)}
+.price-amount{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:32px;font-weight:600;letter-spacing:-1.3px;line-height:1.05;margin-top:7px;color:var(--ink)}
+.card.rec .price-amount{color:var(--accent-strong)}
+.card.muted .price-amount{color:var(--ink-2)}
+.price-amount.is-text{font-family:var(--sans);font-size:25px;font-weight:700;letter-spacing:-.6px}
+.price-cur{font-family:var(--sans);font-size:11.5px;font-weight:500;letter-spacing:0;color:var(--muted);margin-left:7px;vertical-align:2px}
+.price-note{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+.price-note .num{color:var(--ink-2);font-weight:600}
+.price-metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px 12px;margin-top:15px;padding-top:13px;border-top:1px dashed var(--line-strong)}
+.price-metrics>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.price-metrics .k{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.85px;text-transform:uppercase;color:var(--muted)}
+.price-metrics .v{font-size:13.5px;font-weight:600;color:var(--ink);letter-spacing:-.2px}
+.card.rec .price-metrics .v{color:var(--accent-strong)}
+.card.muted .price-metrics .v{color:var(--ink-2)}
+.card-link{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-size:13.5px;font-weight:600}
+.card-link svg{flex:none;transition:transform .18s ease}
+.card-link:hover{text-decoration:none}
+.card-link:hover svg{transform:translateX(3px)}
 .tag{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.6px;padding:3px 8px;border-radius:6px;background:var(--bg-soft);color:var(--ink-2);border:1px solid var(--line-strong)}
 .card.rec .tag{background:var(--accent-soft);border-color:transparent;color:var(--accent-strong)}
 
@@ -360,11 +377,19 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
             <span><strong>Límite:</strong> el servidor se comparte, así que el dimensionamiento depende del conjunto de afiliados. Si el bar supera los 1.000 mensajes, se avisa antes de facturar.</span>
           </div>
           <div class="price">
-            <div class="label">Precio mensual</div>
-            <div class="amount num">$80.000 <span style="font-size:13px;color:var(--muted)">+ IVA COP</span></div>
-            <div class="range">Valor final con IVA 19%: $95.200. Instalación gratis. Sin permanencia.</div>
+            <div class="price-label">Precio mensual</div>
+            <div class="price-amount num">$80.000<span class="price-cur">COP + IVA</span></div>
+            <div class="price-note">Factura final con IVA 19%: <span class="num">$95.200</span> · sin permanencia · instalación gratis.</div>
+            <div class="price-metrics">
+              <div><span class="k">Por mensaje</span><span class="v num">$80</span></div>
+              <div><span class="k">Costo interno</span><span class="v num">$839</span></div>
+              <div><span class="k">Mensaje extra</span><span class="v num">$60</span></div>
+              <div><span class="k">Margen bruto</span><span class="v num">99,0%</span></div>
+            </div>
           </div>
-          <a class="card-link" href="#detalle-op1">Ver detalle →</a>
+          <a class="card-link" href="#detalle-op1">Ver detalle
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
         </article>
 
         <article class="card rec reveal">
@@ -389,11 +414,19 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
             <span><strong>Ventaja clave:</strong> la talla de 8 slices ya tiene soporte gestionado y capacidad para 200 negocios, así que el afiliado no compite por recursos durante los picos de fin de semana.</span>
           </div>
           <div class="price">
-            <div class="label">Precio mensual</div>
-            <div class="amount num">$190.000 <span style="font-size:13px;color:var(--muted)">+ IVA COP</span></div>
-            <div class="range">Valor final con IVA 19%: $226.100. Instalación gratis. Sin permanencia.</div>
+            <div class="price-label">Precio mensual</div>
+            <div class="price-amount num">$190.000<span class="price-cur">COP + IVA</span></div>
+            <div class="price-note">Factura final con IVA 19%: <span class="num">$226.100</span> · sin permanencia · instalación gratis.</div>
+            <div class="price-metrics">
+              <div><span class="k">Por mensaje</span><span class="v num">$63</span></div>
+              <div><span class="k">Costo interno</span><span class="v num">$1.558</span></div>
+              <div><span class="k">Mensaje extra</span><span class="v num">$60</span></div>
+              <div><span class="k">Margen bruto</span><span class="v num">99,2%</span></div>
+            </div>
           </div>
-          <a class="card-link" href="#detalle-op2">Ver detalle →</a>
+          <a class="card-link" href="#detalle-op2">Ver detalle
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
         </article>
 
         <article class="card muted reveal">
@@ -417,11 +450,19 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
             <span><strong>A considerar:</strong> un servidor dedicado cuesta más por negocio que uno compartido. Solo se justifica con volumen alto o con requisitos de aislamiento.</span>
           </div>
           <div class="price">
-            <div class="label">Precio mensual</div>
-            <div class="amount num">A convenir <span style="font-size:13px;color:var(--muted)">+ IVA COP</span></div>
-            <div class="range">Se calcula sobre el volumen acordado y la talla de servidor elegida.</div>
+            <div class="price-label">Precio mensual</div>
+            <div class="price-amount is-text">A convenir<span class="price-cur">COP + IVA</span></div>
+            <div class="price-note">Se calcula sobre el volumen acordado y la talla de servidor elegida.</div>
+            <div class="price-metrics">
+              <div><span class="k">Por mensaje</span><span class="v">A convenir</span></div>
+              <div><span class="k">Costo de IA</span><span class="v">Al costo</span></div>
+              <div><span class="k">Mensaje extra</span><span class="v">A convenir</span></div>
+              <div><span class="k">Margen bruto</span><span class="v">A calcular</span></div>
+            </div>
           </div>
-          <a class="card-link" href="#detalle-op3">Ver detalle →</a>
+          <a class="card-link" href="#detalle-op3">Ver detalle
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
         </article>
       </div>
 
@@ -468,7 +509,7 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
             <span class="tag">Panel web</span>
           </div>
           <ul>
-            <li><strong>Costo de operar:</strong> $359 al mes de IA (0,4% del precio base) más $480 de infraestructura prorrateada. El margen bruto es del <strong>84,6%</strong>.</li>
+            <li><strong>Costo de operar:</strong> $359 al mes de IA (0,4% del precio base) más $480 de infraestructura prorrateada, para un costo total de $839. El margen bruto es del <strong>99,0%</strong>; si el negocio tuviera que cubrir el servidor completo, bajaría a 84,6%.</li>
             <li><strong>Mensajería de WhatsApp:</strong> sin costo. El agente solo responde dentro de la ventana de servicio de 24 h; nunca envía plantillas de marketing.</li>
             <li><strong>Límite:</strong> los 1.000 mensajes son el tope del plan. Si el negocio lo supera, se le avisa y se le muestra el consumo antes de facturar cualquier excedente.</li>
             <li><strong>Instalación:</strong> gratis, en menos de 30 minutos, incluida la carga de la carta y la configuración del tono del agente.</li>
@@ -786,9 +827,15 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
               <td class="num">A convenir</td>
             </tr>
             <tr>
+              <td class="rowhead">IVA 19%</td>
+              <td class="num">$15.200</td>
+              <td class="num col-rec">$36.100</td>
+              <td class="num">—</td>
+            </tr>
+            <tr>
               <td class="rowhead">Valor final con IVA</td>
-              <td class="num">$95.200</td>
-              <td class="num col-rec">$226.100</td>
+              <td class="num"><span class="strong">$95.200</span></td>
+              <td class="num col-rec"><span class="strong">$226.100</span></td>
               <td class="num">—</td>
             </tr>
             <tr>
@@ -796,6 +843,12 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
               <td class="num">1.000</td>
               <td class="num col-rec"><span class="strong">3.000</span></td>
               <td class="num">Desde 8.000</td>
+            </tr>
+            <tr>
+              <td class="rowhead">Precio por mensaje</td>
+              <td class="num"><span class="strong">$80</span></td>
+              <td class="num col-rec"><span class="strong">$63</span> <span class="muted-sm">−21%</span></td>
+              <td class="num">A convenir</td>
             </tr>
             <tr>
               <td class="rowhead">Costo de IA al mes</td>
@@ -808,6 +861,12 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
               <td>Compartida · 1 slice</td>
               <td class="col-rec">Compartida · 8 slices</td>
               <td>Dedicada · 16–32 slices</td>
+            </tr>
+            <tr>
+              <td class="rowhead">Costo total interno</td>
+              <td class="num">$839</td>
+              <td class="num col-rec">$1.558</td>
+              <td class="num">A calcular</td>
             </tr>
             <tr>
               <td class="rowhead">Capacidad del servidor</td>
@@ -823,7 +882,7 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
             </tr>
             <tr>
               <td class="rowhead">Margen bruto</td>
-              <td class="num">84,6%</td>
+              <td class="num">99,0%</td>
               <td class="num col-rec"><span class="strong">99,2%</span></td>
               <td class="num">A calcular</td>
             </tr>
@@ -870,100 +929,29 @@ footer{border-top:1px solid var(--line);background:var(--bg-soft);padding:34px 0
 </footer>
 
 <script>
-/* Dither Canvas — adaptado de ObsidianUI (obsidianui.dev/docs/dither-canvas).
-   Sin el video original: la señal se genera proceduralmente y se le aplica el
-   mismo pipeline (simulación de fluido, matriz de Bayer 4x4, atlas de caracteres,
-   distorsión por puntero). Se degrada en silencio si no hay WebGL2. */
+/* Dither Canvas — ObsidianUI (obsidianui.dev/docs/dither-canvas).
+   Fiel al original salvo la fuente de la señal: aquí es procedural (ruido fBm
+   con domain warping y bandas direccionales) porque el proyecto no cuenta con
+   el video. Se conserva todo el pipeline: superficie blanca opaca, rejilla de
+   caracteres, matriz de Bayer 4x4, simulación de fluido y distorsión por puntero.
+   Se degrada en silencio si no hay WebGL2, dejando visible el fallback CSS. */
 (function(){
 "use strict";
-var canvas = document.getElementById('dither');
+var canvas = document.getElementById("dither");
 if (!canvas) return;
 var motion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 var FC = 80, FR = 60, FN = FC * FR;
-var CC = 60, EDGE_LO = 36, EDGE_HI = 130;
-var EDGES = ['.', ',', '=', '+', '-'];
-var BRIGHTS = ['A','S','O','B','A','R','E','S'];
+var CELL = 13;
+var EDGES = [".", ",", "=", "+", "-"];
+var BRIGHTS = ["A", "S", "O", "B", "R", "E"];
 var ALL_CHARS = EDGES.concat(BRIGHTS);
-var BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+var BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 var TL = 320, TS = 10, TM = 72;
 var TRAIL_CFG = { fb: 0.08, fss: 18, ffm: 0.15, fir: 0.8, firl: 1.0 };
 
-var VS = '#version 300 es\nin vec2 a_pos;\nvoid main(){ gl_Position = vec4(a_pos, 0, 1); }';
-
-var FS = '#version 300 es\n' +
-'precision highp float;\n' +
-'uniform sampler2D uFluid, uAtlas;\n' +
-'uniform vec2 uRes;\n' +
-'uniform float uTime;\n' +
-'uniform int uPhase, uTrailN;\n' +
-'uniform vec4 uTP[' + TM + '];\n' +
-'uniform float uTL[' + TM + '];\n' +
-'out vec4 O;\n' +
-'const float CC = ' + CC + '.0, EL = ' + EDGE_LO + '.0, EH = ' + EDGE_HI + '.0;\n' +
-'const float FC = ' + FC + '.0, FR = ' + FR + '.0;\n' +
-'const int BAYER[16] = int[16](' + BAYER.map(function(v){return Math.round((v/16)*255);}).join(',') + ');\n' +
-'const int CHAR_N = ' + ALL_CHARS.length + ';\n' +
-'float signal(vec2 uv){\n' +
-'  float horizon = smoothstep(0.0, 0.45, uv.y) * (1.0 - smoothstep(0.55, 1.0, uv.y));\n' +
-'  float band = 1.0 - abs(uv.y - 0.5) * 2.0;\n' +
-'  float swell = sin(uv.x * 5.2 + uTime * 0.55) * 0.5 + 0.5;\n' +
-'  float ripple = sin(uv.y * 7.5 - uTime * 0.42 + uv.x * 3.1) * 0.5 + 0.5;\n' +
-'  float pulse = sin((uv.x + uv.y) * 3.4 - uTime * 0.33) * 0.5 + 0.5;\n' +
-'  float s = 0.16 + band * 0.26 + horizon * (swell * 0.34 + ripple * 0.22 + pulse * 0.18);\n' +
-'  return clamp(s, 0.0, 1.0);\n' +
-'}\n' +
-'void main(){\n' +
-'  float cw = uRes.x / CC;\n' +
-'  float rows = ceil(uRes.y / cw) + 1.0;\n' +
-'  float gx = floor(gl_FragCoord.x / cw);\n' +
-'  float gy = floor((uRes.y - gl_FragCoord.y) / cw);\n' +
-'  if(gx >= CC || gy >= rows) discard;\n' +
-'  vec2 cp = vec2(fract(gl_FragCoord.x / cw), fract((uRes.y - gl_FragCoord.y) / cw));\n' +
-'  vec2 bp = vec2((gx + 0.5) * cw, (gy + 0.5) * cw);\n' +
-'  ivec2 fc = ivec2(gx / CC * FC, gy / rows * FR);\n' +
-'  fc = clamp(fc, ivec2(0), ivec2(int(FC)-1, int(FR)-1));\n' +
-'  vec2 flow = texelFetch(uFluid, fc, 0).rg;\n' +
-'  vec2 disp = vec2(0.0);\n' +
-'  for(int i = 0; i < uTrailN; i++){\n' +
-'    float life = uTL[i];\n' +
-'    if(life <= 0.0) continue;\n' +
-'    vec2 d = bp - uTP[i].xy;\n' +
-'    float dist = length(d);\n' +
-'    float r = 5.0 + life * 3.0;\n' +
-'    if(dist == 0.0 || dist > r) continue;\n' +
-'    float f = pow(1.0 - dist / r, 2.0);\n' +
-'    disp += (d / dist) * f * life * 3.0 + uTP[i].zw * f * 0.04;\n' +
-'  }\n' +
-'  vec2 sp = bp + disp + flow * 6.0;\n' +
-'  vec2 uv = clamp(sp / uRes, 0.0, 1.0);\n' +
-'  float s = signal(uv);\n' +
-'  float bg = smoothstep(0.06, 0.62, s) * 255.0;\n' +
-'  float hm = min(1.0, length(flow) * 1.1);\n' +
-'  float gray = bg * (1.0 - hm) + (255.0 - bg) * hm;\n' +
-'  float thr = float(BAYER[(int(gy) & 3) * 4 + (int(gx) & 3)]);\n' +
-'  bool invDark = hm > 0.05 && bg > thr && gray <= thr;\n' +
-'  bool lit = gray > thr;\n' +
-'  if(!lit && !invDark) discard;\n' +
-'  float pg = invDark ? bg : gray;\n' +
-'  int ci;\n' +
-'  if(pg >= EL && pg <= EH) ci = uPhase % 5;\n' +
-'  else if(pg > EH) ci = 5 + uPhase % ' + BRIGHTS.length + ';\n' +
-'  else discard;\n' +
-'  float au = (float(ci) + cp.x) / float(CHAR_N);\n' +
-'  float ca = texture(uAtlas, vec2(au, cp.y)).a;\n' +
-'  if(ca < 0.05) discard;\n' +
-'  vec3 teal   = vec3(0.059, 0.463, 0.431);\n' +
-'  vec3 cyan   = vec3(0.051, 0.580, 0.529);\n' +
-'  vec3 deep   = vec3(0.043, 0.369, 0.345);\n' +
-'  vec3 green  = vec3(0.102, 0.498, 0.306);\n' +
-'  float tint = smoothstep(0.15, 0.9, uv.x * 0.6 + uv.y * 0.4);\n' +
-'  vec3 col = mix(teal, cyan, tint);\n' +
-'  col = mix(col, deep, hm * 0.65);\n' +
-'  col = mix(col, green, smoothstep(0.72, 1.0, uv.x) * 0.45);\n' +
-'  float a = (invDark ? 0.85 : 1.0) * ca;\n' +
-'  O = vec4(col * a, a);\n' +
-'}\n';
+var VS = "#version 300 es\nin vec2 a_pos;\nvoid main(){ gl_Position = vec4(a_pos, 0, 1); }";
+var FS = "#version 300 es\nprecision highp float;\nuniform sampler2D uFluid, uAtlas;\nuniform vec2 uRes;\nuniform float uCC;\nuniform float uTime;\nuniform int uPhase, uTrailN;\nuniform vec4 uTP[72];\nuniform float uTL[72];\nout vec4 O;\nconst float EL = 36.0, EH = 130.0;\nconst float FC = 80.0, FR = 60.0;\nconst int BAYER[16] = int[16](0,128,32,159,191,64,223,96,48,175,16,143,239,112,207,80);\nconst int EDGE_N = 5, BRIGHT_N = 6;\nconst int CHAR_N = 11;\n\n/* --- Se\u00f1al procedural: sustituye a la luminancia del video original --- */\nfloat hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }\nfloat vnoise(vec2 p){\n  vec2 i = floor(p), f = fract(p);\n  vec2 u = f * f * (3.0 - 2.0 * f);\n  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),\n             mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);\n}\nfloat fbm(vec2 p){\n  float v = 0.0, a = 0.5;\n  for(int i = 0; i < 5; i++){ v += a * vnoise(p); p = p * 2.03 + 17.7; a *= 0.5; }\n  return v;\n}\nfloat signal(vec2 uv){\n  vec2 q = uv * vec2(2.3, 1.7);\n  float t = uTime * 0.06;\n  vec2 w = vec2(fbm(q + vec2(t, 4.1)), fbm(q + vec2(9.3, -t)));\n  /* dos escalas de estructura: masas grandes y detalle fino */\n  float macro = smoothstep(0.34, 0.66, fbm(q + w * 2.2));\n  float micro = smoothstep(0.25, 0.80, fbm(q * 3.1 - w * 1.4));\n  float n = clamp(macro * 0.78 + micro * 0.34, 0.0, 1.0);\n  float bandA = sin((uv.x * 3.1 + uv.y * 2.2) * 3.141592 + uTime * 0.35) * 0.5 + 0.5;\n  float bandB = sin((uv.y * 4.3 - uv.x * 1.7) * 3.141592 - uTime * 0.27) * 0.5 + 0.5;\n  float s = n * (0.70 + 0.20 * bandA + 0.14 * bandB);\n  float band = smoothstep(0.0, 1.0, clamp(1.0 - abs(uv.y - 0.46) * 1.05, 0.0, 1.0));\n  float edge = smoothstep(0.015, 0.22, uv.y) * (1.0 - smoothstep(0.82, 1.0, uv.y));\n  /* Sesgo de lado: la masa densa se concentra a la derecha para que el\n     titular de la izquierda no dependa del fotograma. */\n  float side = mix(0.350, 1.0, smoothstep(0.08, 0.90, uv.x));\n  return clamp(s * (0.34 + 0.66 * band) * mix(0.30, 1.0, edge) * side * 1.45, 0.0, 1.0);\n}\n\nvoid main(){\n  float cw = uRes.x / uCC;\n  float rows = ceil(uRes.y / cw) + 1.0;\n  float gx = floor(gl_FragCoord.x / cw);\n  float gy = floor((uRes.y - gl_FragCoord.y) / cw);\n  if(gx >= uCC || gy >= rows) discard;\n  vec2 cp = vec2(fract(gl_FragCoord.x / cw), fract((uRes.y - gl_FragCoord.y) / cw));\n  vec2 bp = vec2((gx + 0.5) * cw, (gy + 0.5) * cw);\n  ivec2 fc = ivec2(gx / uCC * FC, gy / rows * FR);\n  fc = clamp(fc, ivec2(0), ivec2(int(FC) - 1, int(FR) - 1));\n  vec2 flow = texelFetch(uFluid, fc, 0).rg;\n\n  /* estela del puntero: empuja la celda y la desplaza */\n  vec2 disp = vec2(0.0);\n  for(int i = 0; i < uTrailN; i++){\n    float life = uTL[i];\n    if(life <= 0.0) continue;\n    vec2 d = bp - uTP[i].xy;\n    float dist = length(d);\n    float r = 5.0 + life * 3.0;\n    if(dist == 0.0 || dist > r) continue;\n    float f = pow(1.0 - dist / r, 2.0);\n    disp += (d / dist) * f * life * 3.0 + uTP[i].zw * f * 0.04;\n  }\n\n  vec2 sp = bp + disp + flow * 6.0;\n  vec2 uv = clamp(sp / uRes, 0.0, 1.0);\n  float s = signal(uv);\n\n  /* luminancia \u2192 umbral de Bayer. La densidad de glifos forma la imagen. */\n  float bg = smoothstep(0.14, 0.90, s) * 255.0;\n  float hm = min(1.0, length(flow) * 1.1);\n  float gray = bg * (1.0 - hm) + (255.0 - bg) * hm;\n  float thr = float(BAYER[(int(gy) & 3) * 4 + (int(gx) & 3)]);\n  bool invDark = hm > 0.05 && bg > thr && gray <= thr;\n  bool lit = gray > thr;\n  if(!lit && !invDark) discard;\n\n  /* elecci\u00f3n de glifo: bordes para medios tonos, letras para las luces */\n  float pg = invDark ? bg : gray;\n  int ci;\n  if(pg >= EL && pg <= EH) ci = uPhase % EDGE_N;\n  else if(pg > EH) ci = EDGE_N + uPhase % BRIGHT_N;\n  else discard;\n\n  float au = (float(ci) + cp.x) / float(CHAR_N);\n  float ca = texture(uAtlas, vec2(au, cp.y)).a;\n  if(ca < 0.05) discard;\n\n  vec3 colA = vec3(0.059, 0.463, 0.431);\n  vec3 colB = vec3(0.051, 0.580, 0.529);\n  vec3 colC = vec3(0.043, 0.369, 0.345);\n  vec3 colD = vec3(0.102, 0.498, 0.306);\n  float tint = smoothstep(0.15, 0.9, uv.x * 0.6 + uv.y * 0.4);\n  vec3 col = mix(colA, colB, tint);\n  col = mix(col, colC, hm * 0.65);\n  col = mix(col, colD, smoothstep(0.72, 1.0, uv.x) * 0.45);\n  float a = (invDark ? 0.85 : 1.0) * ca;\n  O = vec4(col * a, a);\n}";
 
 function createFluid(){
   var vx = new Float32Array(FN), vy = new Float32Array(FN);
@@ -1056,7 +1044,10 @@ function autoPulse(fluid, W, H){
 }
 
 var gl = null;
-try { gl = canvas.getContext('webgl2', { alpha: true, antialias: false, premultipliedAlpha: true, preserveDrawingBuffer: true }); } catch (e) { gl = null; }
+try {
+  /* alpha:false como el original: superficie blanca opaca, sin velo encima. */
+  gl = canvas.getContext('webgl2', { alpha: false, antialias: false, premultipliedAlpha: true, preserveDrawingBuffer: true });
+} catch (e) { gl = null; }
 if (!gl) return;   /* el fallback CSS con mask-image queda visible */
 
 var disposed = false, rafId = 0, textures = [], shaders = [], buffers = [], prog = null;
@@ -1186,18 +1177,25 @@ try {
   listen(canvas, 'webglcontextlost', function (ev) { ev.preventDefault(); fallback(); });
 
   var W = 1, H = 1;
+  /* Columnas según el ancho, no un número fijo: con un ancho estrecho (la
+     columna de documentación) un número fijo de columnas daría glifos
+     diminutos y el efecto se leería como polvo en vez de textura. */
   function resize(){
     var rect = canvas.getBoundingClientRect();
     W = canvas.width = Math.max(1, Math.round(rect.width));
     H = canvas.height = Math.max(1, Math.round(rect.height));
     gl.viewport(0, 0, W, H);
+    var cc = Math.round(W / CELL);
+    gl.uniform1f(uCC, Math.max(34, Math.min(142, cc)));
   }
-  resize();
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
   var uTP = loc('uTP'), uTLoc = loc('uTL'), uRes = loc('uRes');
   var uPhase = loc('uPhase'), uTrailN = loc('uTrailN'), uTime = loc('uTime');
+  var uCC = loc('uCC');
+
+  resize();
   var tpBuf = new Float32Array(TM * 4);
   var tlBuf = new Float32Array(TM);
   var phase = 0, frame = 0, pulseAt = 0, running = false;
@@ -1257,7 +1255,7 @@ try {
     gl.uniform2f(uRes, W, H);
     gl.uniform1i(uPhase, phase);
     gl.uniform1f(uTime, elapsed);
-    gl.clearColor(0, 0, 0, 0);
+    gl.clearColor(1, 1, 1, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     if (canvas.style.opacity !== '1') canvas.style.opacity = '1';

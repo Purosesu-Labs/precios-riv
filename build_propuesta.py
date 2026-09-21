@@ -7,14 +7,17 @@ Sistema de diseño: Propuestas comerciales (skill diseno-propuestas-comerciales)
   · Teal #0f766e como único acento; fondos #fff / #f6f8f8 / #eef7f6
   · Radios 14px cards, 9px botones
 
-Fondo del título: Dither Canvas de ObsidianUI, adaptado a señal procedural.
+Fondo del título: Dither Canvas de ObsidianUI (dither_js.py) — réplica fiel del
+efecto original: superficie blanca opaca, rejilla fina de 110 columnas, matriz
+de Bayer y simulación de fluido. La señal es procedural porque el proyecto no
+cuenta con el video que usa el original.
 """
 import html as H
 import os
 from data_precios import PRECIO_BASE, PRECIO_IVA, PRECIO_FINAL, MENSAJES_INCLUIDOS
 from simulacion_tokens import filas_perfiles, filas_plan, sensibilidad
 from simulador_js import SIM_JS
-from dither_js import DITHER_JS
+from dither_js import dither_js, TEAL
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "propuesta")
 os.makedirs(OUT, exist_ok=True)
@@ -137,17 +140,20 @@ a:hover{text-decoration:underline}
   -webkit-mask-size:7px 7px;mask-size:7px 7px;opacity:.4}
 #dither{position:absolute;inset:0;z-index:2;width:100%;height:100%;display:block;
   opacity:0;transition:opacity .6s ease;pointer-events:auto;cursor:crosshair}
-/* Velo: cubre el H1 y se abre hacia los bordes. */
+/* Velo direccional: opaco donde va el texto (izquierda) y abierto hacia la
+   derecha, para que el dither se vea nítido en lugar de lavado. */
 .hero::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
   background:
-    linear-gradient(180deg, rgba(246,248,248,.72) 0%, rgba(255,255,255,.62) 40%,
-                    rgba(255,255,255,.40) 72%, var(--bg) 100%)}
-/* Bajo el bloque de texto el velo se refuerza solo lo necesario para leer. */
+    linear-gradient(90deg, rgba(255,255,255,.76) 0%, rgba(255,255,255,.56) 38%,
+                    rgba(255,255,255,.30) 62%, rgba(255,255,255,.10) 84%,
+                    rgba(255,255,255,0) 100%),
+    linear-gradient(180deg, rgba(255,255,255,.48) 0%, rgba(255,255,255,0) 26%,
+                    rgba(255,255,255,0) 58%, var(--bg) 100%)}
 .hero .wrap{position:relative;z-index:4}
-.hero .wrap::before{content:"";position:absolute;inset:-18px -26px -14px -26px;z-index:-1;
-  border-radius:18px;
-  background:radial-gradient(72% 88% at 34% 46%, rgba(255,255,255,.74), rgba(255,255,255,.30) 62%, transparent 100%)}
-.hero .wrap{position:relative;z-index:4}
+/* Refuerzo local bajo el bloque de texto, no en toda la banda. */
+.hero .wrap::before{content:"";position:absolute;inset:-22px -34px -18px -34px;z-index:-1;
+  border-radius:20px;
+  background:radial-gradient(72% 88% at 30% 44%, rgba(255,255,255,.90), rgba(255,255,255,.58) 58%, rgba(255,255,255,.12) 100%)}
 .mesh-hint{position:absolute;right:24px;top:74px;z-index:5;font-family:var(--mono);font-size:10px;
   letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,.8);
   backdrop-filter:blur(6px);border:1px solid var(--line-strong);border-radius:99px;padding:5px 11px;
@@ -193,11 +199,25 @@ section{padding:64px 0}
 .risk svg{flex:none;margin-top:3px}
 .risk.warn svg circle.r{stroke:var(--warn)}
 .risk.ok svg circle.r{stroke:var(--ok)}
-.price{border-top:1px solid var(--line);padding-top:16px;margin-top:auto}
-.price .label{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted)}
-.price .amount{font-size:21px;font-weight:600;letter-spacing:-.3px;margin-top:4px}
-.price .range{font-size:13px;color:var(--muted);margin-top:2px}
-.card-link{margin-top:6px;font-size:13.5px;font-weight:600}
+.price{border-top:1px solid var(--line);padding-top:18px;margin-top:auto}
+.price-label{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted)}
+.price-amount{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:32px;font-weight:600;letter-spacing:-1.3px;line-height:1.05;margin-top:7px;color:var(--ink)}
+.card.rec .price-amount{color:var(--accent-strong)}
+.card.muted .price-amount{color:var(--ink-2)}
+.price-amount.is-text{font-family:var(--sans);font-size:25px;font-weight:700;letter-spacing:-.6px}
+.price-cur{font-family:var(--sans);font-size:11.5px;font-weight:500;letter-spacing:0;color:var(--muted);margin-left:7px;vertical-align:2px}
+.price-note{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+.price-note .num{color:var(--ink-2);font-weight:600}
+.price-metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px 12px;margin-top:15px;padding-top:13px;border-top:1px dashed var(--line-strong)}
+.price-metrics>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.price-metrics .k{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.85px;text-transform:uppercase;color:var(--muted)}
+.price-metrics .v{font-size:13.5px;font-weight:600;color:var(--ink);letter-spacing:-.2px}
+.card.rec .price-metrics .v{color:var(--accent-strong)}
+.card.muted .price-metrics .v{color:var(--ink-2)}
+.card-link{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-size:13.5px;font-weight:600}
+.card-link svg{flex:none;transition:transform .18s ease}
+.card-link:hover{text-decoration:none}
+.card-link:hover svg{transform:translateX(3px)}
 .tag{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.6px;padding:3px 8px;border-radius:6px;background:var(--bg-soft);color:var(--ink-2);border:1px solid var(--line-strong)}
 .card.rec .tag{background:var(--accent-soft);border-color:transparent;color:var(--accent-strong)}
 
@@ -447,11 +467,19 @@ html_doc = f'''<!DOCTYPE html>
             <span><strong>Límite:</strong> el servidor se comparte, así que el dimensionamiento depende del conjunto de afiliados. Si el bar supera los 1.000 mensajes, se avisa antes de facturar.</span>
           </div>
           <div class="price">
-            <div class="label">Precio mensual</div>
-            <div class="amount num">$80.000 <span style="font-size:13px;color:var(--muted)">+ IVA COP</span></div>
-            <div class="range">Valor final con IVA 19%: $95.200. Instalación gratis. Sin permanencia.</div>
+            <div class="price-label">Precio mensual</div>
+            <div class="price-amount num">$80.000<span class="price-cur">COP + IVA</span></div>
+            <div class="price-note">Factura final con IVA 19%: <span class="num">$95.200</span> · sin permanencia · instalación gratis.</div>
+            <div class="price-metrics">
+              <div><span class="k">Por mensaje</span><span class="v num">$80</span></div>
+              <div><span class="k">Costo interno</span><span class="v num">$839</span></div>
+              <div><span class="k">Mensaje extra</span><span class="v num">$60</span></div>
+              <div><span class="k">Margen bruto</span><span class="v num">99,0%</span></div>
+            </div>
           </div>
-          <a class="card-link" href="#detalle-op1">Ver detalle →</a>
+          <a class="card-link" href="#detalle-op1">Ver detalle
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
         </article>
 
         <article class="card rec reveal">
@@ -476,11 +504,19 @@ html_doc = f'''<!DOCTYPE html>
             <span><strong>Ventaja clave:</strong> la talla de 8 slices ya tiene soporte gestionado y capacidad para 200 negocios, así que el afiliado no compite por recursos durante los picos de fin de semana.</span>
           </div>
           <div class="price">
-            <div class="label">Precio mensual</div>
-            <div class="amount num">$190.000 <span style="font-size:13px;color:var(--muted)">+ IVA COP</span></div>
-            <div class="range">Valor final con IVA 19%: $226.100. Instalación gratis. Sin permanencia.</div>
+            <div class="price-label">Precio mensual</div>
+            <div class="price-amount num">$190.000<span class="price-cur">COP + IVA</span></div>
+            <div class="price-note">Factura final con IVA 19%: <span class="num">$226.100</span> · sin permanencia · instalación gratis.</div>
+            <div class="price-metrics">
+              <div><span class="k">Por mensaje</span><span class="v num">$63</span></div>
+              <div><span class="k">Costo interno</span><span class="v num">$1.558</span></div>
+              <div><span class="k">Mensaje extra</span><span class="v num">$60</span></div>
+              <div><span class="k">Margen bruto</span><span class="v num">99,2%</span></div>
+            </div>
           </div>
-          <a class="card-link" href="#detalle-op2">Ver detalle →</a>
+          <a class="card-link" href="#detalle-op2">Ver detalle
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
         </article>
 
         <article class="card muted reveal">
@@ -504,11 +540,19 @@ html_doc = f'''<!DOCTYPE html>
             <span><strong>A considerar:</strong> un servidor dedicado cuesta más por negocio que uno compartido. Solo se justifica con volumen alto o con requisitos de aislamiento.</span>
           </div>
           <div class="price">
-            <div class="label">Precio mensual</div>
-            <div class="amount num">A convenir <span style="font-size:13px;color:var(--muted)">+ IVA COP</span></div>
-            <div class="range">Se calcula sobre el volumen acordado y la talla de servidor elegida.</div>
+            <div class="price-label">Precio mensual</div>
+            <div class="price-amount is-text">A convenir<span class="price-cur">COP + IVA</span></div>
+            <div class="price-note">Se calcula sobre el volumen acordado y la talla de servidor elegida.</div>
+            <div class="price-metrics">
+              <div><span class="k">Por mensaje</span><span class="v">A convenir</span></div>
+              <div><span class="k">Costo de IA</span><span class="v">Al costo</span></div>
+              <div><span class="k">Mensaje extra</span><span class="v">A convenir</span></div>
+              <div><span class="k">Margen bruto</span><span class="v">A calcular</span></div>
+            </div>
           </div>
-          <a class="card-link" href="#detalle-op3">Ver detalle →</a>
+          <a class="card-link" href="#detalle-op3">Ver detalle
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
         </article>
       </div>
 
@@ -555,7 +599,7 @@ html_doc = f'''<!DOCTYPE html>
             <span class="tag">Panel web</span>
           </div>
           <ul>
-            <li><strong>Costo de operar:</strong> $359 al mes de IA (0,4% del precio base) más $480 de infraestructura prorrateada. El margen bruto es del <strong>84,6%</strong>.</li>
+            <li><strong>Costo de operar:</strong> $359 al mes de IA (0,4% del precio base) más $480 de infraestructura prorrateada, para un costo total de $839. El margen bruto es del <strong>99,0%</strong>; si el negocio tuviera que cubrir el servidor completo, bajaría a 84,6%.</li>
             <li><strong>Mensajería de WhatsApp:</strong> sin costo. El agente solo responde dentro de la ventana de servicio de 24 h; nunca envía plantillas de marketing.</li>
             <li><strong>Límite:</strong> los 1.000 mensajes son el tope del plan. Si el negocio lo supera, se le avisa y se le muestra el consumo antes de facturar cualquier excedente.</li>
             <li><strong>Instalación:</strong> gratis, en menos de 30 minutos, incluida la carga de la carta y la configuración del tono del agente.</li>
@@ -850,9 +894,15 @@ html_doc = f'''<!DOCTYPE html>
               <td class="num">A convenir</td>
             </tr>
             <tr>
+              <td class="rowhead">IVA 19%</td>
+              <td class="num">$15.200</td>
+              <td class="num col-rec">$36.100</td>
+              <td class="num">—</td>
+            </tr>
+            <tr>
               <td class="rowhead">Valor final con IVA</td>
-              <td class="num">$95.200</td>
-              <td class="num col-rec">$226.100</td>
+              <td class="num"><span class="strong">$95.200</span></td>
+              <td class="num col-rec"><span class="strong">$226.100</span></td>
               <td class="num">—</td>
             </tr>
             <tr>
@@ -860,6 +910,12 @@ html_doc = f'''<!DOCTYPE html>
               <td class="num">1.000</td>
               <td class="num col-rec"><span class="strong">3.000</span></td>
               <td class="num">Desde 8.000</td>
+            </tr>
+            <tr>
+              <td class="rowhead">Precio por mensaje</td>
+              <td class="num"><span class="strong">$80</span></td>
+              <td class="num col-rec"><span class="strong">$63</span> <span class="muted-sm">−21%</span></td>
+              <td class="num">A convenir</td>
             </tr>
             <tr>
               <td class="rowhead">Costo de IA al mes</td>
@@ -872,6 +928,12 @@ html_doc = f'''<!DOCTYPE html>
               <td>Compartida · 1 slice</td>
               <td class="col-rec">Compartida · 8 slices</td>
               <td>Dedicada · 16–32 slices</td>
+            </tr>
+            <tr>
+              <td class="rowhead">Costo total interno</td>
+              <td class="num">$839</td>
+              <td class="num col-rec">$1.558</td>
+              <td class="num">A calcular</td>
             </tr>
             <tr>
               <td class="rowhead">Capacidad del servidor</td>
@@ -887,7 +949,7 @@ html_doc = f'''<!DOCTYPE html>
             </tr>
             <tr>
               <td class="rowhead">Margen bruto</td>
-              <td class="num">84,6%</td>
+              <td class="num">99,0%</td>
               <td class="num col-rec"><span class="strong">99,2%</span></td>
               <td class="num">A calcular</td>
             </tr>
@@ -933,7 +995,7 @@ html_doc = f'''<!DOCTYPE html>
   </div>
 </footer>
 
-<script>{DITHER_JS}</script>
+<script>{dither_js(TEAL)}</script>
 <script>{SIM_JS}</script>
 <script>
 (function(){{
