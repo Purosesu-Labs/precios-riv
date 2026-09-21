@@ -22,8 +22,8 @@ _CONST = json.dumps({
     "hist_tok": 30,            # tokens por mensaje previo del historial
     "hist_max": 10,            # historial_max_mensajes por defecto
     "user_tok": 20,            # mensaje del cliente
-    "out_msg": 35,             # salida por mensaje en una conversación normal
-    "msgs_conv": 6,            # mensajes por conversación (supuesto del doc)
+    "out_msg": 82,             # salida medida por mensaje (no 35: el agente escribe largo)
+    "msgs_conv": 6,            # mensajes por conversación (perfil normal)
 }, ensure_ascii=False)
 
 SIM_JS = r"""

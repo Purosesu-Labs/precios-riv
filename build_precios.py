@@ -130,6 +130,21 @@ sens_rows = "\n".join(
     f"<td class='tnum'>{esc(r)}</td><td>{esc(no)}</td></tr>"
     for e, v, r, no in sensibilidad())
 
+# --- Medición real de una conversación (contar_tokens_conversacion.py) ---
+CONV_MEDIDA = [
+    ("Mensajes en el chat", "16", "8 del cliente, 8 del agente"),
+    ("Tokens de texto intercambiado", "693", "Lo que se ve en la pantalla"),
+    ("Llamadas al LLM", "8", "Una por mensaje del cliente"),
+    ("Tokens de entrada facturados", "25.394", "36,6× el texto: el historial se reenvía"),
+    ("Tokens de salida", "506", "82 por respuesta en promedio"),
+    ("Costo de la conversación", "$3,26", "Con caché de prompt, off-peak"),
+]
+
+conv_medida_rows = "\n".join(
+    f"<tr><td class='rowhead'>{esc(c)}</td><td class='tnum'><strong>{esc(v)}</strong></td>"
+    f"<td>{esc(n)}</td></tr>"
+    for c, v, n in CONV_MEDIDA)
+
 central_rows = "\n".join(
     f"<tr><td class='rowhead'>{esc(c)}</td><td>{esc(ind)}</td>"
     f"<td><strong>{esc(cen)}</strong></td></tr>"
@@ -943,7 +958,7 @@ html_doc = f'''<!DOCTYPE html>
       <div class="stat-row">
         <span class="stat-pill"><b>$95.200</b> valor final con IVA</span>
         <span class="stat-pill"><b>1.000</b> mensajes incluidos</span>
-        <span class="stat-pill"><b>$247</b> costo de IA / mes</span>
+        <span class="stat-pill"><b>$359</b> costo de IA / mes</span>
         <span class="stat-pill"><b>84,3%</b> margen en VPS 1 slice</span>
       </div>
     </header>
@@ -959,7 +974,7 @@ html_doc = f'''<!DOCTYPE html>
         <div class="ph-sub">Valor final con IVA del 19%: <strong>$95.200</strong> mensuales. La instalación no tiene costo.</div>
         <div class="ph-grid">
           <div class="ph-cell"><div class="k">Mensajes incluidos</div><div class="v">{MENSAJES_INCLUIDOS:,}</div></div>
-          <div class="ph-cell"><div class="k">Costo de IA real</div><div class="v">$247</div></div>
+          <div class="ph-cell"><div class="k">Costo de IA real</div><div class="v">$359</div></div>
           <div class="ph-cell"><div class="k">Permanencia</div><div class="v">Ninguna</div></div>
         </div>
       </div>
@@ -1042,7 +1057,7 @@ html_doc = f'''<!DOCTYPE html>
       </div>
 
       {admon("note", "El rango honesto va de $211 a $2.185 al mes",
-      "<p>Según el perfil, agotar los 1.000 mensajes cuesta entre <strong>$211 y $536 con caché</strong>, o entre <strong>$1.859 y $2.185 sin él</strong>. Cualquier cifra única es un caso particular, no el costo esperado. El valor de referencia es el de la conversación normal <strong>con caché: $247/mes</strong>, el 0,3% del precio.</p>")}
+      "<p>Según el perfil, agotar los 1.000 mensajes cuesta entre <strong>$247 y $512 con caché</strong>, o entre <strong>$1.895 y $2.161 sin él</strong>. Cualquier cifra única es un caso particular, no el costo esperado. El valor de referencia es el de la conversación normal <strong>con caché: $359/mes</strong>, el 0,4% del precio.</p>")}
 
       <h3>Qué pasa si cambian las condiciones</h3>
       <p class="section-sub">Cada caso calculado por separado, sobre el plan de 1.000 mensajes.</p>
@@ -1056,7 +1071,27 @@ html_doc = f'''<!DOCTYPE html>
       </div>
 
       {admon("warning", "El riesgo real es quedarse sin caché",
-      "<p>Todo el modelo depende de que el prefijo de <code>2.804</code> tokens se reutilice. Si el caché no funciona —porque el prompt cambia en cada turno, porque se reordena el contexto o porque el proveedor no lo aplica— el costo salta de <strong>$247 a $1.895, un 668% más</strong>. Es el supuesto que hay que verificar primero en el piloto.</p>")}
+      "<p>Todo el modelo depende de que el prefijo de <code>2.804</code> tokens se reutilice. Si el caché no funciona —porque el prompt cambia en cada turno, porque se reordena el contexto o porque el proveedor no lo aplica— el costo salta de <strong>$359 a $2.008, un 459% más</strong>. Es el supuesto que hay que verificar primero en el piloto.</p>")}
+
+      <h3>Verificación con una conversación real</h3>
+      <p class="section-sub">Una conversación de WhatsApp del agente, tokenizada con <code>tiktoken</code> y simulada turno a turno. Es la primera medición real sobre el agente en operación.</p>
+      <div class="tbl-wrap">
+        <table class="doc-t">
+          <thead><tr><th>Métrica</th><th>Medido</th><th>Qué significa</th></tr></thead>
+          <tbody>
+{conv_medida_rows}
+          </tbody>
+        </table>
+      </div>
+
+      {admon("note", "El texto del chat no es el costo: se paga 36,6 veces más",
+      "<p>En pantalla la conversación tiene <strong>693 tokens</strong>. Al LLM se le enviaron <strong>25.394</strong>. La diferencia es el prompt fijo (2.924 tokens) repetido en cada una de las 8 llamadas, más el historial que se reenvía completo cada vez. Por eso el número de <em>mensajes</em> importa más que su longitud: cada mensaje nuevo arrastra todo lo anterior.</p>")}
+
+      {admon("warning", "La salida real es el doble de lo que asumía el modelo",
+      "<p>El modelo calculaba <strong>35 tokens de salida</strong> por respuesta. La medición da <strong>82</strong>: 2,3× más. El agente es conversacional —saluda, usa emoji, lista opciones y recuerda las promociones— así que escribe largo. La <em>entrada</em> del modelo quedó validada con un error de solo −7,9%, pero la salida estaba subestimada. Los perfiles de la tabla anterior ya usan la cifra corregida.</p>")}
+
+      {admon("note", "Validación cruzada del modelo",
+      "<p>Entrada real por turno: <strong>3.174 tokens</strong>. El modelo predijo 2.924 de prompt fijo más el historial variable. El error es de <strong>−7,9%</strong>, dentro del margen esperado entre el tokenizer de referencia (<code>cl100k_base</code>) y el BPE propio de DeepSeek. El modelo de entrada es fiable; el de salida ya está corregido.</p>")}
 
       {admon("note", "Pendiente: confirmar con consumo medido",
       "<p>Estas cifras son un modelo construido sobre el código, no una factura. La tabla <code>consumo_negocio</code> ya registra tokens de entrada, salida y llamadas por negocio y día, pero <strong>todavía no se ha consultado con datos reales</strong>. Antes de fijar precios con estos números hay que leer esa tabla tras el piloto y comparar con lo simulado aquí.</p>")}
@@ -1079,7 +1114,7 @@ html_doc = f'''<!DOCTYPE html>
       "<p>El Cloud VPS de InterServer arranca en <strong>US$3 al mes</strong> con 1 core, 2 GB de RAM y 40 GB de SSD, con IP pública y acceso root. El análisis de capacidad del proyecto concluyó que el stack completo consume ~1,5 GB de RAM para 20–25 negocios, así que <strong>un solo slice ya sobra para el piloto</strong> y el plan de 4 slices cubre la operación completa.</p>")}
 
       {admon("warning", "El servidor es el costo dominante, no la IA",
-      "<p>En el escenario más eficiente el servidor cuesta $12.000 COP al mes contra $247 de IA: <strong>48 veces más</strong>. Cualquier decisión de precio tiene que mirar primero el dimensionamiento del servidor. Cabe destacar que el VPS se comparte entre varios negocios, así que ese costo se prorratea.</p>")}
+      "<p>En el escenario más eficiente el servidor cuesta $12.000 COP al mes contra $359 de IA: <strong>33 veces más</strong>. Cualquier decisión de precio tiene que mirar primero el dimensionamiento del servidor. Cabe destacar que el VPS se comparte entre varios negocios, así que ese costo se prorratea.</p>")}
     </section>
 
     <section id="arquitectura">
@@ -1233,7 +1268,7 @@ html_doc = f'''<!DOCTYPE html>
             </div>
             <div class="sim-row sim-sep">
               <dt>Costo de IA <span class="sim-int">interno</span></dt>
-              <dd class="tnum"><span id="sim-ia">$247</span> <span class="sim-sup" id="sim-sup">con caché</span></dd>
+              <dd class="tnum"><span id="sim-ia">$359</span> <span class="sim-sup" id="sim-sup">con caché</span></dd>
             </div>
             <div class="sim-row">
               <dt>Infraestructura <span class="sim-int">interno</span></dt>
@@ -1241,11 +1276,11 @@ html_doc = f'''<!DOCTYPE html>
             </div>
             <div class="sim-row sim-row-total">
               <dt>Costo total</dt>
-              <dd class="tnum" id="sim-costo">$727</dd>
+              <dd class="tnum" id="sim-costo">$839</dd>
             </div>
             <div class="sim-row sim-row-margen">
               <dt>Margen bruto</dt>
-              <dd class="tnum"><span id="sim-margen">$79.273</span> <span class="sim-pct" id="sim-margen-pct">99,1%</span></dd>
+              <dd class="tnum"><span id="sim-margen">$79.161</span> <span class="sim-pct" id="sim-margen-pct">99,1%</span></dd>
             </div>
           </dl>
 

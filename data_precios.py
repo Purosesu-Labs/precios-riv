@@ -50,9 +50,9 @@ COSTO_IA = [
 # ---------- P&L por negocio ----------
 # Se compara el costo total del plan contra distintos supuestos de servidor.
 PYL = [
-    ("VPS 1 slice (compartido entre negocios)", "12.000", "247".replace(",", "."), "12.247", "67.753", "84,7%"),
-    ("Web Hosting Standard (instancia dedicada)", "28.000", "247".replace(",", "."), "28.247", "51.753", "64,7%"),
-    ("VPS 4 slices (instancia dedicada)", "48.000", "247".replace(",", "."), "48.247", "31.753", "39,7%"),
+    ("VPS 1 slice (compartido entre negocios)", "12.000", "359", "12.359", "67.641", "84.6".replace(".", ",")+"%"),
+    ("Web Hosting Standard (instancia dedicada)", "28.000", "359", "28.359", "51.641", "64.6".replace(".", ",")+"%"),
+    ("VPS 4 slices (instancia dedicada)", "48.000", "359", "48.359", "31.641", "39.6".replace(".", ",")+"%"),
 ]
 
 # ---------- Escenarios de consumo ----------

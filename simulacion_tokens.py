@@ -41,14 +41,18 @@ CACHEABLE = 1140 + 1664        # = 2.804
 
 # ---------- Perfiles de conversación ----------
 # n = mensajes; out = tokens de salida por mensaje (sube si hay herramientas).
+# La salida por mensaje está calibrada con una conversación real medida
+# (contar_tokens_conversacion.py): el agente respondió 82 tokens por mensaje de
+# media, no los 35 que asumía el modelo. Es un agente conversacional: saluda,
+# usa emoji, lista opciones y ofrece promociones, así que escribe largo.
 PERFILES = [
-    ("Consulta simple", 2, 35,
+    ("Consulta simple", 2, 50,
      "Pregunta de horario o dirección. Se resuelve en un intercambio."),
-    ("Conversación normal", 6, 35,
-     "El supuesto histórico del documento: reserva o consulta de menú."),
-    ("Conversación larga", 12, 60,
-     "El cliente pide varias cosas; el historial se llena."),
-    ("Con herramientas", 20, 120,
+    ("Conversación normal", 6, 82,
+     "Reserva o consulta de menú. Calibrado con una conversación real."),
+    ("Conversación larga", 12, 90,
+     "El cliente pide varias cosas; el historial se llena y se trunca a 10."),
+    ("Con herramientas", 20, 110,
      "Reservas y pedidos: varias llamadas a herramientas y respuestas detalladas."),
 ]
 
